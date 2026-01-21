@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DevOpsVaultX</title>
+    <!-- Global specific CSS (About / Contact / Home) -->
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <!-- Pages specific CSS (About / Contact / Home) -->
+    <link rel="stylesheet" href="{% static 'pages/css/pages.css' %}">
+</head>
+<body>
+<header class="navbar">
+    <div class="logo">DevOpsVaultX</div>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/products/">Products</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+    </nav>
+</header>
+{% block content %}{% endblock %}
+<footer class="footer">
+    © 2024 DevOpsVaultX • Learn DevOps Smart Way
+</footer>
+</body>
+</html>

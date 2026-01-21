@@ -1,0 +1,59 @@
+DEVOPSVAULTX_APP/
+│
+├── manage.py
+├── venv/
+│
+├── devopsvaultx/          ← main project (settings)
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+│
+├── templates/             ← GLOBAL templates
+│   ├── base.html          ← layout (navbar + footer)
+│   ├── navbar.html
+│   ├── footer.html
+│
+├── static/                ← GLOBAL static
+│   ├── css/
+│   │   └── global.css     ← navbar, footer, fonts, layout
+│   ├── images/
+│   │   └── logo.png
+│
+├── products/              ← PRODUCTS APP
+│   ├── migrations/
+│   ├── static/
+│   │   └── products/
+│   │       ├── css/
+│   │       │   └── products.css   ← cards, filters UI
+│   │       └── images/
+│   │           └── product-icons/
+│   │
+│   ├── templates/
+│   │   └── products/      ← IMPORTANT
+│   │       ├── product_list.html
+│   │       └── product_detail.html
+│   │
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── urls.py
+│   └── views.py
+│
+├── pages/                 ← About / Contact app
+│   ├── templates/
+│   │   └── pages/
+│   │       ├── about.html
+│   │       └── contact.html
+│   ├── views.py
+│   └── urls.py
+
+
+
+
+🧠 WHY THIS IS BEST?
+Type	Reason
+Global CSS	Navbar, footer, fonts, layout
+App CSS	App specific UI (Products cards etc.)
+App templates	No name clash
+Scalable	10+ apps add karta yetil
