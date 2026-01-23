@@ -1,0 +1,306 @@
+/* --- Global Container Fix --- */
+.products-page-container {
+    max-width: 1400px; 
+    margin: 0 auto;
+    padding: 20px 40px;
+    width: 100%;
+}
+
+/* --- Header & Navigation --- */
+.page-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.page-header h1 {
+    font-size: 36px;
+    color: #1e293b;
+    font-weight: 800;
+}
+
+.filter-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 50px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background-color: #f1f5f9;
+    color: #64748b;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.filter-btn.active {
+    background-color: #2563eb;
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* --- Responsive Product Grid --- */
+.card-grid, .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 40px 30px; /* टॅगसाठी उभ्या गॅपमध्ये थोडी वाढ केली आहे */
+    width: 100%;
+    margin-top: 40px; /* पहिल्या रांगेतील टॅगसाठी वर जागा सोडली आहे */
+    align-items: start; /* सर्व कार्डे एकाच रेषेत टॉपला अलाईन होतील */
+}
+
+/* --- Product Card Design --- */
+.product-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    height: 100%; 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+    position: relative; /* टॅगच्या Absolute Position साठी आवश्यक */
+    overflow: visible;  /* टॅग कार्डच्या बाहेर दिसण्यासाठी हा बदल केला आहे */
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* --- 'NEW' Tag Top Row Alignment --- */
+.badge-new-top {
+    position: absolute;
+    top: -15px;   /* कार्डच्या डोक्यावर अलाईन करण्यासाठी */
+    right: 20px;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 900;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    animation: spark-glow 1.5s infinite alternate;
+}
+
+/* --- Image Container Fix --- */
+.card-img-container {
+    width: 100%;
+    height: 180px; 
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; 
+    border-radius: 12px 12px 0 0;
+}
+
+/* --- Image Scaling Fix --- */
+.card-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
+    padding: 10px; 
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .card-thumbnail {
+    transform: scale(1.05); 
+}
+
+/* --- Card Body & Button Alignment --- */
+.card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; 
+}
+
+.price-row {
+    margin-top: auto; 
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.product-title {
+    font-size: 19px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.product-desc {
+    font-size: 14px;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; 
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.price-tag {
+    font-size: 26px;
+    color: #2563eb;
+    font-weight: 800;
+    text-align: center;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #2563eb 0%, #bf03ed 100%);
+    color: white !important;
+    text-decoration: none;
+    padding: 14px;
+    border-radius: 50px;
+    font-weight: 700;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+/* --- Glowing Animation --- */
+@keyframes spark-glow {
+    from { box-shadow: 0 0 5px rgba(34, 197, 94, 0.2); filter: brightness(1); }
+    to { box-shadow: 0 0 15px rgba(34, 197, 94, 0.6); filter: brightness(1.2); }
+}
+
+/* --- Modal Background --- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.9);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    padding: 20px;
+}
+
+/* --- Main Modal Box --- */
+.modal-content-large {
+    background: white;
+    width: 95%;
+    max-width: 900px;
+    border-radius: 30px; /* गोलाकार कोपरे */
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr; /* दोन भागात विभागणी */
+}
+
+/* --- Left Section (Image & Price) --- */
+.modal-left {
+    padding: 40px;
+    background: #f8fafc;
+    border-right: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-image-preview {
+    width: 100%;
+    height: 300px;
+    background: white;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+    border: 1px solid #f1f5f9;
+    padding: 20px;
+}
+
+.product-image-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* इमेज पूर्ण दिसेल, कट होणार नाही */
+}
+
+.modal-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 10px;
+}
+
+.modal-price {
+    font-size: 24px;
+    color: #2563eb;
+    font-weight: 800;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+/* --- Right Section (Details) --- */
+.modal-right {
+    padding: 50px 40px;
+    background: white;
+}
+
+.details-heading {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 15px;
+}
+
+.details-divider {
+    height: 2px;
+    background: #f1f5f9;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.description-content p {
+    font-size: 16px;
+    color: #64748b;
+    line-height: 1.8;
+}
+
+/* --- Close Button --- */
+.close-modal {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    font-size: 35px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: 0.3s;
+    line-height: 1;
+}
+
+.close-modal:hover {
+    color: #ef4444;
+}
+
+/* --- Buy Now Button in Modal --- */
+.buy-now-large {
+    width: 100%;
+    padding: 16px;
+    font-size: 18px;
+    border-radius: 50px;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .modal-grid { grid-template-columns: 1fr; }
+    .products-page-container { padding: 20px; }
+    .card-grid, .products-grid { gap: 35px 20px; }
+}

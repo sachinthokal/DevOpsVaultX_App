@@ -1,27 +1,40 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>DevOpsVaultX</title>
-    <!-- Global specific CSS (About / Contact / Home) -->
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
     <link rel="stylesheet" href="{% static 'css/global.css' %}">
-    <!-- Pages specific CSS (About / Contact / Home) -->
     <link rel="stylesheet" href="{% static 'pages/css/pages.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/products.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
+
 <body>
-<header class="navbar">
-    <div class="logo">DevOpsVaultX</div>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/products/">Products</a>
-        <a href="/about/">About</a>
-        <a href="/contact/">Contact</a>
-    </nav>
-</header>
-{% block content %}{% endblock %}
-<footer class="footer">
-    © 2024 DevOpsVaultX • Learn DevOps Smart Way
-</footer>
+    <header class="navbar">
+        <div class="logo-container">
+            <img src="{% static 'images/favicon.png' %}" alt="DevOpsVaultX Logo" class="nav-logo">
+            <span class="brand-name">DevOpsVaultX</span>
+        </div>
+
+        <nav class="nav-links">
+            <a href="/">Home</a>
+            <a href="/products/">Products</a>
+            <a href="/about/">About</a>
+            <a href="/contact/">Contact</a>
+        </nav>
+    </header>
+
+    <main class="content-wrapper">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p>© 2026 DevOpsVaultX</p>
+        </div>
+    </footer>
 </body>
 </html>

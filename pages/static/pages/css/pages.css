@@ -1,52 +1,150 @@
-/* About / Contact Pages Styling */
-h1 {
-    color: #2c3e50;
-    margin-bottom: 10px;
+.hero {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2)), url("../../images/hero-bg.png");
+    background-size: cover;       
+    background-repeat: no-repeat;
+    
+    min-height: 400px;            
+    
+    display: flex;
+    flex-direction: column;       
+    justify-content: center;      
+    align-items: flex-start;      
+    padding: 20px;
+    color: black;
 }
 
-h2 {
-    color: #34495e;
-    margin-top: 20px;
-}
-
-p {
-    font-size: 16px;
-    line-height: 1.6;
-    margin-bottom: 15px;
-}
-
-/* Contact Form Styling */
-.contact-form {
+.hero-text {
     max-width: 500px;
-    margin-top: 20px;
+    color: white; 
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); 
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+/* --- Featured Section Container --- */
+.featured {
+    padding: 60px 0;
+    background-color: #f8fafc; /* Subtle light background */
+}
+
+.section-title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 40px;
+}
+/* Card Grid with Side Gap Fix */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    max-width: 1200px; /* Limits the stretch on large screens */
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Card Styling for Uniform Height */
+.card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    height: 100%; 
+    padding: 25px;
 }
 
-.contact-form label {
-    font-weight: bold;
+.price {
+    display: block; /* Flex ऐवजी Block वापरा जेणेकरून विथ कंट्रोलमध्ये राहील */
+    font-size: 24px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 800;
+    color: #2563eb;
+    padding: 5px; /* जुना 20px गॅप काढला, यामुळे अलाईन्मेंट सुधारेल */
+    text-align: center; /* किंमत डाव्या बाजूला अलाईन करण्यासाठी */
 }
 
-.contact-form input,
-.contact-form textarea {
-    padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
+/* --- Glowing Spark Effect for New Badge --- */
+.badge-new {
+    background-color: #dcfce7;
+    color: black;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-left: 10px;
+    
+    /* Animation Spark Effect */
+    animation: spark-glow 1.5s infinite alternate;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
+    border: 1px solid rgba(2, 2, 2, 0.3);
 }
 
-.contact-form button {
-    background-color: #1abc9c;
-    color: white;
+@keyframes spark-glow {
+    0% {
+        box-shadow: 0 0 5px rgba(244, 187, 42, 0.264);
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    100% {
+        box-shadow: 0 0 15px rgba(252, 156, 1, 0.934); /* Greenish glow */
+        transform: scale(1.05); /* हलकासा झूम इफेक्ट */
+        filter: brightness(1.2); /* थोडा जास्त चमकणारा */
+    }
+}
+
+/* --- Description Spacing --- */
+.desc {
+    font-size: 15px;
+    color: #64748b;
+    line-height: 1.6;
+    flex-grow: 1; /* Pushes the price-row to the bottom */
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #2563eb 0%, #bf03ed 100%);
+    color: white !important;
+    text-decoration: none;
+    padding: 14px;
+    border-radius: 50px;
+    font-weight: 700;
+    text-align: center;
     border: none;
-    padding: 10px;
-    font-size: 16px;
     cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.3s;
+    transition: 0.3s ease;
 }
 
-.contact-form button:hover {
-    background-color: #16a085;
+.btn-secondary:hover {
+    filter: brightness(1.1);
+    transform: scale(1.02);
+}
+
+/* --- Coming Soon (Muted) Card Style --- */
+.card.muted {
+    background-color: #f1f5f9;
+    border-style: dashed;
+    border-color: #cbd5e1;
+}
+
+.card.muted h3 {
+    color: #64748b;
+}
+
+.status {
+    background: #e2e8f0;
+    color: #475569;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    align-self: flex-start;
+    margin-top: auto;
+}
+
+/* --- Responsive Fix --- */
+@media (max-width: 640px) {
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
 }

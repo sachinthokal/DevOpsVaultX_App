@@ -1,27 +1,50 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="hero">
+<div class="hero">
     <div class="hero-text">
         <h1>Learn DevOps the Smart Way</h1>
         <p>Boost your skills with practical DevOps guides</p>
         <button class="btn-primary">Explore Products</button>
     </div>
-</section>
+</div>
 
 <section class="featured">
-    <h2>Featured Products</h2>
-    <div class="card-grid">
-        <div class="card">
-            <h3>DevOps Roadmap Notes</h3>
-            <p>₹99</p>
-            <button class="btn-secondary">Buy Now</button>
-        </div>
+    <h2 class="section-title">Featured Products</h2>
 
-        <div class="card muted">
-            <h3>Coming Soon...</h3>
-            <p>More guides on the way</p>
-        </div>
+    <div class="products-grid">
+        {% if products %}
+            {% for product in products %}
+                {% if product.is_new %}  <div class="product-card" data-category="{{ product.category|lower }}">
+                    <div class="card-img-container">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.title }}" class="card-thumbnail">
+                        {% else %}
+                        <div class="no-image-text">No Preview</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-body">
+                        <h3 class="product-title">
+                            {{ product.title }}
+                            <span class="badge-new">New</span>
+                        </h3>
+
+                        <p class="product-desc">{{ product.description|truncatechars:80 }}</p>
+
+                        <div class="price-row">
+                            <span class="price-tag">₹{{ product.price }}</span>
+                            <button class="btn-secondary view-details-btn" data-id="{{ product.id }}">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %} {% endfor %}
+        {% else %}
+            <p>No products found.</p>
+        {% endif %}
     </div>
 </section>
+
 {% endblock %}

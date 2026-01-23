@@ -1,7 +1,11 @@
 from django.shortcuts import render
+# Products app मधील मॉडेल इम्पोर्ट करणे आवश्यक आहे
+from products.models import Product 
 
 def home(request):
-    return render(request, 'pages/home.html')
+    # Fakt is_new=True aslele products fetch kara
+    featured_products = Product.objects.filter(is_new=True)
+    return render(request, 'pages/home.html', {'products': featured_products})
 
 def about(request):
     return render(request, 'pages/about.html')
