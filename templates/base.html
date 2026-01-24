@@ -5,19 +5,35 @@
 <head>
     <meta charset="UTF-8">
     <title>DevOpsVaultX</title>
+
+    <!-- Project Icon -->
     <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+
+    <!-- Project Global CSS -->
     <link rel="stylesheet" href="{% static 'css/global.css' %}">
-    <link rel="stylesheet" href="{% static 'pages/css/pages.css' %}">
+
+    <!-- Project Pages CSS -->
+    <link rel="stylesheet" href="{% static 'pages/css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'pages/css/abouts.css' %}">
+    <link rel="stylesheet" href="{% static 'pages/css/contact.css' %}">
+    
+    <!-- Project Products CSS -->
     <link rel="stylesheet" href="{% static 'products/css/products.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/productview.css' %}">
+
+    <!-- Project Payments CSS -->
+    <link rel="stylesheet" href="{% static 'payments/css/payments.css' %}">
+
+    <!-- Global Google Font CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <header class="navbar">
-        <div class="logo-container">
+        <a href="/"><div class="logo-container">
             <img src="{% static 'images/favicon.png' %}" alt="DevOpsVaultX Logo" class="nav-logo">
             <span class="brand-name">DevOpsVaultX</span>
-        </div>
+        </div></a>
 
         <nav class="nav-links">
             <a href="/">Home</a>
