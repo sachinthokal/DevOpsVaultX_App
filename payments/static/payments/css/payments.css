@@ -1,0 +1,85 @@
+* {
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+.page {
+    min-height: 75vh;        /* full screen */
+    display: flex;
+    align-items: center;      /* vertical center */
+    justify-content: center;  /* horizontal center */
+    background: #f4f7fb;
+}
+
+.payment-card {
+  background: #ffffff;
+  width: 380px;
+  padding: 35px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  animation: fadeIn 0.6s ease;
+}
+
+.payment-card h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #111827;
+}
+
+.payment-card p {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 25px;
+}
+
+.price {
+  font-size: 34px;
+  font-weight: 700;
+  color: #2563eb;
+  margin-bottom: 30px;
+}
+
+.pay-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+}
+
+.secure {
+  margin-top: 18px;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-card {
+    width: 90%;
+    padding: 28px;
+  }
+}

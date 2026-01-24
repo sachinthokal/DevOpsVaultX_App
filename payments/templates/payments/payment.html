@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pay for {{ product.title }}</title>
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="page">
+        <div class="payment-card">
+            <h2>{{ product.title }}</h2>
+            <p>One-time purchase • Instant download</p>
+
+            <div class="price">₹{{ product.price }}</div>
+
+            <button id="pay-button" class="pay-btn">
+                Pay Now
+            </button>
+
+            <div class="secure">
+                🔒 Secure payment powered by Razorpay
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+<script>
+var options = {
+    "key": "{{ razorpay_key_id }}",
+    "amount": "{{ amount }}",
+    "currency": "INR",
+    "name": "DevOpsVaultX",
+    "description": "{{ product.title }}",
+    "order_id": "{{ razorpay_order_id }}",
+
+    // ✅ MOST IMPORTANT LINE
+    "callback_url": "{% url 'payments:payment_success' product.id %}",
+
+    "prefill": {
+        "email": "test@example.com"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+
+var rzp1 = new Razorpay(options);
+document.getElementById("pay-button").onclick = function (e) {
+    rzp1.open();
+    e.preventDefault();
+};
+</script>
+{% endblock %}
