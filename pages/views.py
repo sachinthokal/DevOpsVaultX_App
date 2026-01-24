@@ -7,6 +7,9 @@ def home(request):
     featured_products = Product.objects.filter(is_new=True)
     return render(request, 'pages/home.html', {'products': featured_products})
 
+# def products(request):
+#     return render(request, 'products/product_list.html')
+
 def about(request):
     return render(request, 'pages/about.html')
 

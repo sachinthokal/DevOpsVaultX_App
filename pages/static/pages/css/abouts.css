@@ -1,0 +1,74 @@
+.about-hero {
+    text-align: center;
+    padding: 80px 20px 40px;
+}
+.about-logo {
+    margin-top: -60px;
+    width: 250px; /* adjust size */
+    height: auto;
+    display: inline-block;
+    object-fit: contain;
+}
+
+.about-hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.about-hero span {
+    color: #2563eb;
+}
+
+.about-hero p {
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 1.1rem;
+    color: #555;
+}
+
+.about-features {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 60px 20px;
+    flex-wrap: wrap;
+}
+
+.feature-card {
+    width: 300px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.feature-card .icon {
+    font-size: 2rem;
+}
+
+.feature-card h3 {
+    margin: 15px 0 10px;
+}
+
+.feature-card p {
+    color: #555;
+}
+
+.about-mission {
+    background: #f8fafc;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.about-mission h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.about-mission p {
+    max-width: 800px;
+    margin: 0 auto;
+    color: #555;
+    font-size: 1.1rem;
+}
