@@ -52,4 +52,4 @@ class ProductAdmin(admin.ModelAdmin):
     image_preview.short_description = 'Current Image Preview'
 
     # Form madhe fields cha sequence tharvnyasathi (Optional)
-    fields = ('title', 'category', 'description', 'price', 'image', 'image_preview', 'is_new', 'is_active', 'created_at')
+    fields = ('title', 'category', 'description', 'price', 'image', 'image_preview','file', 'is_new', 'is_active', 'created_at')

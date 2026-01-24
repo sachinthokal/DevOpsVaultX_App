@@ -11,20 +11,19 @@ class Product(models.Model):
     title = models.CharField(max_length=100)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     price = models.IntegerField()
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     is_new = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    
-    # 1. Image field for product preview
-    # upload_to creates a folder 'product_images' inside your media directory
+
+    # Image for product preview
     image = models.ImageField(upload_to='product_images/', null=True, blank=True)
-    
-    # 2. Tracking creation time (Helpful for sorting)
+
+    # File to sell (any type)
+    file = models.FileField(upload_to='product_files/', null=False, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # 3. Meta class to handle sorting automatically
     class Meta:
-        # '-created_at' ensures new products appear at the top
         ordering = ['-created_at', '-id']
 
     def __str__(self):

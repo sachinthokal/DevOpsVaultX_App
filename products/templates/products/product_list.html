@@ -20,15 +20,15 @@
     <div class="products-grid">
         {% if products %}
         {% for product in products %}
-        <div class="product-card" data-category="{{ product.category|lower }}">
+        <div class="product-card" data-category="{{ product.category|lower }}"
+            data-new="{% if product.is_new %}1{% else %}0{% endif %}">
+
 
             <div class="card-img-container">
                 {% if product.image %}
                 <img src="{{ product.image.url }}" alt="{{ product.title }}" class="card-thumbnail">
                 {% else %}
-                <div><img src="{% static 'images/no-file-img.png' %}" alt="No Data" style="width: 120px; opacity: 0.5;">
-                </div>
-                <!-- <div class="no-image-text">No Preview</div> -->
+                <img src="{% static 'images/no-file-img.png' %}" alt="No Image" style="width:120px;opacity:0.5;">
                 {% endif %}
             </div>
 
@@ -40,65 +40,35 @@
                     {% endif %}
                 </h3>
 
-                <p class="product-desc">{{ product.description|truncatechars:80 }}</p>
+                <p class="product-desc">
+                    {{ product.description|truncatechars:80 }}
+                </p>
 
                 <div class="price-row">
                     <span class="price-tag">₹{{ product.price }}</span>
-                    <button class="btn-secondary view-details-btn" data-id="{{ product.id }}">
+
+                    <a class="btn-secondary" href="{% url 'products:product_detail' product.pk %}">
                         View Details
-                    </button>
-                </div>
-            </div>
-        </div>
+                    </a>
 
-        <div id="modal-{{ product.id }}" class="modal-overlay">
-            <div class="modal-content-large">
-                <span class="close-modal" data-id="{{ product.id }}">&times;</span>
-                <div class="modal-grid">
-                    <div class="modal-left">
-                        <div class="badge-category">{{ product.category|upper }}</div>
 
-                        <div class="product-image-preview">
-                            {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.title }}">
-                            {% else %}
-                            <div class="no-image-box">No Image Available</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="modal-info-box">
-                            <h2 class="modal-title">{{ product.title }}</h2>
-                            <p class="modal-price">₹{{ product.price }}</p>
-                            <button class="btn-secondary buy-now-large">Buy Now</button>
-                        </div>
-                    </div>
-
-                    <div class="modal-right">
-                        <h3 class="details-heading">Product Details</h3>
-                        <div class="details-divider"></div>
-                        <div class="description-content">
-                            <p>{{ product.description }}</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
         {% endfor %}
 
-        <div id="js-no-data" class="no-data-msg" style="display: none; grid-column: 1 / -1; text-align: center;">
-            <img src="{% static 'images/no-data.png' %}" alt="No Data" style="width: 120px; opacity: 0.5;">
+        <div id="js-no-data" class="no-data-msg" style="display:none;grid-column:1/-1;text-align:center;">
+            <img src="{% static 'images/no-data.png' %}" style="width:120px;opacity:0.5;">
             <h3>No Products Found in this Category!</h3>
         </div>
 
         {% else %}
-        <div class="no-data-msg" style="grid-column: 1 / -1; text-align: center; padding: 50px;">
-            <img src="{% static 'images/no-data.png' %}" alt="No Data" style="width: 150px; opacity: 0.5;">
+        <div class="no-data-msg" style="grid-column:1/-1;text-align:center;padding:50px;">
+            <img src="{% static 'images/no-data.png' %}" style="width:150px;opacity:0.5;">
             <h3>No Products Found!</h3>
-            <p>Please check back later for new resources.</p>
         </div>
         {% endif %}
     </div>
-
-    <script src="{% static 'products/js/filter.js' %}"></script>
-    <script src="{% static 'products/js/popup.js' %}"></script>
-    {% endblock %}
+</div>
+<script src="{% static 'products/js/filter.js' %}"></script>
+{% endblock %}
