@@ -9,12 +9,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls), # Replace at time live
     path('', include('pages.urls')),               # Home / About / Contact
-    path('products/', include('products.urls')),    # Products pages
+    path('products/', include('products.urls')),  # Products
+    path('payments/', include('payments.urls')),  # Payment app include
 ]
 
-# --- Append Media URL configuration for development ---
-# This allows Django to serve images from the 'media' folder
+
+# Media files
+from django.conf import settings
+from django.conf.urls.static import static
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
