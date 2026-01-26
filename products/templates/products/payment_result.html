@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Toast -->
+<div id="toast" class="toast">
+  <div class="icon">✔️</div>
+  <div class="message">Processing payment...</div>
+  {% if file_url %}
+  <button class="btn-download" id="downloadBtn">Download</button>
+  {% endif %}
+</div>
+
+{% if file_url %}
+<a id="downloadLink" href="{{ file_url }}" download hidden></a>
+{% endif %}
+
+<style>
+  /* Toast styling */
+  .toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: #1e1e2f;
+    color: #fff;
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 9999;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .toast .icon {
+    font-size: 2rem;
+  }
+
+  .toast .message {
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .toast .btn-download {
+    background: #4caf50;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s ease;
+  }
+
+  .toast .btn-download:hover {
+    background: #45a049;
+  }
+
+  /* Success / Failed colors */
+  .toast.success {
+    background: #1e462f;
+  }
+
+  .toast.failed {
+    background: #46201e;
+  }
+</style>
+
+<script>
+  const toast = document.getElementById("toast");
+  const icon = toast.querySelector(".icon");
+  const message = toast.querySelector(".message");
+  const downloadBtn = document.getElementById("downloadBtn");
+
+  // Get payment status from Django
+  const paymentStatus = "{{ status|default:'failed' }}";
+
+  // Update toast based on status
+  if (paymentStatus === "success") {
+    toast.classList.add("success");
+    icon.textContent = "✅";
+    message.textContent = "Payment successful! Thank you for your purchase.";
+  } else {
+    toast.classList.add("failed");
+    icon.textContent = "❌";
+    message.textContent = "Payment failed! Redirecting...";
+  }
+
+  // Show toast
+  setTimeout(() => toast.classList.add("show"), 200);
+
+  // Download button functionality
+  if (downloadBtn) {
+    downloadBtn.addEventListener("click", () => {
+      document.getElementById("downloadLink").click();
+      // Auto-hide toast after 5s
+      setTimeout(() => toast.classList.remove("show"), 5200);
+      window.location.href = "{% url 'products:product_list' %}";
+    });
+  }
+
+  // Redirect to product list on failure after 5s
+  if (paymentStatus === "failed") {
+    setTimeout(() => {
+      window.location.href = "{% url 'products:product_list' %}";
+    }, 5000);
+  }
+</script>
+{% endblock %}

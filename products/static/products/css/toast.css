@@ -1,0 +1,55 @@
+/* Toast Container */
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  z-index: 99999;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  padding: 20px 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  gap: 15px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  max-width: 90%;
+}
+
+/* Show animation */
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Success and Failed styles */
+.toast.success {
+  background-color: #28a745;
+}
+
+.toast.failed {
+  background-color: #dc3545;
+}
+
+/* Icon */
+.toast .icon {
+  font-size: 24px;
+}
+
+/* Download Button */
+.toast .btn-download {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s ease;
+}
+.toast .btn-download:hover {
+  background: rgba(255,255,255,0.4);
+}

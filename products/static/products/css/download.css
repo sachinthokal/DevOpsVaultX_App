@@ -1,0 +1,56 @@
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  background: #f5f7fb;
+}
+
+/* Toast Container */
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: #111827;
+  color: #fff;
+  padding: 22px 30px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.35);
+  opacity: 0;
+  transition: all .35s ease;
+  z-index: 9999;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.toast .icon {
+  font-size: 32px;
+}
+
+.toast strong {
+  font-size: 18px;
+}
+
+/* Mobile behavior */
+@media (max-width: 480px) {
+  .toast {
+    top: auto;
+    bottom: 20px;
+    right: 50%;
+    transform: translate(50%, 20px) scale(0.95);
+    border-radius: 16px;
+  }
+
+  .toast.show {
+    transform: translate(50%, 0) scale(1);
+  }
+}

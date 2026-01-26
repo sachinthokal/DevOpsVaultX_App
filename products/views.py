@@ -1,7 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import FileResponse, HttpResponseForbidden
+from django.urls import reverse
+from django.utils.http import http_date
 from .models import Product
-
+import os, time
 
 # ======================
 # Home Page
@@ -55,21 +57,55 @@ def confirm_payment(request, pk):
 # Secure File Download
 # ======================
 def download_file(request, pk):
-    """
-    Secure download:
-    - Payment must be completed
-    - File served as attachment
-    """
-    if not request.session.get(f'paid_{pk}'):
-        return HttpResponseForbidden("❌ Payment not completed")
+
+    session_key = f"paid_{pk}"
+
+    if not request.session.get(session_key):
+        return HttpResponseForbidden("Payment not completed")
 
     product = get_object_or_404(Product, pk=pk, is_active=True)
 
     if not product.file:
-        return HttpResponseForbidden("❌ File not available")
+        return HttpResponseForbidden("File not available")
 
-    return FileResponse(
-        product.file.open('rb'),
+    file_path = product.file.path
+
+    if not os.path.exists(file_path):
+        return HttpResponseForbidden("File missing")
+
+    response = FileResponse(
+        open(file_path, "rb"),
         as_attachment=True,
-        filename=product.file.name.split('/')[-1]
+        filename=os.path.basename(file_path)
     )
+
+    # 🔐 prevent caching / re-download
+    response["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response["Pragma"] = "no-cache"
+    response["Expires"] = http_date(time.time() - 3600)
+
+    # 🔐 one-time download
+    del request.session[session_key]
+
+    return response
+
+
+def payment_result(request, pk):
+    session_key = f"paid_{pk}"
+    product = get_object_or_404(Product, pk=pk, is_active=True)
+
+    if request.session.get(session_key):
+        # Payment successful
+        status = "success"
+        file_url = reverse("products:download_file", args=[pk])
+    else:
+        # Payment failed / session expired
+        status = "failed"
+        file_url = None
+
+    return render(request, "products/payment_result.html", {
+        "status": status,
+        "file_url": file_url,
+        "session_key": session_key
+    })
+
