@@ -12,7 +12,7 @@ urlpatterns = [
     path('admin/', admin.site.urls), # Replace at time live
     path('', include('pages.urls')),               # Home / About / Contact
     path('products/', include('products.urls')),  # Products
-    path('payments/', include('payments.urls')),  # Payment app include
+    path('payments/', include('payments.urls')),  # Payment app include 
 ]
 
 
