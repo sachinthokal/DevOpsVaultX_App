@@ -36,6 +36,14 @@
 
 </html>
 <script>
+  if (
+    location.hostname !== "127.0.0.1" &&
+    location.hostname !== "localhost"
+  ) {
+    console.error = () => {};
+    console.warn = () => {};
+  }
+
 var options = {
     "key": "{{ razorpay_key_id }}",
     "amount": "{{ amount }}",
@@ -44,7 +52,7 @@ var options = {
     "description": "{{ product.title }}",
     "order_id": "{{ razorpay_order_id }}",
 
-    // ✅ MOST IMPORTANT LINE
+    // ✅ MOST IMPORTANT LINE - callback_url
     "callback_url": "{% url 'payments:payment_success' product.id %}",
 
     "prefill": {

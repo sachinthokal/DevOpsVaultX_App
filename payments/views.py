@@ -2,14 +2,13 @@ from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
 from products.models import Product
 from .models import Payment
 import razorpay
 
 # Razorpay client
-client = razorpay.Client(
-    auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
-)
+client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
 # ======================
 # Buy Product (Create Razorpay Order)
@@ -41,12 +40,8 @@ def buy_product(request, pk):
     return render(request, "payments/payment.html", context)
 
 
-# ======================
-# Payment Success Callback (Razorpay POST)
-# ======================
-@csrf_exempt   # 🔥 VERY IMPORTANT
+@csrf_exempt
 def payment_success(request, pk):
-
     if request.method != "POST":
         return HttpResponseForbidden("Invalid request method")
 
@@ -57,13 +52,8 @@ def payment_success(request, pk):
     if not all([razorpay_payment_id, razorpay_order_id, razorpay_signature]):
         return HttpResponse("Invalid payment response", status=400)
 
-    payment = get_object_or_404(
-        Payment,
-        razorpay_order_id=razorpay_order_id,
-        product_id=pk
-    )
+    payment = get_object_or_404(Payment, razorpay_order_id=razorpay_order_id, product_id=pk)
 
-    # 🔐 Verify signature
     try:
         client.utility.verify_payment_signature({
             "razorpay_order_id": razorpay_order_id,
@@ -71,14 +61,15 @@ def payment_success(request, pk):
             "razorpay_signature": razorpay_signature
         })
     except razorpay.errors.SignatureVerificationError:
-        return HttpResponseForbidden("Payment verification failed")
+        return redirect(reverse("products:payment_result", args=[pk]))  # failure
 
-    # ✅ Mark payment as PAID
     payment.razorpay_payment_id = razorpay_payment_id
     payment.paid = True
     payment.save()
 
-    # Session flag for download
+    # Set session key
     request.session[f"paid_{pk}"] = True
 
-    return redirect("products:download_file", pk=pk)
+    # Redirect to payment_result page
+    return redirect(reverse("products:payment_result", args=[pk]))
+
