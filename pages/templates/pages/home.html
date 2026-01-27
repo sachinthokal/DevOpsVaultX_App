@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
 <div class="hero">
     <div class="hero-text">
         <h1>Learn DevOps the Smart Way</h1>
         <p>Boost your skills with practical DevOps guides</p>
-        <a href="/products/"><button class="btn-primary">Explore Products</button></a>
+        <a href="/products/" class="btn-secondary">Explore Products</a>
     </div>
 </div>
 
@@ -14,38 +15,40 @@
 
     <div class="products-grid">
         {% if products %}
-        {% for product in products %}
-        {% if product.is_new %}
-        <div class="product-card" data-category="{{ product.category|lower }}">
-            <div class="card-img-container">
-                {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.title }}" class="card-thumbnail">
-                {% else %}
-                <div class="no-image-text">No Preview</div>
-                {% endif %}
-            </div>
+            {% for product in products %}
+                {% if product.is_new %}
+                <div class="product-card" data-category="{{ product.category|lower }}">
 
-            <div class="card-body">
-                <h3 class="product-title">
-                    {{ product.title }}
-                    <span class="badge-new">New</span>
-                </h3>
+                    <!-- NEW BADGE -->
+                    <span class="badge-new">NEW</span>
 
-                <p class="product-desc">{{ product.description|truncatechars:80 }}</p>
+                    <div class="card-img-container">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.title }}" class="card-thumbnail">
+                        {% else %}
+                            <div class="no-image-text">No Preview</div>
+                        {% endif %}
+                    </div>
 
-                <div class="price-row">
-                    <span class="price-tag">₹{{ product.price }}</span>
+                    <div class="card-body">
+                        <h3 class="product-title">{{ product.title }}</h3>
 
-                    <!-- Fixed Buy Now button -->
-                    <a href="{% url 'products:buy_now' product.pk %}" class="btn-secondary">Buy Now
-                    </a>
+                        <p class="product-desc">
+                            {{ product.description|truncatechars:80 }}
+                        </p>
+
+                        <div class="price-row">
+                            <span class="price-tag">₹ {{ product.price }}</span>
+                            <a href="{% url 'products:buy_now' product.pk %}" class="btn-secondary">
+                                Buy Now
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        {% endif %}
-        {% endfor %}
+                {% endif %}
+            {% endfor %}
         {% else %}
-        <p>No products found.</p>
+            <p>No products found.</p>
         {% endif %}
     </div>
 </section>
