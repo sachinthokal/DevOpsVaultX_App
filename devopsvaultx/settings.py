@@ -149,6 +149,24 @@ RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID')
 RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET')
 
 
-# settings.py
+# =========================
+# db_monitor settings
+# =========================
 if not DEBUG:
     INSTALLED_APPS.remove("db_monitor")
+
+
+# =========================
+# settings.py - Email & Contacts
+# =========================
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_PORT = config("EMAIL_PORT", cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+CONTACT_EMAIL_SUBJECT = config("CONTACT_EMAIL_SUBJECT")
+CONTACT_RECEIVER_EMAIL = config("CONTACT_RECEIVER_EMAIL")
+
+

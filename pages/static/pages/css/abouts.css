@@ -53,6 +53,7 @@
 
 .feature-card p {
     color: #555;
+    text-align: justify;
 }
 
 .about-mission {
