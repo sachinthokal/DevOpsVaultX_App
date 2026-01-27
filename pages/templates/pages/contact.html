@@ -1,33 +1,64 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block content %}
 <section class="contact-section">
-
     <div class="contact-container">
 
-        <!-- Left : Form -->
+        <!-- Contact Form -->
         <div class="contact-form">
-            <h2>Contact Us</h2>
-            <p class="subtitle">Have questions or need help? Get in touch with us.</p>
+            <h2>Let’s Talk</h2>
+            <p class="subtitle">Questions, feedback, or collaboration? Drop a message.</p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
 
             <form method="post">
                 {% csrf_token %}
-                <input type="text" name="name" placeholder="Your Name" required>
-                <input type="email" name="email" placeholder="Your Email" required>
-                <textarea name="message" placeholder="Your Message" required></textarea>
-                <button type="submit">Send Message</button>
+                
+                <div class="field">
+                    <input type="text" name="name" required placeholder=" ">
+                    <label>Your Name</label>
+                </div>
+
+                <div class="field">
+                    <input type="email" name="email" required placeholder=" ">
+                    <label>Email Address</label>
+                </div>
+
+                <div class="field">
+                    <textarea name="message" required placeholder=" "></textarea>
+                    <label>Your Message</label>
+                </div>
+
+                <button type="submit">Send Message 🚀</button>
             </form>
         </div>
 
-        <!-- Right : Info -->
+        <!-- Contact Info -->
         <div class="contact-info">
-            <h3>Contact Info</h3>
-            <p><strong>Email:</strong> support@devopsvaultx.com</p>
-            <p><strong>WhatsApp:</strong> Available</p>
+            <h3>CONTACT INFO</h3>
+            <div class="contact-body">
+                <p>📧 <a href="mailto:devopsvaultx_support@devopsvaultx.com">devopsvaultx_support@devopsvaultx.com</a></p>
+                <p>💬 WhatsApp Support Available</p>
+                <p>🌍 Built for DevOps Engineers</p>
+                <p>📞 +91 8804 17 1399</p>
+                <p>🕒 Mon-Fri, 9 AM - 6 PM</p>
+                <p>💻 <a href="https://www.devopsvaultx.com" target="_blank">www.devopsvaultx.com</a></p>
+            </div>
+
+            <ul class="no-bullets icon-list">
+                <li><a href="mailto:devopsvaultx_support@devopsvaultx.com"><img src="https://img.icons8.com/3d-fluency/94/gmail.png" alt="Gmail" /></a></li>
+                <li><a href="https://www.instagram.com/devopsvaultx" target="_blank"><img src="https://img.icons8.com/3d-fluency/94/instagram-logo.png" alt="Instagram" /></a></li>
+                <li><a href="https://wa.me/8804171399" target="_blank"><img src="https://img.icons8.com/3d-fluency/94/whatsapp.png" alt="WhatsApp" /></a></li>
+            </ul>
+
+            <a href="mailto:devopsvaultx_support@devopsvaultx.com" class="support-btn">Get Support</a>
         </div>
 
     </div>
-
 </section>
 {% endblock %}
