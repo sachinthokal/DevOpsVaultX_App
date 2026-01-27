@@ -32,21 +32,22 @@
 .filter-tabs {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 14px;
     margin-bottom: 50px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;   /* IMPORTANT */
 }
 
+
 .filter-btn {
-    background: #f1f5f9;
-    color: #64748b;
-    border: none;
-    padding: 10px 26px;
-    border-radius: 999px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    width: auto;          /* REMOVE full width */
+    display: inline-flex;
+    min-width: 120px;     /* thodi length fixed */
+    padding: 12px 32px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;  /* text break honar nahi */
 }
 
 .filter-btn:hover {
@@ -197,5 +198,8 @@
 
     .products-grid {
         gap: 30px;
+    }
+    .filter-tabs {
+        flex-wrap: wrap;
     }
 }
