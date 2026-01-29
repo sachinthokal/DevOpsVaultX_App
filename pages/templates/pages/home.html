@@ -2,53 +2,79 @@
 
 {% block content %}
 
-<div class="hero">
+<!-- HERO SECTION -->
+<section class="hero" aria-label="DevOps Learning Hero Section">
     <div class="hero-text">
+        <!-- ✅ ONE H1 (GOOD SEO) -->
         <h1>Learn DevOps the Smart Way</h1>
-        <p>Boost your skills with practical DevOps guides</p>
-        <a href="/products/" class="btn-secondary">Explore Products</a>
-    </div>
-</div>
 
-<section class="featured">
-    <h2 class="section-title">Featured Products</h2>
+        <p>
+            Boost your DevOps skills with practical guides, tools, and real-world resources.
+        </p>
+
+        <a href="/products/" class="btn-secondary" aria-label="Explore DevOps Products">
+            Explore Products
+        </a>
+    </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="featured" aria-labelledby="featured-products-title">
+    <!-- ✅ H2 for section -->
+    <h2 id="featured-products-title" class="section-title">
+        Featured DevOps Products
+    </h2>
 
     <div class="products-grid">
         {% if products %}
-            {% for product in products %}
-                {% if product.is_new %}
-                <div class="product-card" data-category="{{ product.category|lower }}">
+        {% for product in products %}
+        {% if product.is_new %}
+        <article class="product-card" data-category="{{ product.category|lower }}"
+            aria-label="Product {{ product.title }}">
 
-                    <!-- NEW BADGE -->
-                    <span class="badge-new">NEW</span>
+            <!-- NEW BADGE -->
+            <span class="badge-new" aria-label="New Product">
+                NEW
+            </span>
 
-                    <div class="card-img-container">
-                        {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.title }}" class="card-thumbnail">
-                        {% else %}
-                            <div class="no-image-text">No Preview</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="card-body">
-                        <h3 class="product-title">{{ product.title }}</h3>
-
-                        <p class="product-desc">
-                            {{ product.description|truncatechars:80 }}
-                        </p>
-
-                        <div class="price-row">
-                            <span class="price-tag">₹ {{ product.price }}</span>
-                            <a href="{% url 'products:buy_now' product.pk %}" class="btn-secondary">
-                                Buy Now
-                            </a>
-                        </div>
-                    </div>
+            <div class="card-img-container">
+                {% if product.image %}
+                <!-- ✅ ALT improved -->
+                <img src="{{ product.image.url }}" alt="{{ product.title }} - DevOps Product" class="card-thumbnail"
+                    loading="lazy">
+                {% else %}
+                <div class="no-image-text" aria-hidden="true">
+                    No Preview
                 </div>
                 {% endif %}
-            {% endfor %}
+            </div>
+
+            <div class="card-body">
+                <!-- ✅ H3 for card title -->
+                <h3 class="product-title">
+                    {{ product.title }}
+                </h3>
+
+                <p class="product-desc">
+                    {{ product.description|truncatechars:80 }}
+                </p>
+
+                <div class="price-row">
+                    <span class="price-tag">
+                        ₹ {{ product.price }}
+                    </span>
+
+                    <a href="{% url 'products:buy_now' product.pk %}" class="btn-secondary"
+                        aria-label="Buy {{ product.title }}">
+                        Buy Now
+                    </a>
+                </div>
+            </div>
+        </article>
+        {% endif %}
+        {% endfor %}
         {% else %}
-            <p>No products found.</p>
+        <p>No products found.</p>
         {% endif %}
     </div>
 </section>
