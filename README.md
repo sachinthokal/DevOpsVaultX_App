@@ -93,7 +93,7 @@ DevOpsVaultX_App/
 
 ```
 
-## Razorpay Payment Flow
+## 💳 Razorpay Payment Flow
 
 1. User selects a product
 2. Order created in backend
@@ -104,7 +104,7 @@ DevOpsVaultX_App/
 7. Download enabled
 
 
-## DevOpsVaultX Deployment Guide
+## ⚙️ DevOpsVaultX Deployment Guide
 ```bash
 ## Local Deployment
 - Python 3.10+
@@ -121,7 +121,7 @@ DevOpsVaultX_App/
 - Gunicorn as WSGI server
 ```
 
-## DevOpsVaultX Architecture
+## 🏗 DevOpsVaultX Architecture
 ```bash
 ## Components
 - Frontend: Django Templates
@@ -134,7 +134,7 @@ DevOpsVaultX_App/
 User -> UI -> Backend API -> Database -> Razorpay
 ```
 
-## DevOpsVaultX API Documentation
+## 📡 DevOpsVaultX API Documentation
 
 ```bash
 This document describes the REST APIs used in DevOpsVaultX.
@@ -156,7 +156,7 @@ All APIs are secured using Django Authentication.
 
 ```
 
-## ⚙️ Installation & Setup
+## 🛠 Installation & Setup
 
 ```bash
 git clone https://github.com/your-username/devopsvaultx.git
