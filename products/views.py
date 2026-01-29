@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import FileResponse, HttpResponseForbidden
+from django.contrib.auth.decorators import login_required
+
 from django.urls import reverse
 from django.utils.http import http_date
 from .models import Product
@@ -49,6 +51,7 @@ def confirm_payment(request, pk):
     Called only after successful payment
     Marks session as paid
     """
+    request.session.flush()  # 🔐 reset old session
     request.session[f'paid_{pk}'] = True
     return redirect('products:download_file', pk=pk)
 
@@ -56,6 +59,7 @@ def confirm_payment(request, pk):
 # ======================
 # Secure File Download
 # ======================
+@login_required
 def download_file(request, pk):
 
     session_key = f"paid_{pk}"
@@ -68,7 +72,9 @@ def download_file(request, pk):
     if not product.file:
         return HttpResponseForbidden("File not available")
 
-    file_path = product.file.path
+    # file_path = product.file.path
+    file_path = os.path.abspath(product.file.path)
+
 
     if not os.path.exists(file_path):
         return HttpResponseForbidden("File missing")
