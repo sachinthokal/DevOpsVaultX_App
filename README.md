@@ -48,16 +48,49 @@ DevOpsVaultX allows users to:
 
 ## 📂 Updated Project Structure
 
-```
+```bash
+
 DevOpsVaultX_App/
-|-- db_monitor
-|-- devopsvaultx
-|-- media
-|-- pages
-|-- payments
-|-- products
-|-- static
-|-- templates
+|-- db_monitor                  # DB Health system for admin
+|   |-- migrations
+|   |-- static                  # html/css files
+|   |   `-- db_monitor
+|   |       `-- css
+|   |-- templates
+|   |   `-- admin
+|   `-- utils                   # utility files
+|-- devopsvaultx                # main project settings
+|-- pages                       # main project pages (home, about, contact)
+|   |-- migrations
+|   |-- static
+|   |   |-- images
+|   |   `-- pages
+|   |       `-- css
+|   `-- templates
+|       `-- pages
+|-- payments                    # main apps
+|   |-- migrations
+|   |-- static
+|   |   `-- payments
+|   |       |-- css
+|   |       `-- js
+|   `-- templates
+|       `-- payments
+|-- products                    # main apps
+|   |-- migrations
+|   |-- static
+|   |   `-- products
+|   |       |-- css
+|   |       |-- images
+|   |       `-- js
+|   `-- templates
+|       `-- products
+|-- static                      # main css/js/images files
+|   |-- css
+|   |-- images
+|   `-- js
+`-- templates                   # main html files
+
 ```
 
 ## Razorpay Payment Flow
