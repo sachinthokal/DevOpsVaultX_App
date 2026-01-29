@@ -1,117 +1,154 @@
 # DevOpsVaultX 🚀
 
-**DevOpsVaultX** is a Django-based e-commerce platform built specifically for DevOps Engineers. The platform offers high-quality digital products such as **Guides, Tools, and Templates** designed to help engineers upskill and apply DevOps practices in real-world environments.
+**DevOpsVaultX** is a Django-based digital product platform built for **DevOps & Cloud Engineers**.  
+It provides high-quality **Guides, Tools, and Templates** with secure payments and downloadable content.
+
+This project is built using **Django + Django REST Framework (DRF)** with **PostgreSQL**, Razorpay payment integration, and a clean HTML/CSS frontend with admin control.
 
 ---
 
 ## 📌 Project Overview
 
-DevOpsVaultX focuses on selling downloadable digital content. Users can browse products by category, view details, and securely purchase and download DevOps resources.
+DevOpsVaultX allows users to:
+- Browse DevOps-related digital products
+- View product details
+- Make secure payments using **Razorpay**
+- Download purchased content
+- Contact the team and learn about products via static pages
 
-**Target Audience:**
+**Target Audience**
 - DevOps Engineers
 - Cloud Engineers
 - SREs
 - Freshers entering DevOps
 
----
-
 ## 🛠 Tech Stack
 
-- **Backend:** Django (Python)
+- **Backend:** Django, Django REST Framework (DRF)
 - **Database:** PostgreSQL
 - **Frontend:** HTML, CSS, JavaScript (Django Templates)
 - **Authentication:** Django Auth
-- **Payments:** (Planned / Razorpay / Stripe)
-- **Deployment:** Azure / Docker / Nginx (Planned)
-
----
+- **Payments:** Razorpay
+- **Media Storage:** Local Media (Product Images & Files)
+- **Admin Control:** Django Admin (Superuser)
+- **Deployment Ready:** Docker / Azure / Nginx
 
 ## ✨ Features
 
-- User Authentication (Login / Register)
-- Product Categories (Guides, Tools, Templates)
-- Digital Product Management (Admin Panel)
-- Secure File Downloads
-- Order & Purchase Tracking
-- Responsive UI
+- Product Listing & Categories
+- Secure Digital File Downloads
+- Razorpay Payment Flow
+- Order & Payment
+- Admin Panel for Product & Order Management
+- Static Pages (About, Contact, Sitemap)
+- Responsive UI using HTML/CSS
 - SEO-friendly URLs
 
----
 
-## 📂 Project Structure
+## 📂 Updated Project Structure
 
 ```
-DevOpsVaultX/
-├── core/              # Project settings
-├── apps/
-│   ├── products/      # Products & categories
-│   ├── accounts/      # User authentication
-│   ├── orders/        # Orders & payments
-│   └── pages/         # Home, About, Contact
-├── templates/         # HTML templates
-├── static/            # CSS, JS, images
-├── media/             # Uploaded digital files
-├── manage.py
-└── requirements.txt
+DevOpsVaultX_App/
+|-- db_monitor
+|-- devopsvaultx
+|-- media
+|-- pages
+|-- payments
+|-- products
+|-- static
+|-- templates
 ```
 
----
+## Razorpay Payment Flow
+
+1. User selects a product
+2. Order created in backend
+3. Razorpay Checkout opens
+4. Payment success callback
+5. Payment verification
+6. Order marked as PAID
+7. Download enabled
+
+
+## DevOpsVaultX Deployment Guide
+```bash
+## Local Deployment
+- Python 3.10+
+- PostgreSQL
+- Virtualenv
+
+## Docker (Planned)
+- Dockerfile
+- docker-compose.yml
+
+## Cloud Deployment (Planned)
+- Azure VM / App Service
+- Nginx as Reverse Proxy
+- Gunicorn as WSGI server
+```
+
+## DevOpsVaultX Architecture
+```bash
+## Components
+- Frontend: Django Templates
+- Backend: Django + DRF
+- Database: PostgreSQL
+- Payments: Razorpay
+- Media: Local Storage
+
+## Flow
+User -> UI -> Backend API -> Database -> Razorpay
+```
+
+## DevOpsVaultX API Documentation
+
+```bash
+This document describes the REST APIs used in DevOpsVaultX.
+
+## Authentication APIs
+- POST /api/register/
+- POST /api/login/
+- POST /api/logout/
+
+## Product APIs
+- GET /api/products/
+- GET /api/products/<id>/
+
+## Order & Payment APIs
+- POST /api/orders/create/
+- POST /api/payments/verify/
+
+All APIs are secured using Django Authentication.
+
+```
 
 ## ⚙️ Installation & Setup
 
 ```bash
-# Clone the repository
 git clone https://github.com/your-username/devopsvaultx.git
-cd devopsvaultx
-
-# Create virtual environment
+cd DevOpsVaultX_App
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install dependencies
+source venv/bin/activate
 pip install -r requirements.txt
-
-# Apply migrations
+python manage.py makemigrations
 python manage.py migrate
-
-# Create superuser
 python manage.py createsuperuser
-
-# Run server
 python manage.py runserver
 ```
 
----
-
-## 🔐 Admin Panel
-
-- URL: `/admin`
-- Admin can:
-  - Add / Update products
-  - Upload digital files
-  - Manage orders & users
-
----
-
-## 🎯 Future Enhancements
-
-- Payment Gateway Integration
-- Email Notifications
-- Discount Coupons
-- User Dashboard
-- Download History
-- Docker & Kubernetes Deployment
-
----
-
-## 👨‍💻 Author
+## 👨‍💻 Authors
 
 **Sachin Thokal**  
-DevOps Engineer | Azure | Kubernetes | Django
+DevOps Engineer | Azure | Kubernetes | Docker  
+
+**Pallavi Pawar**  
+DBOps Engineer | PostgreSQL | Python | PySpark | Django  
 
 ---
+
 
 ## 📄 License
 
 This project is licensed for personal and educational use.
+
+---
