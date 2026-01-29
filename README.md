@@ -21,6 +21,7 @@ DevOpsVaultX allows users to:
 - Cloud Engineers
 - SREs
 - Freshers entering DevOps
+- DevOps Learner's
 
 ## 🛠 Tech Stack
 
