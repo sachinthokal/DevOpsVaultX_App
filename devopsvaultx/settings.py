@@ -169,4 +169,88 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 CONTACT_EMAIL_SUBJECT = config("CONTACT_EMAIL_SUBJECT")
 CONTACT_RECEIVER_EMAIL = config("CONTACT_RECEIVER_EMAIL")
 
+# =========================
+# Logger
+# =========================
+import os
+from pathlib import Path
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Ensure the logs directory exists, otherwise Django will throw an error
+LOG_DIR = BASE_DIR / "logs"
+if not LOG_DIR.exists():
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+# Production-ready JSON Logging Configuration for DevOpsVaultX
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "json": {
+            # Structured logging for OpenSearch compatibility
+            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            "format": "%(asctime)s %(levelname)s %(name)s %(message)s %(ip)s",
+        },
+        "verbose": {
+            "format": "[{asctime}] {levelname} {name} {message}",
+            "style": "{",
+        },
+    },
+
+    "handlers": {
+        "file_info": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            # Convert Path object to string using str() to avoid errors
+            "filename": str(BASE_DIR / "logs" / "devopsvaultx_json.log"),
+            "maxBytes": 10 * 1024 * 1024,  # 10 MB
+            "backupCount": 5,
+            "formatter": "json",
+        },
+        "file_error": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            # Separate file for critical errors to speed up troubleshooting
+            "filename": str(BASE_DIR / "logs" / "errors_json.log"),
+            "maxBytes": 5 * 1024 * 1024,   # 5 MB
+            "backupCount": 5,
+            "formatter": "json",
+        },
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+
+    "loggers": {
+        "django": {
+            "handlers": ["file_info", "file_error", "console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "products": {
+            "handlers": ["file_info", "file_error", "console"], # console जोडल्यामुळे terminal वर पण दिसेल
+            "level": "INFO",
+            "propagate": False,
+        },
+        "payments": {
+            "handlers": ["file_info", "file_error", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "db_monitor": {
+            "handlers": ["file_info", "file_error", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "pages": {
+            "handlers": ["file_info", "file_error", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}

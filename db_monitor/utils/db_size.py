@@ -1,25 +1,44 @@
 from django.db import connection
+import logging
+
+# Logger client
+logger = logging.getLogger(__name__)
 
 def generate_db_size_report():
+    logger.info("Generating database size report")
 
-    with connection.cursor() as cursor:
-        cursor.execute("""
-        WITH db AS (
-            SELECT current_database() AS name,
-                   pg_database_size(current_database()) AS size_bytes
-        )
-        SELECT
-            db.name,
-            db.size_bytes,
-            t.relname,
-            pg_relation_size(t.relid) AS data_bytes,
-            pg_indexes_size(t.relid) AS index_bytes,
-            pg_total_relation_size(t.relid) AS total_bytes
-        FROM db, pg_statio_user_tables t
-        ORDER BY pg_total_relation_size(t.relid) DESC
-        LIMIT 20;
-        """)
-        rows = cursor.fetchall()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+            WITH db AS (
+                SELECT current_database() AS name,
+                       pg_database_size(current_database()) AS size_bytes
+            )
+            SELECT
+                db.name,
+                db.size_bytes,
+                t.relname,
+                pg_relation_size(t.relid) AS data_bytes,
+                pg_indexes_size(t.relid) AS index_bytes,
+                pg_total_relation_size(t.relid) AS total_bytes
+            FROM db, pg_statio_user_tables t
+            ORDER BY pg_total_relation_size(t.relid) DESC
+            LIMIT 20;
+            """)
+            rows = cursor.fetchall()
+            logger.debug(f"Fetched {len(rows)} tables for DB report")
+    except Exception as e:
+        logger.error("Error fetching database size report", exc_info=True)
+        return {
+            "database": "N/A",
+            "database_size": "N/A",
+            "total_data": "N/A",
+            "total_index": "N/A",
+            "db_percentage": 0,
+            "DB_Bar_Cap": 0,
+            "db_bar_color": "red",
+            "tables": []
+        }
 
     # ---------- helpers ----------
     def human_readable(size_bytes):
@@ -35,8 +54,7 @@ def generate_db_size_report():
     def bytes_to_mb(b):
         return (b or 0) / (1024 * 1024)
 
-    # ---------- TABLE LEVEL (AUTO SCALE RELATIVE) ----------
-    # ---------- TABLE LEVEL (FIXED SCALE) ----------
+    # ---------- TABLE LEVEL ----------
     MAX_BAR_MB = 102.4 # 10 MB = 100% bar width
 
     tables = []
@@ -68,6 +86,7 @@ def generate_db_size_report():
             "bar_color": bar_color,
             "Table_Bar_Cap": MAX_BAR_MB
         })
+        logger.debug(f"Table {r[2]}: {human_readable(r[5])}, status: {status_emoji}")
 
     # ---------- SUMMARY ----------
     total_data_bytes = sum((r[3] or 0) for r in rows)
@@ -79,13 +98,14 @@ def generate_db_size_report():
     MAX_DB_MB = 102.4 # 10 MB = 100% bar width
     db_percentage = min((database_mb / MAX_DB_MB) * 100, 100)
 
-    # Color thresholds
-    if database_mb > 800:       # > 800 MB
+    if database_mb > 800:
         db_bar_color = "red"
-    elif database_mb > 400:     # > 400 MB
+    elif database_mb > 400:
         db_bar_color = "yellow"
     else:
         db_bar_color = "green"
+
+    logger.info(f"Database '{rows[0][0] if rows else 'N/A'}' size: {human_readable(database_bytes)}, status color: {db_bar_color}")
 
     return {
         "database": rows[0][0] if rows else "N/A",
@@ -93,7 +113,7 @@ def generate_db_size_report():
         "total_data": human_readable(total_data_bytes),
         "total_index": human_readable(total_index_bytes),
         "db_percentage": db_percentage,
-         "DB_Bar_Cap": MAX_DB_MB,
+        "DB_Bar_Cap": MAX_DB_MB,
         "db_bar_color": db_bar_color,
         "tables": tables
     }
