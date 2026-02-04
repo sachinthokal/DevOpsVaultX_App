@@ -32,6 +32,12 @@ main, .content-wrapper {
     top: 0; 
     z-index: 1000; 
 }
+.nav-links a.active {
+    color: #fff;         /* Text color */
+    border-radius: 5px;  /* Optional */
+    padding: 5px 10px;   /* Optional */
+}
+
 a{
     text-decoration: none;
 }

@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <!-- Basic Meta -->
     <meta charset="UTF-8">
@@ -13,7 +14,8 @@
     <title>DevOpsVaultX | DevOps Tools, Scripts & Learning Resources</title>
 
     <!-- SEO Description -->
-    <meta name="description" content="DevOpsVaultX provides DevOps tools, scripts, monitoring dashboards, and learning resources for DevOps engineers.">
+    <meta name="description"
+        content="DevOpsVaultX provides DevOps tools, scripts, monitoring dashboards, and learning resources for DevOps engineers.">
 
     <!-- SEO Keywords (optional but helps Lighthouse) -->
     <meta name="keywords" content="DevOps, DevOps tools, monitoring, CI/CD, Docker, Kubernetes, DevOpsVaultX">
@@ -40,46 +42,47 @@
     <link rel="stylesheet" href="{% static 'products/css/toast.css' %}">
     <link rel="stylesheet" href="{% static 'payments/css/payments.css' %}">
     <link rel="stylesheet" href="{% static 'db_monitor/css/db_size.css' %}">
+    <link rel="stylesheet" href="{% static 'vault/css/vault.css' %}">
+
 
     <!-- JS (defer = performance boost) -->
     <script src="{% static 'products/js/popup.js' %}" defer></script>
     <script src="{% static 'products/js/filter.js' %}" defer></script>
+    <script src="{% static 'vault/js/vault.js' %}" defer></script>
 </head>
 
 <body>
 
-<header class="navbar">
-    <a href="/" aria-label="DevOpsVaultX Home">
-        <div class="logo-container">
-            <img 
-                src="{% static 'images/favicon.png' %}" 
-                alt="DevOpsVaultX Logo - DevOps Tools Platform"
-                class="nav-logo"
-                width="32"
-                height="32"
-            >
-            <span class="brand-name">DevOpsVaultX</span>
+    <header class="navbar">
+        <a href="/" aria-label="DevOpsVaultX Home">
+            <div class="logo-container">
+                <img src="{% static 'images/favicon.png' %}" alt="DevOpsVaultX Logo - DevOps Tools Platform"
+                    class="nav-logo" width="32" height="32">
+                <span class="brand-name">DevOpsVaultX</span>
+            </div>
+        </a>
+
+        <nav class="nav-links" aria-label="Main Navigation">
+            <a href="/" class="{% if request.path == '/' %}active{% endif %}">HOME</a>
+            <a href="/products/" class="{% if request.path == '/products/' %}active{% endif %}">PRODUCTS</a>
+            <a href="/vault/" class="{% if request.path == '/vault/' %}active{% endif %}">THE VAULT</a>
+            <a href="/about/" class="{% if request.path == '/about/' %}active{% endif %}">ABOUT</a>
+            <a href="/contact/" class="{% if request.path == '/contact/' %}active{% endif %}">CONTACT</a>
+        </nav>
+
+    </header>
+
+    <main class="content-wrapper">
+        <!-- Ensure each page has ONE <h1> inside block content -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p>© 2026 DevOpsVaultX. All rights reserved.</p>
         </div>
-    </a>
-
-    <nav class="nav-links" aria-label="Main Navigation">
-        <a href="/">Home</a>
-        <a href="/products/">Products</a>
-        <a href="/about/">About</a>
-        <a href="/contact/">Contact</a>
-    </nav>
-</header>
-
-<main class="content-wrapper">
-    <!-- Ensure each page has ONE <h1> inside block content -->
-    {% block content %}{% endblock %}
-</main>
-
-<footer class="site-footer">
-    <div class="footer-inner">
-        <p>© 2026 DevOpsVaultX. All rights reserved.</p>
-    </div>
-</footer>
+    </footer>
 
 </body>
+
 </html>
