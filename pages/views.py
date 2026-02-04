@@ -69,49 +69,59 @@ def buy_product(request, product_id):
 def contact(request):
     ip = get_client_ip(request)
     logger.info("Contact page requested", extra={'ip': ip})
-    
+
+    # Default empty context for rendering
+    context = {}
+
     if request.method == "POST":
         name = request.POST.get("name", "").strip()
         email = request.POST.get("email", "").strip()
-        message = request.POST.get("message", "").strip()
+        message_text = request.POST.get("message", "").strip()
 
         # Rate limit: 1 message / minute
         one_min_ago = now() - timedelta(minutes=1)
         if ContactMessage.objects.filter(ip_address=ip, created_at__gte=one_min_ago).exists():
             logger.warning(f"Rate limit exceeded! IP: {ip}", extra={'ip': ip})
             messages.error(request, "⏳ Please wait before sending another message.")
-            return redirect("contact")
+            context.update({'name': name, 'email': email, 'message': message_text})
+            return render(request, "pages/contact.html", context)  # 200 OK
 
-        if not name or not email or not message:
+        # Validate fields
+        if not name or not email or not message_text:
             logger.warning(f"Validation Failed: Incomplete form", extra={'ip': ip})
             messages.error(request, "⚠️ All fields are required.")
-            return redirect("contact")
+            context.update({'name': name, 'email': email, 'message': message_text})
+            return render(request, "pages/contact.html", context)  # 200 OK
 
         try:
-            # Database entry
+            # Save to database
             ContactMessage.objects.create(
-                name=name, email=email, message=message, ip_address=ip
+                name=name, email=email, message=message_text, ip_address=ip
             )
             logger.info(f"SUCCESS: Contact message saved from {email}", extra={'ip': ip})
 
-            # Email Content
-            html_content = f"<html><body><h2>📬 New Message: {name}</h2><p>{message}</p></body></html>"
+            # Send email
+            html_content = f"<html><body><h2>📬 New Message: {name}</h2><p>{message_text}</p></body></html>"
             email_msg = EmailMultiAlternatives(
                 subject=settings.CONTACT_EMAIL_SUBJECT,
-                body=message,
+                body=message_text,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[settings.CONTACT_RECEIVER_EMAIL],
             )
             email_msg.attach_alternative(html_content, "text/html")
             email_msg.send()
-            
             logger.info(f"SUCCESS: Email sent for user {email}", extra={'ip': ip})
+
             messages.success(request, "✅ Message sent successfully!")
-            return redirect("contact")
+            # Clear form fields after successful submission
+            context.update({'name': '', 'email': '', 'message': ''})
+            return render(request, "pages/contact.html", context)  # 200 OK
 
         except Exception as e:
             logger.error(f"CRITICAL: Form processing failed", exc_info=True, extra={'ip': ip})
             messages.error(request, "❌ Something went wrong.")
-            return redirect("contact")
+            context.update({'name': name, 'email': email, 'message': message_text})
+            return render(request, "pages/contact.html", context)  # 200 OK
 
-    return render(request, "pages/contact.html")
+    # GET request
+    return render(request, "pages/contact.html", {'name': '', 'email': '', 'message': ''})

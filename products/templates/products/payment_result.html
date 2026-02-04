@@ -103,14 +103,14 @@
       document.getElementById("downloadLink").click();
       // Auto-hide toast after 5s
       setTimeout(() => toast.classList.remove("show"), 5200);
-      window.location.href = "{% url 'products:product_list' %}";
+      window.location.href = "{% url 'products:list' %}";
     });
   }
 
   // Redirect to product list on failure after 5s
   if (paymentStatus === "failed") {
     setTimeout(() => {
-      window.location.href = "{% url 'products:product_list' %}";
+      window.location.href = "{% url 'products:list' %}";
     }, 5000);
   }
 </script>
