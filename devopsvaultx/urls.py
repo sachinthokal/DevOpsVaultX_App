@@ -14,6 +14,7 @@ urlpatterns = [
     path('', include('pages.urls')),               # Home / About / Contact
     path('products/', include('products.urls')),  # Products
     path('payments/', include('payments.urls')),  # Payments
+    path('vault/', include('vault.urls')), # Vault
 
     # 🔥 SEO REQUIRED FILES
     path(

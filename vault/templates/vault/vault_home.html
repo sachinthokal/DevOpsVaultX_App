@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="vault-wrapper">
+    <div class="vault-grid">
+
+        <!-- ================= NEWS ================= -->
+        <div class="vault-card">
+            <h2>📰 DevOps News</h2>
+            <div class="vault-content">
+
+                {% for item in news %}
+                <a href="{% url 'vault:detail' item.category item.slug %}"
+                   class="vault-item news-item">
+
+                    {% if item.is_pinned %}
+                        <span class="pin">📌</span>
+                    {% endif %}
+
+                    {% if item.mark_new or item.is_new %}
+                        <span class="new-badge">NEW</span>
+                    {% endif %}
+
+                    <div class="vault-row">
+                        <span class="vault-title">{{ item.title }}</span>
+                        <span class="vault-meta">{{ item.created_at|timesince }} ago</span>
+                        <!-- <span class="vault-desc">
+                            {{ item.content|truncatewords:15 }}
+                        </span> -->
+                    </div>
+                </a>
+                {% empty %}
+                    <p class="empty">No news available.</p>
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <!-- ================= BLOGS ================= -->
+        <div class="vault-card">
+            <h2>✍️ Blogs</h2>
+            <div class="vault-content">
+
+                {% for item in blogs %}
+                <a href="{% url 'vault:detail' item.category item.slug %}"
+                   class="vault-item blog-item">
+
+                    {% if item.mark_new or item.is_new %}
+                        <span class="new-badge">NEW</span>
+                    {% endif %}
+
+                    <div class="vault-row">
+                        <span class="vault-title">{{ item.title }}</span>
+                        <span class="vault-meta">{{ item.created_at|timesince }} ago</span>
+                        <!-- <span class="vault-desc">
+                            {{ item.content|truncatewords:18 }}
+                        </span> -->
+                    </div>
+                </a>
+                {% empty %}
+                    <p class="empty">No blogs yet.</p>
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <!-- ================= OFFERS ================= -->
+        <div class="vault-card">
+            <h2>🎁 Offers</h2>
+            <div class="vault-content">
+
+                {% for item in offers %}
+                <a href="{% url 'vault:detail' item.category item.slug %}"
+                   class="vault-item offer-item">
+
+                    <span class="offer-badge">OFFER</span>
+
+                    {% if item.mark_new or item.is_new %}
+                        <span class="new-badge">NEW</span>
+                    {% endif %}
+
+                    <div class="vault-row">
+                        <span class="vault-title">{{ item.title }}</span>
+                        <span class="vault-meta">{{ item.created_at|timesince }} ago</span>
+                        <!-- <span class="vault-desc">
+                            {{ item.content|truncatewords:12 }}
+                        </span> -->
+                    </div>
+                </a>
+                {% empty %}
+                    <p class="empty">No offers available.</p>
+                {% endfor %}
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

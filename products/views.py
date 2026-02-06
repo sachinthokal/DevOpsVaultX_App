@@ -1,19 +1,18 @@
+import os
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import FileResponse, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
-
 from django.urls import reverse
-from django.utils.http import http_date
 from .models import Product
-import os, time
+from payments.models import Payment
 
 # ======================
 # Home Page
 # ======================
 def home(request):
+    # Top 3 active products
     products = Product.objects.filter(is_active=True).order_by('-created_at')[:3]
     return render(request, 'home.html', {'products': products})
-
 
 # ======================
 # Products List Page
@@ -22,7 +21,6 @@ def product_list(request):
     products = Product.objects.filter(is_active=True).order_by('-created_at')
     return render(request, 'products/product_list.html', {'products': products})
 
-
 # ======================
 # Product Detail Page
 # ======================
@@ -30,88 +28,68 @@ def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk, is_active=True)
     return render(request, 'products/product_detail.html', {'product': product})
 
-
 # ======================
-# Buy Now (Redirects to Razorpay via payments app)
+# Buy Now
 # ======================
 def buy_now(request, pk):
-    """
-    This view can be OPTIONAL.
-    Ideally Buy Now should redirect to payments app.
-    """
     product = get_object_or_404(Product, pk=pk, is_active=True)
     return redirect('payments:buy_product', pk=product.id)
 
-
 # ======================
-# Payment Success Callback
+# Payment Success Callback (Session Based)
 # ======================
 def confirm_payment(request, pk):
-    """
-    Called only after successful payment
-    Marks session as paid
-    """
-    request.session.flush()  # 🔐 reset old session
     request.session[f'paid_{pk}'] = True
     return redirect('products:download_file', pk=pk)
-
 
 # ======================
 # Secure File Download
 # ======================
 @login_required
 def download_file(request, pk):
-
     session_key = f"paid_{pk}"
+    
+    # Security check: Session OR Database
+    db_paid = Payment.objects.filter(product_id=pk, status="SUCCESS", paid=True).exists()
 
-    if not request.session.get(session_key):
+    if not request.session.get(session_key) and not db_paid:
         return HttpResponseForbidden("Payment not completed")
 
     product = get_object_or_404(Product, pk=pk, is_active=True)
+    
+    if not product.file or not os.path.exists(product.file.path):
+        return HttpResponseForbidden("File not available or missing")
 
-    if not product.file:
-        return HttpResponseForbidden("File not available")
-
-    # file_path = product.file.path
-    file_path = os.path.abspath(product.file.path)
-
-
-    if not os.path.exists(file_path):
-        return HttpResponseForbidden("File missing")
-
-    response = FileResponse(
-        open(file_path, "rb"),
-        as_attachment=True,
-        filename=os.path.basename(file_path)
-    )
-
-    # 🔐 prevent caching / re-download
+    response = FileResponse(open(product.file.path, "rb"), as_attachment=True)
     response["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    response["Pragma"] = "no-cache"
-    response["Expires"] = http_date(time.time() - 3600)
-
-    # 🔐 one-time download
-    del request.session[session_key]
-
+    response.reason_phrase = f"File Download Started: {product.title}"
+    # Cleanup session after download start
+    if session_key in request.session:
+        del request.session[session_key]
+        
     return response
 
-
+# ======================
+# Payment Result Page
+# ======================
 def payment_result(request, pk):
     session_key = f"paid_{pk}"
     product = get_object_or_404(Product, pk=pk, is_active=True)
 
-    if request.session.get(session_key):
-        # Payment successful
+    # Database check
+    db_paid = Payment.objects.filter(product=product, status="SUCCESS", paid=True).exists()
+
+    if request.session.get(session_key) or db_paid:
         status = "success"
         file_url = reverse("products:download_file", args=[pk])
+        # Ensure session is persistent for download access
+        request.session[session_key] = True 
     else:
-        # Payment failed / session expired
         status = "failed"
         file_url = None
 
     return render(request, "products/payment_result.html", {
         "status": status,
+        "product": product,
         "file_url": file_url,
-        "session_key": session_key
     })
-

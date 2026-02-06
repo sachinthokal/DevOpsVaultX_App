@@ -134,27 +134,107 @@ DevOpsVaultX_App/
 User -> UI -> Backend API -> Database -> Razorpay
 ```
 
-## 📡 DevOpsVaultX API Documentation
+## 📝 Logging & Monitoring Setup
 
-```bash
-This document describes the REST APIs used in DevOpsVaultX.
+DevOpsVaultX uses **OpenSearch** as the centralized logging system and **Fluent Bit** as the log shipper to collect application logs from Django and send them to OpenSearch for monitoring and analysis.
 
-## Authentication APIs
-- POST /api/register/
-- POST /api/login/
-- POST /api/logout/
+### 🔹 Components
 
-## Product APIs
-- GET /api/products/
-- GET /api/products/<id>/
+- **Fluent Bit**: Lightweight log forwarder
+- **OpenSearch**: Search & analytics engine (fork of Elasticsearch)
+- **OpenSearch Dashboards**: Visualization and monitoring UI
 
-## Order & Payment APIs
-- POST /api/orders/create/
-- POST /api/payments/verify/
+### 🔹 Fluent Bit Setup (Windows / Local)
 
-All APIs are secured using Django Authentication.
+**1️⃣ Install Fluent Bit**
+Download from [Fluent Bit official site](https://fluentbit.io/download/).
+
+**2️⃣ Configure `fluent-bit.conf`**
+
+```ini
+[SERVICE]
+    Flush        5
+    Log_Level    info
+    Daemon       off
+    Parsers_File parsers.conf
+
+[INPUT]
+    Name           tail
+    Path           D:/Sachin/Projects/DevOpsVaultX_App/logs/*.log
+    Tag            devopsvaultx.app
+    Read_from_Head true
+
+[OUTPUT]
+    Name           opensearch
+    Match          *
+    Host           192.168.1.50
+    Port           9200
+    Index          devopsvaultx
+    Type           _doc
+    HTTP_User      opensearch_username
+    HTTP_Passwd    opensearch_password
+```
+
+> 💡 **Tip:** Avoid hardcoding the `Path` by using environment variables if deploying across multiple environments.
+
+**3️⃣ Start Fluent Bit**
+
+```powershell
+$ Start-Service -Name FluentBit
+$ Stop-Service -Name FluentBit
+
+OR
+
+$ cd C:\fluent-bit\bin
+$ .\fluent-bit.exe -c C:\fluent-bit\conf\fluent-bit.conf
 
 ```
+
+Check logs for connection and parsing errors.
+
+---
+
+## 🔹 OpenSearch Setup
+
+
+**1️⃣ Install OpenSearch**
+Download [OpenSearch 3.x](https://opensearch.org/downloads.html) or use Docker:
+
+```bash
+docker run -d --name opensearch \
+  -p 9200:9200 -p 9600:9600 \
+  -e "discovery.type=single-node" \
+  opensearchproject/opensearch:3.4.0
+```
+
+**2️⃣ Install OpenSearch Dashboards**
+
+```bash
+docker run -d --name os-dashboards \
+  -p 5601:5601 \
+  --link opensearch:opensearch \
+  opensearchproject/opensearch-dashboards:3.4.0
+```
+
+**3️⃣ Verify Connection**
+- Open: `http://localhost:9200` → Should return cluster info  
+- Open Dashboards: `http://localhost:5601` → Login and visualize logs
+
+## ⚙️ Integration Flow
+
+```text
+Django App Logs → Local log files → Fluent Bit → OpenSearch → OpenSearch Dashboards
+```
+
+- All application logs (info, error, debug) can be viewed in **OpenSearch Dashboards**.
+- Helps monitor **payments**, **product views**, and **server errors**.
+
+### 🔹 Tips for Production
+
+- Use **Docker Compose** to deploy **OpenSearch + Dashboards + Fluent Bit** together.
+- Secure OpenSearch with **user authentication**.
+- Rotate logs and manage disk space using **Fluent Bit buffering**.
+- Optionally, integrate with **Grafana** for advanced dashboards.
 
 ## 🛠 Installation & Setup
 

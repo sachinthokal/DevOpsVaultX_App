@@ -40,16 +40,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'corsheaders',
     # Custom apps
     'products',
     'pages',
     'payments',
     'db_monitor',
+    'vault',
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'devopsvaultx.middleware.RequestLoggingMiddleware',
     'django.middleware.common.CommonMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
@@ -152,8 +155,8 @@ RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET')
 # =========================
 # db_monitor settings
 # =========================
-if not DEBUG:
-    INSTALLED_APPS.remove("db_monitor")
+# if not DEBUG:
+#     INSTALLED_APPS.remove("db_monitor")
 
 
 # =========================
@@ -169,4 +172,72 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 CONTACT_EMAIL_SUBJECT = config("CONTACT_EMAIL_SUBJECT")
 CONTACT_RECEIVER_EMAIL = config("CONTACT_RECEIVER_EMAIL")
 
+# =========================
+# Logger
+# =========================
+import os
+from pathlib import Path
+from pythonjsonlogger import jsonlogger
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Ensure logs directory exists
+LOG_DIR = BASE_DIR / "logs"
+if not LOG_DIR.exists():
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "json": {
+            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            "fmt": "%(asctime)s %(levelname)s %(name)s %(message)s",
+        },
+    },
+
+    "handlers": {
+        "file_info": {
+            "level": "DEBUG" if DEBUG else "INFO", # ✅ .env DEBUG level set 
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": str(LOG_DIR / "devopsvaultx_json.log"),
+            "maxBytes": 10 * 1024 * 1024,  # 10 MB
+            "backupCount": 5,
+            "formatter": "json",
+        },
+        "file_error": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": str(LOG_DIR / "errors_json.log"),
+            "maxBytes": 5 * 1024 * 1024,  # 5 MB
+            "backupCount": 5,
+            "formatter": "json",
+        },
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "json",
+        },
+    },
+
+    "loggers": {
+        "request.audit": {
+            "handlers": ["file_info", "file_error", "console"],
+            "level": "DEBUG" if DEBUG else "INFO", # ✅ .env DEBUG level set 
+            "propagate": False,
+        },
+        "django": {
+            "handlers": [],
+            "propagate": False,
+        },
+        "django.server": {
+            "handlers": [],
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": [],
+            "propagate": False,
+        },
+    },
+}
