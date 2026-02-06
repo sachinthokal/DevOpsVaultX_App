@@ -52,6 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'devopsvaultx.middleware.RequestLoggingMiddleware',
     'django.middleware.common.CommonMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
@@ -154,8 +155,8 @@ RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET')
 # =========================
 # db_monitor settings
 # =========================
-if not DEBUG:
-    INSTALLED_APPS.remove("db_monitor")
+# if not DEBUG:
+#     INSTALLED_APPS.remove("db_monitor")
 
 
 # =========================
@@ -176,38 +177,31 @@ CONTACT_RECEIVER_EMAIL = config("CONTACT_RECEIVER_EMAIL")
 # =========================
 import os
 from pathlib import Path
+from pythonjsonlogger import jsonlogger
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Ensure the logs directory exists, otherwise Django will throw an error
+# Ensure logs directory exists
 LOG_DIR = BASE_DIR / "logs"
 if not LOG_DIR.exists():
     LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-# Production-ready JSON Logging Configuration for DevOpsVaultX
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
 
     "formatters": {
         "json": {
-            # Structured logging for OpenSearch compatibility
             "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
-            "format": "%(asctime)s %(levelname)s %(name)s %(message)s %(ip)s",
-        },
-        "verbose": {
-            "format": "[{asctime}] {levelname} {name} {message}",
-            "style": "{",
+            "fmt": "%(asctime)s %(levelname)s %(name)s %(message)s",
         },
     },
 
     "handlers": {
         "file_info": {
-            "level": "INFO",
+            "level": "DEBUG" if DEBUG else "INFO", # ✅ .env DEBUG level set 
             "class": "logging.handlers.RotatingFileHandler",
-            # Convert Path object to string using str() to avoid errors
-            "filename": str(BASE_DIR / "logs" / "devopsvaultx_json.log"),
+            "filename": str(LOG_DIR / "devopsvaultx_json.log"),
             "maxBytes": 10 * 1024 * 1024,  # 10 MB
             "backupCount": 5,
             "formatter": "json",
@@ -215,43 +209,34 @@ LOGGING = {
         "file_error": {
             "level": "ERROR",
             "class": "logging.handlers.RotatingFileHandler",
-            # Separate file for critical errors to speed up troubleshooting
-            "filename": str(BASE_DIR / "logs" / "errors_json.log"),
-            "maxBytes": 5 * 1024 * 1024,   # 5 MB
+            "filename": str(LOG_DIR / "errors_json.log"),
+            "maxBytes": 5 * 1024 * 1024,  # 5 MB
             "backupCount": 5,
             "formatter": "json",
         },
         "console": {
-            "level": "INFO",
+            "level": "DEBUG",
             "class": "logging.StreamHandler",
-            "formatter": "verbose",
+            "formatter": "json",
         },
     },
 
     "loggers": {
+        "request.audit": {
+            "handlers": ["file_info", "file_error", "console"],
+            "level": "DEBUG" if DEBUG else "INFO", # ✅ .env DEBUG level set 
+            "propagate": False,
+        },
         "django": {
-            "handlers": ["file_info", "file_error", "console"],
-            "level": "INFO",
-            "propagate": True,
-        },
-        "products": {
-            "handlers": ["file_info", "file_error", "console"], # console जोडल्यामुळे terminal वर पण दिसेल
-            "level": "INFO",
+            "handlers": [],
             "propagate": False,
         },
-        "payments": {
-            "handlers": ["file_info", "file_error", "console"],
-            "level": "INFO",
+        "django.server": {
+            "handlers": [],
             "propagate": False,
         },
-        "db_monitor": {
-            "handlers": ["file_info", "file_error", "console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "pages": {
-            "handlers": ["file_info", "file_error", "console"],
-            "level": "INFO",
+        "django.request": {
+            "handlers": [],
             "propagate": False,
         },
     },

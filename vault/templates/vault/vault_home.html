@@ -10,7 +10,7 @@
             <div class="vault-content">
 
                 {% for item in news %}
-                <a href="{% url 'vault:detail' slug=item.slug %}"
+                <a href="{% url 'vault:detail' item.category item.slug %}"
                    class="vault-item news-item">
 
                     {% if item.is_pinned %}
@@ -42,7 +42,7 @@
             <div class="vault-content">
 
                 {% for item in blogs %}
-                <a href="{% url 'vault:detail' slug=item.slug %}"
+                <a href="{% url 'vault:detail' item.category item.slug %}"
                    class="vault-item blog-item">
 
                     {% if item.mark_new or item.is_new %}
@@ -70,7 +70,7 @@
             <div class="vault-content">
 
                 {% for item in offers %}
-                <a href="{% url 'vault:detail' slug=item.slug %}"
+                <a href="{% url 'vault:detail' item.category item.slug %}"
                    class="vault-item offer-item">
 
                     <span class="offer-badge">OFFER</span>

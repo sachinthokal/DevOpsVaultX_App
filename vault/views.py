@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from .models import VaultPost
 
@@ -12,6 +13,18 @@ def vault_home(request):
     return render(request, "vault/vault_home.html", context)
 
 
-def vault_detail(request, slug):
-    post = get_object_or_404(VaultPost, slug=slug, is_published=True)
-    return render(request, "vault/vault_detail.html", {"post": post})
+def vault_detail(request,category, slug):
+    post = get_object_or_404(VaultPost,slug=slug,category=category,is_published=True)
+
+    response = render(
+        request,
+        "vault/vault_detail.html",
+        {"post": post}
+    )
+    return response
+
+# def vault_detail(request, category, slug):
+#     # Only raise error for testing
+#     res = 1 / 0  # force exception
+#     return HttpResponse(res)
+
