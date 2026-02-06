@@ -1,6 +1,5 @@
 import json
 import razorpay
-import logging
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
@@ -9,21 +8,15 @@ from django.views.decorators.csrf import csrf_exempt
 from products.models import Product
 from .models import Payment
 
-logger = logging.getLogger(__name__)
-
+# Razorpay Client Initialization
 client = razorpay.Client(
     auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
 )
-
-def get_client_ip(request):
-    xff = request.META.get("HTTP_X_FORWARDED_FOR")
-    return xff.split(",")[0] if xff else request.META.get("REMOTE_ADDR")
 
 # ======================
 # BUY PRODUCT
 # ======================
 def buy_product(request, pk):
-    logger.info(f"Starting buying product: {pk}")
     product = get_object_or_404(Product, pk=pk, is_active=True)
     amount = int(product.price * 100)
 
@@ -49,7 +42,7 @@ def buy_product(request, pk):
     })
 
 # ======================
-# PAYMENT SUCCESS (Frontend) - FIXED
+# PAYMENT SUCCESS (Frontend)
 # ======================
 def payment_success(request, pk):
     if request.method != "POST":
@@ -62,6 +55,7 @@ def payment_success(request, pk):
     )
 
     try:
+        # Verify Razorpay Signature
         client.utility.verify_payment_signature({
             "razorpay_payment_id": request.POST.get("razorpay_payment_id"),
             "razorpay_order_id": request.POST.get("razorpay_order_id"),
@@ -74,31 +68,35 @@ def payment_success(request, pk):
         payment.paid = True
         payment.save()
 
-        # ✅ FIXED: Set session so payment_result can see it
+        # Set session for download access
         request.session[f"paid_{pk}"] = True
-
-        logger.info(f"PAYMENT_SUCCESS {payment.razorpay_order_id}")
-        return redirect(reverse("products:payment_result", args=[pk]))
+        response = redirect(reverse("products:payment_result", args=[pk]))
+        # 👇 He add kara, jemule log madhe "Found" chya jagi he disel
+        response.reason_phrase = f"Payment Successful for Product {pk}"
+        return response
 
     except razorpay.errors.SignatureVerificationError:
         payment.status = "FAILED"
         payment.save()
-        logger.error(f"SIGNATURE_FAIL {payment.razorpay_order_id}")
-        return redirect(reverse("products:payment_result", args=[pk]))
+        # Middleware will automatically log the 302 redirect. 
+        # If you want to show 'Signature Fail' in logs, set reason_phrase before redirect:
+        response = redirect(reverse("products:payment_result", args=[pk]))
+        response.reason_phrase = f"Payment FAILED for Product {pk}"
+        return response
 
 # ======================
-# PAYMENT FAILED (AJAX)
+# PAYMENT FAILED (AJAX Call from Frontend)
 # ======================
 @csrf_exempt
 def payment_failed(request):
     order_id = request.POST.get("order_id")
+    error_msg = request.POST.get("error_msg", "Payment Failed") 
 
-    Payment.objects.filter(
-        razorpay_order_id=order_id
-    ).update(status="FAILED")
+    Payment.objects.filter(razorpay_order_id=order_id).update(status="FAILED")
 
-    logger.error(f"PAYMENT_FAILED Order={order_id}")
-    return JsonResponse({"retry": True}, status=402)
+    response = JsonResponse({"retry": True}, status=402)
+    response.reason_phrase = error_msg  # Captured by Middleware Audit Log
+    return response
 
 # ======================
 # RETRY PAYMENT
@@ -120,16 +118,17 @@ def retry_payment(request, order_id):
         retry_count=old.retry_count + 1,
         status="INIT"
     )
-
-    return render(request, "payments/payment.html", {
+    response = render(request, "payments/payment.html", {
         "product": old.product,
         "amount": old.amount,
         "razorpay_key_id": settings.RAZORPAY_KEY_ID,
         "razorpay_order_id": new_order["id"],
     })
+    response.reason_phrase = f"Retry Payment for Product {order_id}"
+    return response
 
 # ======================
-# 🔐 RAZORPAY WEBHOOK (FINAL)
+# 🔐 RAZORPAY WEBHOOK (Server-to-Server)
 # ======================
 @csrf_exempt
 def razorpay_webhook(request):
@@ -143,25 +142,18 @@ def razorpay_webhook(request):
             settings.RAZORPAY_WEBHOOK_SECRET
         )
     except razorpay.errors.SignatureVerificationError:
-        logger.error("INVALID WEBHOOK SIGNATURE")
-        return HttpResponse(status=400)
+        # Webhook logs are better handled manually since they don't have a standard user request flow
+        return HttpResponse("Invalid Signature", status=400)
 
     data = json.loads(payload)
-    event = data.get("event")
-
-    if event == "payment.captured":
+    if data.get("event") == "payment.captured":
         entity = data["payload"]["payment"]["entity"]
         order_id = entity["order_id"]
-        payment_id = entity["id"]
-
-        Payment.objects.filter(
-            razorpay_order_id=order_id
-        ).update(
-            razorpay_payment_id=payment_id,
+        
+        Payment.objects.filter(razorpay_order_id=order_id).update(
+            razorpay_payment_id=entity["id"],
             status="SUCCESS",
             paid=True
         )
-
-        logger.info(f"WEBHOOK_SUCCESS Order={order_id}")
 
     return HttpResponse(status=200)

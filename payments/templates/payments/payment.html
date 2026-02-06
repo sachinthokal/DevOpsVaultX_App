@@ -14,21 +14,24 @@
     </div>
 </div>
 
-<!-- External Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
     const csrfToken = "{{ csrf_token }}";
     const razorpayOrderId = "{{ razorpay_order_id }}";
-
-    // 🔁 Backend retry page URL
     const retryUrl = "{% url 'payments:retry_payment' razorpay_order_id %}";
+    
+    // ✅ Flag to prevent duplicate logging
+    let isFailureLogged = false;
 
     /**
      * Log payment failure + redirect to retry page
      */
     function logPaymentFailure(reason, orderId) {
+        if (isFailureLogged) return; // Exit if already logged for this attempt
+        isFailureLogged = true;
+
         fetch("{% url 'payments:payment_failed' %}", {
             method: "POST",
             headers: {
@@ -41,12 +44,11 @@
             Swal.fire({
                 icon: "error",
                 title: "Payment Failed",
-                text: "Payment was unsuccessful. You can retry safely.",
+                text: reason,
                 confirmButtonText: "Retry Payment",
                 confirmButtonColor: "#3085d6"
             }).then(result => {
                 if (result.isConfirmed) {
-                    // ✅ PROPER RETRY FLOW
                     window.location.href = retryUrl;
                 }
             });
@@ -87,6 +89,7 @@
 
         modal: {
             ondismiss: function () {
+                // If the user closes the modal without the 'payment.failed' event firing first
                 logPaymentFailure("User closed payment popup", razorpayOrderId);
             }
         },
@@ -98,16 +101,15 @@
 
     const razorpay = new Razorpay(options);
 
-    // Razorpay failure handler
+    // Razorpay failure handler (fires on technical failures)
     razorpay.on("payment.failed", function (response) {
-        logPaymentFailure(
-            response.error.description || "Payment failed",
-            razorpayOrderId
-        );
+        const description = response.error.description || "Payment failed";
+        logPaymentFailure(description, razorpayOrderId);
     });
 
     document.getElementById("pay-button").addEventListener("click", function (e) {
         e.preventDefault();
+        isFailureLogged = false; // ✅ Reset flag before opening new payment instance
         razorpay.open();
     });
 </script>
