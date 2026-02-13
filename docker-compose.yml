@@ -2,6 +2,9 @@ version: "3.9"
 
 services:
 
+  # =========================
+  # Django Web Service
+  # =========================
   devopsvaultx_web:
     build: .
     container_name: devopsvaultx_app
@@ -15,7 +18,17 @@ services:
       - devopsvaultx_db
     networks:
       - devopsvaultx_network
+    command: >
+      sh -c "
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
+      gunicorn devopsvaultx.wsgi:application --bind 0.0.0.0:8000
+      "
 
+  # =========================
+  # PostgreSQL Database
+  # =========================
   devopsvaultx_db:
     image: postgres:15
     container_name: devopsvaultx_db
@@ -27,6 +40,9 @@ services:
     networks:
       - devopsvaultx_network
 
+  # =========================
+  # Nginx Reverse Proxy
+  # =========================
   devopsvaultx_nginx:
     image: nginx:latest
     container_name: devopsvaultx_nginx_server
@@ -43,10 +59,16 @@ services:
     networks:
       - devopsvaultx_network
 
+# =========================
+# Volumes
+# =========================
 volumes:
   postgres_data:
   static_volume:
   media_volume:
 
+# =========================
+# Networks
+# =========================
 networks:
   devopsvaultx_network:
