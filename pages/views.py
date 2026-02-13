@@ -55,7 +55,92 @@ def contact(request):
             name=name, email=email, message=message_text, ip_address=ip
         )
         
-        html_content = f"<html><body><h2>📬 New Message: {name}</h2><p>{message_text}</p></body></html>"
+        # html_content = f"<html><body><h2>📬 New Message: {name}</h2><p>{message_text}</p></body></html>"
+        html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset="UTF-8">
+            <title>New Contact Message</title>
+            </head>
+
+            <body style="margin:0;padding:0;background-color:#f2f5f9;font-family:Arial,Helvetica,sans-serif;">
+
+            <table width="100%" cellpadding="0" cellspacing="0" style="padding:30px 0;">
+            <tr>
+            <td align="center">
+
+            <table width="600" cellpadding="0" cellspacing="0" 
+            style="background:#ffffff;border-radius:12px;overflow:hidden;
+            box-shadow:0 10px 25px rgba(0,0,0,0.08);">
+
+            <!-- HEADER -->
+            <tr>
+            <td align="center" 
+            style="background:linear-gradient(90deg,#0d6efd,#0a58ca);
+            padding:30px;color:#ffffff;">
+
+            <img src="https://devopsvaultx.com/static/images/Email_logo.png" 
+            alt="DevOpsVaultX Logo" 
+            style="max-height:60px;margin-bottom:15px;display:block;" />
+
+            <h2 style="margin:0;font-size:22px;">📬 New Contact Message</h2>
+            <p style="margin:5px 0 0 0;font-size:14px;opacity:0.9;">
+            🚀 DevOpsVaultX Contact Notification
+            </p>
+
+            </td>
+            </tr>
+
+            <!-- CONTENT -->
+            <tr>
+            <td style="padding:30px;color:#333;font-size:15px;line-height:1.6;">
+
+            <p><strong>👤 Name:</strong> {name}</p>
+            <p><strong>📧 Email:</strong> {email}</p>
+
+            <p style="margin-top:25px;"><strong>💬 Message:</strong></p>
+
+            <div style="
+            background:#f8fafc;
+            border-left:5px solid #0d6efd;
+            padding:18px;
+            border-radius:8px;
+            margin-top:10px;
+            font-style:italic;
+            color:#444;">
+            {message_text}
+            </div>
+
+            </td>
+            </tr>
+
+            <!-- FOOTER -->
+            <tr>
+            <td align="center"
+            style="background:#f9fafb;
+            padding:20px;
+            font-size:13px;
+            color:#777;">
+
+            🔔 This email was generated automatically<br>
+            🌐 <a href="https://devopsvaultx.com" 
+            style="color:#0d6efd;text-decoration:none;">
+            devopsvaultx.com
+            </a>
+
+            </td>
+            </tr>
+
+            </table>
+
+            </td>
+            </tr>
+            </table>
+
+            </body>
+            </html>
+            """
         email_msg = EmailMultiAlternatives(
             subject=settings.CONTACT_EMAIL_SUBJECT,
             body=message_text,

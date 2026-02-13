@@ -1,21 +1,17 @@
 /* --- Universal Reset --- */
 * {
     margin: 0;
-    /* padding: 0;
-    box-sizing: border-box; */
+    padding: 0;
+    box-sizing: border-box; /* Padding mule width vadhu naye mhanun he garjeche aahe */
 }
 
 /* --- Layout Fix (Flexbox) --- */
 html, body {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Screen chi purn height ghenyasathi */
+    min-height: 100vh;
 }
 
-/* IMPORTANT: He navin add kara! 
-   He body chya aatlya main content la sagli rikami jaga vaprayla sangte, 
-   jyामुळे footer khali dhakal-la jato.
-*/
 main, .content-wrapper { 
     flex: 1;
 }
@@ -31,15 +27,7 @@ main, .content-wrapper {
     position: sticky; 
     top: 0; 
     z-index: 1000; 
-}
-.nav-links a.active {
-    color: #fff;         /* Text color */
-    border-radius: 5px;  /* Optional */
-    padding: 5px 10px;   /* Optional */
-}
-
-a{
-    text-decoration: none;
+    flex-wrap: wrap; /* Mobile var content wrap honyasathi */
 }
 
 /* --- Logo & Brand Name --- */
@@ -62,17 +50,26 @@ a{
     font-family: 'Poppins', sans-serif;
 }
 
-/* --- Navigation Links --- */
+/* --- Navigation Links (Desktop) --- */
+.nav-links {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 .nav-links a {
-    color: #000;
+    color: #333;
     text-decoration: none;
     margin-left: 25px;
     font-weight: 500;
     position: relative;
+    white-space: nowrap;
 }
 
 .nav-links a.active {
-    color: #1a73e8;   /* blue */
+    color: #1a73e8;
     font-weight: 600;
 }
 
@@ -86,7 +83,12 @@ a{
     background-color: #1a73e8;
 }
 
-/* --- Hero --- */
+/* --- Hero Section --- */
+.hero {
+    text-align: center;
+    padding: 50px 20px;
+}
+
 .hero button, 
 .hero .btn { 
     background-color: #2563eb;
@@ -102,27 +104,46 @@ a{
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-.hero button:hover, 
-.hero .btn:hover {
-    background-color: #1d4ed8; 
-    transform: translateY(-2px); 
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-/* --- Final Footer Fix --- */
+/* --- Final Footer --- */
 .site-footer {
     background-color: #0f172a; 
     color: white;
     padding: 30px 0;
     text-align: center;
     border-top: 4px solid #bf03ed; 
-    
-    /* Jar footer chi width full screen pahije asel tar */
     width: 100%;
-    margin-top: auto; /* Footer la automatic bottom la push karel */
+    margin-top: auto;
 }
 
-.footer-inner {
-    max-width: 1400px; 
-    margin: 0 auto;
+/* ==========================================
+   MOBILE RESPONSIVE SETTINGS (Media Query)
+   ========================================== */
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 10px 20px;
+        flex-direction: column; /* Mobile var logo ani links ekamekanchya khali yetil */
+        gap: 10px;
+    }
+
+    .nav-links {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap; /* Links khup aslyas auto-adjust hotil */
+        gap: 10px;
+    }
+
+    .nav-links a {
+        margin-left: 10px;
+        margin-right: 10px;
+        font-size: 14px; /* Mobile var font thoda lahan */
+    }
+
+    .brand-name {
+        font-size: 20px;
+    }
+
+    .nav-logo {
+        height: 40px;
+    }
 }
