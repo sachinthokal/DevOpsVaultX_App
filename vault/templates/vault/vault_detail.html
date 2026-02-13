@@ -1,29 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
-
 <section class="vault-detail-wrapper">
     <article class="vault-detail-card">
-
         <header class="vault-detail-header">
             <h1>{{ post.title }}</h1>
-            <p class="meta">
-                {{ post.created_at|date:"d M Y" }}
-                {% if post.category %}
-                    · {{ post.category|title }}
-                {% endif %}
-            </p>
+            <div class="meta">
+                <span>📅 {{ post.created_at|date:"d M Y" }}</span> · 
+                <span style="color: #3b82f6; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">{{ post.category }}</span>
+            </div>
         </header>
 
         <div class="vault-detail-content">
             {{ post.content|linebreaks }}
         </div>
 
-        <div class="vault-back">
-            <a href="{% url 'vault:home' %}">← Back to Vault</a>
-            <a href="{% url 'products:list' %}">Checkout to Products →</a>
+        <div class="vault-back-section">
+            <a href="{% url 'vault:home' %}" class="btn-nav btn-back">
+                ← Back to Vault
+            </a>
+            <a href="{% url 'products:list' %}" class="btn-nav btn-products">
+                Explore Products →
+            </a>
         </div>
-
     </article>
 </section>
-
 {% endblock %}
