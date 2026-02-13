@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
 
   # =========================
@@ -7,6 +5,7 @@ services:
   # =========================
   devopsvaultx_web:
     build: .
+    image: devopsvaultx_app:v1.0.0
     container_name: devopsvaultx_app
     restart: always
     env_file:
@@ -22,7 +21,6 @@ services:
       sh -c "
       python manage.py makemigrations &&
       python manage.py migrate &&
-      python manage.py collectstatic --noinput &&
       gunicorn devopsvaultx.wsgi:application --bind 0.0.0.0:8000
       "
 
