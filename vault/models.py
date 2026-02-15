@@ -25,7 +25,13 @@ class VaultPost(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        # 1. डेटाबेस टेबलचे नाव बदलण्यासाठी (तुमच्या आवडीचे नाव द्या)
+        db_table = 'devopsvaultx_vault_posts' # सध्या हे 'vault_vaultpost' आहे
+        
+        # 2. ऑर्डरिंग आणि नावे
         ordering = ['-is_pinned', 'priority', '-created_at']
+        verbose_name = "DevOpsVaultX Vault Post"
+        verbose_name_plural = "DevOpsVaultX Vault Posts"
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -33,6 +39,7 @@ class VaultPost(models.Model):
             slug = base_slug
             counter = 1
 
+            # ड्युप्लिकेट स्लग टाळण्यासाठी लॉजिक
             while VaultPost.objects.filter(slug=slug).exists():
                 slug = f"{base_slug}-{counter}"
                 counter += 1
@@ -43,6 +50,7 @@ class VaultPost(models.Model):
 
     @property
     def is_new(self):
+        # २ दिवसांच्या आतली पोस्ट 'New' दाखवण्यासाठी
         return self.created_at >= timezone.now() - timedelta(days=2)
 
     def __str__(self):

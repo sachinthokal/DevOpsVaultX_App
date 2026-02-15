@@ -1,13 +1,5 @@
 /* ================= VAULT DETAIL PAGE (FIT SCREEN + FOOTER) ================= */
 
-html, body {
-    height: 100%;
-    margin: 0;
-    overflow: hidden; /* Page cha main scroll band */
-    background-color: #f8fafc;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
 /* Main Container to manage Card + Footer */
 .page-container {
     display: flex;
