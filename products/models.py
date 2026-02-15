@@ -24,7 +24,13 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        # 1. डेटाबेस टेबलचे नाव बदलण्यासाठी
+        db_table = 'devopsvaultx_products'
+        
+        # 2. ऑर्डरिंग आणि नावे
         ordering = ['-created_at', '-id']
+        verbose_name = "DevOpsVaultX Product"
+        verbose_name_plural = "DevOpsVaultX Products"
 
     def __str__(self):
         return self.title

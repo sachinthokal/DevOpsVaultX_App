@@ -2,15 +2,73 @@
 {% load static %}
 
 {% block content %}
-<div class="page">
+<style>
+    /* Premium Payment Card Styling */
+    .payment-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 70vh;
+        background: #f4f7f6;
+    }
+    .payment-card {
+        background: #fff;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        text-align: center;
+        max-width: 450px;
+        width: 100%;
+        border-top: 5px solid #1e3c72;
+    }
+    .payment-card h2 {
+        color: #1e3c72;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+    .price {
+        font-size: 48px;
+        font-weight: 900;
+        color: #2ecc71;
+        margin: 20px 0;
+    }
+    .pay-btn {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        font-size: 18px;
+        font-weight: 700;
+        border-radius: 10px;
+        cursor: pointer;
+        width: 100%;
+        transition: transform 0.3s ease;
+    }
+    .pay-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(30, 60, 114, 0.4);
+    }
+    .secure {
+        margin-top: 20px;
+        font-size: 13px;
+        color: #7f8c8d;
+    }
+    /* SweetAlert Custom Classes */
+    .premium-swal-popup { border-radius: 20px !important; }
+    .premium-input { border-radius: 10px !important; border: 1px solid #ddd !important; }
+</style>
+
+<div class="payment-container">
     <div class="payment-card">
         <h2>{{ product.title }}</h2>
-        <p>One-time purchase • Instant download</p>
-        <div class="price">₹{{ product.price }}</div>
+        <p style="color: #666;">Premium DevOps Resource • Instant Access</p>
+        <div class="price">{% if is_free %}FREE{% else %}₹{{ product.price }}{% endif %}</div>
 
-        <button id="pay-button" class="pay-btn">Pay Now</button>
+        <button id="pay-button" class="pay-btn">
+            {% if is_free %}Unlock Now 🚀{% else %}Secure Payment 🔒{% endif %}
+        </button>
 
-        <div class="secure">🔒 Secure payment powered by Razorpay</div>
+        <div class="secure">Verified Secure Transaction • DevOpsVaultX</div>
     </div>
 </div>
 
@@ -19,98 +77,103 @@
 
 <script>
     const csrfToken = "{{ csrf_token }}";
-    const razorpayOrderId = "{{ razorpay_order_id }}";
-    const retryUrl = "{% url 'payments:retry_payment' razorpay_order_id %}";
+    const isFree = {{ is_free|yesno:"true,false" }};
+    const razorpayOrderId = "{{ razorpay_order_id|default:'' }}";
     
-    // ✅ Flag to prevent duplicate logging
+    let retryUrl = "";
+    {% if not is_free and razorpay_order_id %}
+        retryUrl = "{% url 'payments:retry_payment' razorpay_order_id %}";
+    {% endif %}
+    
     let isFailureLogged = false;
+    let customerName = "";
+    let customerEmail = "";
 
-    /**
-     * Log payment failure + redirect to retry page
-     */
-    function logPaymentFailure(reason, orderId) {
-        if (isFailureLogged) return; // Exit if already logged for this attempt
-        isFailureLogged = true;
-
-        fetch("{% url 'payments:payment_failed' %}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                "X-CSRFToken": csrfToken
-            },
-            body: `order_id=${encodeURIComponent(orderId)}&error_msg=${encodeURIComponent(reason)}`
-        })
-        .finally(() => {
-            Swal.fire({
-                icon: "error",
-                title: "Payment Failed",
-                text: reason,
-                confirmButtonText: "Retry Payment",
-                confirmButtonColor: "#3085d6"
-            }).then(result => {
-                if (result.isConfirmed) {
-                    window.location.href = retryUrl;
-                }
-            });
+    function submitPaymentData(p_id, o_id, s_id) {
+        // Show Loading
+        Swal.fire({
+            title: 'Finalizing Access...',
+            html: 'Please wait while we set up your vault.',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
         });
+
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "{% url 'payments:payment_success' product.id %}";
+
+        const fields = {
+            razorpay_payment_id: p_id || "FREE_PAYMENT",
+            razorpay_order_id: o_id || "FREE_ORDER",
+            razorpay_signature: s_id || "FREE_SIGNATURE",
+            csrfmiddlewaretoken: csrfToken,
+            customer_name: customerName,
+            email: customerEmail
+        };
+
+        Object.entries(fields).forEach(([name, value]) => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = name;
+            input.value = value;
+            form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
     }
-
-    const options = {
-        key: "{{ razorpay_key_id }}",
-        amount: "{{ amount }}",
-        currency: "INR",
-        name: "DevOpsVaultX",
-        description: "{{ product.title }}",
-        order_id: razorpayOrderId,
-
-        handler: function (response) {
-            const form = document.createElement("form");
-            form.method = "POST";
-            form.action = "{% url 'payments:payment_success' product.id %}";
-
-            const fields = {
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-                csrfmiddlewaretoken: csrfToken
-            };
-
-            Object.entries(fields).forEach(([name, value]) => {
-                const input = document.createElement("input");
-                input.type = "hidden";
-                input.name = name;
-                input.value = value;
-                form.appendChild(input);
-            });
-
-            document.body.appendChild(form);
-            form.submit();
-        },
-
-        modal: {
-            ondismiss: function () {
-                // If the user closes the modal without the 'payment.failed' event firing first
-                logPaymentFailure("User closed payment popup", razorpayOrderId);
-            }
-        },
-
-        theme: {
-            color: "#3399cc"
-        }
-    };
-
-    const razorpay = new Razorpay(options);
-
-    // Razorpay failure handler (fires on technical failures)
-    razorpay.on("payment.failed", function (response) {
-        const description = response.error.description || "Payment failed";
-        logPaymentFailure(description, razorpayOrderId);
-    });
 
     document.getElementById("pay-button").addEventListener("click", function (e) {
         e.preventDefault();
-        isFailureLogged = false; // ✅ Reset flag before opening new payment instance
-        razorpay.open();
+        
+        Swal.fire({
+            title: '<span style="color: #1e3c72;">Enter Details 🚀</span>',
+            html: `
+                <div style="text-align: left; padding: 0 10px;">
+                    <label style="font-weight: 600; font-size: 13px;">Full Name</label>
+                    <input id="swal-input1" class="swal2-input premium-input" placeholder="e.g. Sachin Thokal">
+                    <label style="font-weight: 600; font-size: 13px; margin-top: 10px; display: block;">Email Address</label>
+                    <input id="swal-input2" class="swal2-input premium-input" placeholder="e.g. sachin@devopsvaultx.com">
+                </div>
+            `,
+            confirmButtonText: isFree ? 'Get Access' : 'Proceed to Pay',
+            confirmButtonColor: '#1e3c72',
+            showCancelButton: true,
+            customClass: { popup: 'premium-swal-popup' },
+            preConfirm: () => {
+                const name = document.getElementById('swal-input1').value;
+                const email = document.getElementById('swal-input2').value;
+                if (!name || !email || !email.includes('@')) {
+                    Swal.showValidationMessage(`Valid name and email required`);
+                }
+                return { name: name, email: email }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                customerName = result.value.name;
+                customerEmail = result.value.email;
+                
+                if (isFree) {
+                    submitPaymentData();
+                } else {
+                    const options = {
+                        key: "{{ razorpay_key_id }}",
+                        amount: "{{ amount }}",
+                        currency: "INR",
+                        name: "DevOpsVaultX",
+                        description: "{{ product.title }}",
+                        order_id: razorpayOrderId,
+                        handler: function (response) {
+                            submitPaymentData(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
+                        },
+                        prefill: { name: customerName, email: customerEmail },
+                        theme: { color: "#1e3c72" }
+                    };
+                    const razorpay = new Razorpay(options);
+                    razorpay.open();
+                }
+            }
+        });
     });
 </script>
 {% endblock %}

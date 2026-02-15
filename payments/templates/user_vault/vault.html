@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Modern Root Variables */
+    :root {
+        --vault-primary: #1e3c72;
+        --vault-bg: #f4f7fa;
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .vault-wrapper {
+        background-color: var(--vault-bg);
+        min-height: 100vh;
+        padding-bottom: 80px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Modern Header with Wave Effect */
+    .vault-header {
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        color: white;
+        padding: 100px 0 140px;
+        text-align: center;
+        clip-path: ellipse(150% 100% at 50% 0%);
+        /* Curved Header */
+        margin-bottom: -60px;
+    }
+
+    .user-info-pill {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(12px);
+        padding: 8px 24px;
+        border-radius: 100px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        margin-top: 20px;
+        transition: 0.3s;
+    }
+
+    /* 5-Column Grid Logic */
+    .vault-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+        padding: 0 40px;
+    }
+
+    @media (max-width: 1400px) {
+        .vault-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    @media (max-width: 1100px) {
+        .vault-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .vault-grid {
+            grid-template-columns: repeat(2, 1fr);
+            padding: 0 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .vault-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Modern Minimalist Card */
+    .asset-card {
+        background: white;
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: var(--card-shadow);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        position: relative;
+    }
+
+    .asset-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 20px 40px rgba(30, 60, 114, 0.15);
+    }
+
+    .card-top {
+        height: 6px;
+        width: 100%;
+        background: var(--vault-primary);
+    }
+
+    .card-content {
+        padding: 25px 20px;
+        flex-grow: 1;
+    }
+
+    .status-tag {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #2ecc71;
+        background: #e8fcf0;
+        padding: 4px 10px;
+        border-radius: 6px;
+        display: inline-block;
+        margin-bottom: 15px;
+    }
+
+    .card-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 20px;
+        line-height: 1.4;
+        min-height: 45px;
+    }
+
+    /* Modern Progress Track */
+    .usage-box {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .usage-text {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        margin-bottom: 8px;
+        color: #64748b;
+    }
+
+    .progress-wrap {
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #2ecc71, #27ae60);
+        border-radius: 10px;
+    }
+
+    .btn-action {
+        background: var(--vault-primary);
+        color: white !important;
+        text-decoration: none;
+        padding: 14px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 14px;
+        border-radius: 0 0 20px 20px;
+        transition: 0.3s;
+        width: 100%;
+        border: none;
+    }
+
+    .btn-action:hover {
+        background: #152c55;
+    }
+</style>
+
+<div class="vault-wrapper">
+    <div class="vault-header">
+        <div class="container">
+            <h1 style="font-weight: 900; font-size: 48px; letter-spacing: -2px;">DEVOPSVAULTX</h1>
+            <div class="user-info-pill">
+                <span style="font-size: 14px;">👤 <strong>{{ customer_name|default:"Sachin Thokal" }}</strong></span>
+                <span style="margin: 0 15px; opacity: 0.3;">|</span>
+                <span style="font-size: 14px; opacity: 0.9;">📧 {{ customer_email|default:"sachinthokal1799@gmail.com"}}</span>
+            </div>
+            <p>
+                Need those files again?<br>Your premium resources are ready for a fresh download. ⬇️
+            </p>
+        </div>
+    </div>
+
+    <div class="vault-grid">
+        {% for payment in payments %}
+        <div class="asset-card">
+            <div class="card-top"></div>
+            <div class="card-content">
+                <span class="status-tag">Premium Access</span>
+                <h4 class="card-title">{{ payment.product.title }}</h4>
+
+                <div class="usage-box">
+                    <div class="usage-text">
+                        <span>Downloads</span>
+                        <span style="color: #1a202c; font-weight: 700;">{{ payment.retry_count }} / 5</span>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-fill" style="width: {% widthratio payment.retry_count 5 100 %}%"></div>
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'products:download_file' payment.product.id %}" class="btn-action">
+                Download Resource ⬇️
+            </a>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 100px 0;">
+            <h3 style="color: #64748b;">No resources found in your vault.</h3>
+            <a href="{% url 'products:list' %}" class="btn btn-primary mt-4"
+                style="background: var(--vault-primary); border: none; border-radius: 12px; padding: 12px 30px;">Explore
+                Products</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

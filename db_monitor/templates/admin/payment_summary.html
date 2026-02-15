@@ -1,0 +1,97 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrahead %}
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="{% static 'db_monitor/css/admin_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="content-main" class="premium-dashboard">
+    <div class="header-section">
+        <div class="welcome-text">
+            <h1>Analytics Overview</h1>
+            <p>Real-time performance metrics for <strong>DevOpsVaultX</strong></p>
+        </div>
+        <div class="current-date">
+            <span class="material-symbols-outlined">calendar_today</span>
+            <span>{{ today_date|date:"D, d M Y" }}</span>
+        </div>
+    </div>
+    
+    <div class="hero-grid">
+        <div class="glass-card activity">
+            <div class="icon-box"><span class="material-symbols-outlined">analytics</span></div>
+            <div class="data">
+                <span class="label">Today's Traffic</span>
+                <h2 class="counter">{{ today_count }}</h2>
+            </div>
+        </div>
+        
+        <div class="glass-card gifts">
+            <div class="icon-box"><span class="material-symbols-outlined">redeem</span></div>
+            <div class="data">
+                <span class="label">Free Downloads</span>
+                <h2 class="counter">{{ free_count }}</h2>
+            </div>
+        </div>
+        
+        <div class="glass-card revenue">
+            <div class="icon-box"><span class="material-symbols-outlined">account_balance_wallet</span></div>
+            <div class="data">
+                <span class="label">Total Revenue</span>
+                <h2 class="counter">₹{{ total_revenue|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-table-container">
+        <div class="table-header-flex">
+            <h3><span class="material-symbols-outlined">query_stats</span> Product Performance</h3>
+            <span class="badge-total">{{ product_stats|length }} Products Tracked</span>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="premium-table">
+                <thead>
+                    <tr>
+                        <th>Product Details</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Unique Users</th>
+                        <th class="text-center">Total Hits</th>
+                        <th class="text-right">Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in product_stats %}
+                    <tr class="table-row">
+                        <td class="product-info">
+                            <div class="p-icon-bg">
+                                <span class="material-symbols-outlined">package_2</span>
+                            </div>
+                            <div class="p-text">
+                                <strong>{{ stat.product__title }}</strong>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge active">Live</span>
+                        </td>
+                        <td class="text-center count-blue">{{ stat.unique_users }}</td>
+                        <td class="text-center count-purple">{{ stat.total_downloads }}</td>
+                        <td class="text-right amount-green">₹{{ stat.total_revenue|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <span class="material-symbols-outlined">database_off</span>
+                            <p>No transactions recorded yet.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

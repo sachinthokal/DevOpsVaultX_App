@@ -1,111 +1,147 @@
-{% extends 'base.html' %}
+{% extends "admin/base_site.html" %}
 {% load static %}
 
-{% block content %}
-<div class="table-body">
+{% block extrahead %}
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="{% static 'db_monitor/css/db_size.css' %}">
+    <link rel="stylesheet" href="{% static 'db_monitor/css/admin_dashboard.css' %}">
+{% endblock %}
 
-    <div class="table-header">
-        <h1>Database Size Report</h1>
-        <button id="exportBtn">Export Table as CSV</button>
+{% block content %}
+<div id="content-main" class="premium-dashboard">
+    <div class="header-section">
+        <div class="welcome-text">
+            <h1>Database Health Report</h1>
+            <p>Monitoring <strong>{{ report.database }}</strong> metrics</p>
+        </div>
+        <div class="action-buttons">
+            <button id="exportBtn" class="btn-premium">
+                <span class="material-symbols-outlined">download</span>
+                Export CSV
+            </button>
+        </div>
+    </div>
+    
+    <div class="hero-grid">
+        <div class="glass-card activity">
+            <div class="icon-box"><span class="material-symbols-outlined">database</span></div>
+            <div class="data">
+                <span class="label">Total Data Size</span>
+                <h2 class="counter">{{ report.total_data }}</h2>
+            </div>
+        </div>
+        
+        <div class="glass-card gifts">
+            <div class="icon-box"><span class="material-symbols-outlined">list_alt</span></div>
+            <div class="data">
+                <span class="label">Total Index Size</span>
+                <h2 class="counter">{{ report.total_index }}</h2>
+            </div>
+        </div>
+        
+        <div class="glass-card storage-status">
+            <div class="icon-box"><span class="material-symbols-outlined">storage</span></div>
+            <div class="data-full">
+                <div class="memory-labels">
+                    <span class="label">Capacity Usage</span>
+                    <span class="label-bold">{{ report.database_size }} / {{ report.DB_Bar_Cap }} MB</span>
+                </div>
+                <div class="size-bar-container main-bar">
+                    <div class="size-bar {{ report.db_bar_color }}"
+                         style="width: {{ report.db_percentage|floatformat:1 }}%;">
+                        {{ report.db_percentage|floatformat:1 }}%
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <p><strong>Database:</strong> {{ report.database }}</p>
-
-    <!-- ===== Summary ===== -->
-    <br>
-    <h2>Summary</h2>
-    <table class="summary-table">
-        <thead>
-            <tr>
-                <th>Total Data Size</th>
-                <th>Total Index Size</th>
-                <th>Total Database Size</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>{{ report.total_data }}</td>
-                <td>{{ report.total_index }}</td>
-                <td>
-                    <div class="memory-labels">
-                        <span>Used: {{ report.database_size }}</span>
-                        <span>Total: {{ report.DB_Bar_Cap }} MB</span>
-                    </div>
-
-                    <div class="size-bar-container">
-                        <div class="size-bar {{ report.db_bar_color }}"
-                             style="width: {{ report.db_percentage|floatformat:1 }}%;">
-                            {{ report.db_percentage|floatformat:1 }}%
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <!-- ===== Table Details ===== -->
-    <br>
-    <h2>Table Details</h2>
-    <table class="summary-table">
-        <thead>
-            <tr>
-                <th>Table</th>
-                <th>Data Size</th>
-                <th>Index Size</th>
-                <th>Total Size</th>
-                <th>Usage</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for t in report.tables %}
-            <tr>
-                <td>{{ t.table }}</td>
-                <td>{{ t.data }}</td>
-                <td>{{ t.index }}</td>
-                <td>{{ t.total }} {{ t.status_emoji }}</td>
-                <td>
-                    <!-- ✅ FIXED USAGE BAR -->
-                    <div class="usage-wrapper">
-                        <div class="size-bar-container usage-bar">
-                            <div class="size-bar {{ t.bar_color }}"
-                                 style="width: {{ t.percentage|floatformat:1 }}%;">
+    <div class="main-table-container">
+        <div class="table-header-flex">
+            <h3><span class="material-symbols-outlined">table_chart</span> Table Details</h3>
+            <span class="badge-total">{{ report.tables|length }} Tables Analyzed</span>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="premium-table summary-table" id="dbReportTable">
+                <thead>
+                    <tr>
+                        <th>Table Name</th>
+                        <th class="text-center">Data Size</th>
+                        <th class="text-center">Index Size</th>
+                        <th class="text-center">Total Size</th>
+                        <th class="text-right" style="width: 250px;">Storage Usage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in report.tables %}
+                    <tr class="table-row">
+                        <td class="product-info">
+                            <div class="p-icon-bg">
+                                <span class="material-symbols-outlined">table_rows</span>
                             </div>
-                        </div>
-                        <span class="usage-text">
-                            {{ t.percentage|floatformat:1 }}%
-                        </span>
-                    </div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                            <div class="p-text">
+                                <strong>{{ t.table }}</strong>
+                            </div>
+                        </td>
+                        <td class="text-center count-blue">{{ t.data }}</td>
+                        <td class="text-center count-purple">{{ t.index }}</td>
+                        <td class="text-center">
+                            <span class="total-size-chip">{{ t.total }}</span>
+                            {{ t.status_emoji }}
+                        </td>
+                        <td class="text-right">
+                            <div class="usage-wrapper">
+                                <div class="size-bar-container usage-bar">
+                                    <div class="size-bar {{ t.bar_color }}"
+                                         style="width: {{ t.percentage|floatformat:1 }}%;">
+                                    </div>
+                                </div>
+                                <span class="usage-text">{{ t.percentage|floatformat:1 }}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty-state">No database records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script>
 document.getElementById("exportBtn").addEventListener("click", function () {
-    const tables = document.querySelectorAll(".summary-table");
+    const table = document.getElementById("dbReportTable");
     let csv = [];
-
+    
     function removeEmojis(text) {
         return text.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
     }
 
-    tables.forEach((table, index) => {
-        csv.push(index === 0 ? '"Summary Table"' : '"Table Details"');
-        table.querySelectorAll("tr").forEach(row => {
-            let rowData = [];
-            row.querySelectorAll("th, td").forEach(cell => {
-                rowData.push('"' + removeEmojis(cell.innerText) + '"');
-            });
-            csv.push(rowData.join(","));
+    // Add Header
+    csv.push('"Database Size Report"');
+    csv.push('"Database: {{ report.database }}"');
+    csv.push("");
+
+    // Add Table Rows
+    const rows = table.querySelectorAll("tr");
+    rows.forEach(row => {
+        let rowData = [];
+        row.querySelectorAll("th, td").forEach(cell => {
+            // Clean text from multiple spaces and newlines
+            let cleanText = cell.innerText.replace(/\s+/g, ' ').trim();
+            rowData.push('"' + removeEmojis(cleanText) + '"');
         });
-        csv.push("");
+        if(rowData.length > 0) csv.push(rowData.join(","));
     });
 
     const csvFile = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
     const downloadLink = document.createElement("a");
-    downloadLink.download = "database_report.csv";
+    downloadLink.download = "DB_Health_Report_{{ today_date|date:'Ymd' }}.csv";
     downloadLink.href = window.URL.createObjectURL(csvFile);
     downloadLink.click();
 });

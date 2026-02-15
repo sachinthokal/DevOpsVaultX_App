@@ -1,157 +1,197 @@
-/* ---------------- HERO ---------------- */
-.hero {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2)),
-        url("../../images/hero-bg.png");
-    background-size: cover;
-    background-repeat: no-repeat;
-    min-height: 400px;
+/* ================= Hero Section ================= */
+.home-section {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 20px;
-    color: black;
-}
-
-.hero-text {
-    max-width: 500px;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
-
-/* ---------------- FEATURED ---------------- */
-.featured {
-    padding: 60px 0;
-    background-color: #f8fafc;
-}
-
-.section-title {
-    text-align: center;
-    font-size: 32px;
-    font-weight: 800;
-    color: #1e293b;
-    margin-bottom: 40px;
-}
-
-.products-grid {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
     flex-wrap: wrap;
-    max-width: 1200px;
-    margin: 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    padding: 80px 5%;
+    background-color: #22314f; /* dark navy hero */
+    color: #fff;
+    border-radius: 0; /* match screenshot */
 }
 
-/* ---------------- PRODUCT CARD ---------------- */
-.product-card {
-    position: relative; /* REQUIRED for badge */
-    width: 320px;
-    background: white;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
+.home-hero-image {
+    max-width: 600px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    flex: 1 1 50%;
+}
+
+.home-text {
+    flex: 1 1 45%;
+    padding: 20px;
+}
+
+.home-text h1 {
+    font-size: 2.8rem;
+    margin-bottom: 20px;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.home-text p {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    color: #d0d0d0;
+}
+
+.home-btn-primary {
+    background: #ff6b00; /* orange button */
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 6px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.home-btn-primary:hover {
+    background: #ff8b33;
+    transform: translateY(-2px);
+}
+
+/* ================= Featured Products ================= */
+.home-featured {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 0 5%;
+}
+
+.home-section-title {
+    font-size: 1.8rem;
+    margin-bottom: 40px;
+    text-align: center;
+    position: relative;
+    color: #212529;
+    text-transform: uppercase;
+}
+
+.home-section-title::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: #ff6b00; /* orange underline */
+    margin: 8px auto 0;
+    border-radius: 2px;
+}
+
+/* ================= Product Grid ================= */
+.home-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+/* ================= Product Card ================= */
+.home-product-card {
+    background-color: #f8f9fa; /* light card */
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
-.card-img-container {
+.home-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+}
+
+.home-card-img-container {
+    position: relative;
     height: 180px;
-    background: #f1f5f9;
+    background: #e1e8f0; /* subtle light background */
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.card-thumbnail {
-    max-width: 100%;
+.home-card-thumbnail {
     max-height: 100%;
     object-fit: contain;
 }
 
-.card-body {
+.home-no-image-text {
+    color: #999;
+    font-weight: 500;
+}
+
+.home-card-body {
     padding: 20px;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
 }
 
-.product-title {
-    font-size: 18px;
-    font-weight: 800;
-    color: #0f172a;
+.home-product-title {
+    font-size: 1.1rem;
+    font-weight: 700;
     margin-bottom: 10px;
+    color: #212529;
+    text-transform: capitalize;
 }
 
-.product-desc {
-    font-size: 14px;
-    color: #64748b;
-    line-height: 1.6;
-    flex-grow: 1;
-}
-.btn-secondary{
-    display: block;
-    margin: 15px 0px 0px -10px;
+.home-product-desc {
+    flex: 1;
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 20px;
 }
 
-/* ---------------- PRICE & BUTTON ---------------- */
-.price-row {
+.home-price-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 15px;
 }
 
-.price-tag {
-    font-size: 22px;
-    font-weight: 800;
-    color: #2563eb;
+.home-price-tag {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #22314f; /* match hero/nav color */
 }
 
-/* ---------------- NEW BADGE (FIXED) ---------------- */
-.badge-new {
-    position: absolute;
-    top: 10px;
-    left: 10px;
+/* Gradient Button */
+.home-btn-secondary {
+    background: linear-gradient(90deg, #6a00ff, #e600ff); /* purple-pink gradient */
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    text-align: center;
+}
 
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    color: #ffffff;
+.home-btn-secondary:hover {
+    background: linear-gradient(90deg, #8c33ff, #ff33e6);
+    transform: translateY(-2px);
+}
 
-    font-size: 10px;
+/* ================= Badge ================= */
+.home-badge-new {
+    background-color: #ff3d00;
+    color: #fff;
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.5px;
-
     padding: 4px 10px;
-    border-radius: 999px;
-
-    width: fit-content;   /* 🔑 VERY IMPORTANT */
-    height: auto;
-
-    box-shadow: 0 4px 8px rgba(34, 197, 94, 0.35);
+    text-align: center;
     text-transform: uppercase;
-    z-index: 10;
 }
 
-
-@keyframes spark-glow {
-    0% {
-        transform: scale(1);
-        filter: brightness(1);
-    }
-    100% {
-        transform: scale(1.08);
-        filter: brightness(1.3);
-    }
-}
-
-/* ---------------- RESPONSIVE ---------------- */
-@media (max-width: 768px) {
-    .hero {
-        min-height: 70vh;
-        background-position: center top;
+/* ================= Responsive ================= */
+@media screen and (max-width: 768px) {
+    .home-section {
+        flex-direction: column-reverse;
+        text-align: center;
+        padding: 60px 5%;
     }
 
-    .products-grid {
-        padding: 0 15px;
+    .home-hero-image {
+        max-width: 100%;
+        margin-bottom: 30px;
+    }
+
+    .home-text h1 {
+        font-size: 2.2rem;
     }
 }

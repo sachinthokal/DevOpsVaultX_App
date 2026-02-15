@@ -1,7 +1,6 @@
 from django.db import models
 from products.models import Product
 
-
 class Payment(models.Model):
 
     STATUS_CHOICES = (
@@ -16,9 +15,21 @@ class Payment(models.Model):
         related_name="payments"
     )
 
+    # 🔥 NEW FIELDS: Guest User चा डेटा साठवण्यासाठी
+    customer_name = models.CharField(max_length=100, blank=True, null=True)
+    email = models.EmailField(db_index=True, blank=True, null=True)
+
+    # unique=True काढले आहे कारण FREE_ID मल्टिपल वेळा येऊ शकतो
     razorpay_order_id = models.CharField(
         max_length=100,
-        unique=True,
+        db_index=True
+    )
+
+    # नवीन फिल्ड: Unique users ट्रॅक करण्यासाठी
+    session_id = models.CharField(
+        max_length=100, 
+        blank=True, 
+        null=True, 
         db_index=True
     )
 
@@ -36,9 +47,8 @@ class Payment(models.Model):
     )
 
     amount = models.PositiveIntegerField(
-    help_text="Amount in paise"
+        help_text="Amount in paise"
     )
-
 
     status = models.CharField(
         max_length=10,
@@ -49,10 +59,21 @@ class Payment(models.Model):
 
     paid = models.BooleanField(default=False)
 
+    # किती वेळा डाउनलोड केलंय ते ट्रॅक करेल
     retry_count = models.PositiveSmallIntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        # १. डेटाबेस टेबलचे नाव बदलण्यासाठी
+        db_table = 'devopsvaultx_payments'
+        
+        # २. ॲडमिन पॅनेलमध्ये सुटसुटीत नाव दिसण्यासाठी
+        verbose_name = "DevOpsVaultX Payment"
+        verbose_name_plural = "DevOpsVaultX Payments"
+
     def __str__(self):
-        return f"{self.product.title} | {self.razorpay_order_id} | {self.status}"
+        # Email असेल तर तो सुद्धा स्ट्रिंगमध्ये दिसेल, ओळखायला सोपे जाईल
+        user_info = self.email if self.email else "Guest"
+        return f"{self.product.title} | {user_info} | {self.status}"
