@@ -1,54 +1,101 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="vault-wrapper">
-    <div class="vault-grid">
-        <div class="side-banner side-left">Advertisement</div>
 
-        <div class="vault-card">
+<section class="vault-wrapper-new">
+    <div class="vault-grid-new">
+
+        <aside class="side-banner-new">
+            <video autoplay muted loop playsinline class="banner-video">
+                <!-- <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4"> -->
+            </video>
+            <p class="banner-text">DevOpsVaultX</p>
+        </aside>
+
+        <div class="vault-card-new fixed-card">
             <h2>📰 DevOps News</h2>
-            <div class="vault-content">
+            <div class="vault-list scroll-area">
                 {% for item in news %}
-                <a href="{% url 'vault:detail' item.category item.slug %}" class="vault-item" style="border-left: 6px solid #3b82f6;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span class="vault-title">{{ item.title }}</span>
-                        <span class="vault-meta">{{ item.created_at|timesince }} ago</span>
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-        </div>
+                <a href="{% url 'vault:detail' item.category item.slug %}" class="vault-row news"
+                    class="vault-row news {% if item.is_pinned %}pinned{% endif %}">
+                    <div class="row-left">
+                        <div class="vault-title">{{ item.title }}</div>
 
-        <div class="vault-card">
-            <h2>✍️ Latest Blogs</h2>
-            <div class="vault-content">
-                {% for item in blogs %}
-                <a href="{% url 'vault:detail' item.category item.slug %}" class="vault-item" style="border-left: 6px solid #10b981;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span class="vault-title">{{ item.title }}</span>
-                        <span class="vault-meta">{{ item.created_at|timesince }} ago</span>
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-        </div>
+                        <div class="tag-container">
+                            {% if item.is_pinned %}
+                            <span class="pin-badge">📌 PINNED</span>
+                            {% endif %}
 
-        <div class="side-banner side-right">Promotions</div>
-
-        <div class="area-offers">
-            <div class="vault-card" style="min-height: auto;">
-                <h2>🎁 Exclusive Offers</h2>
-                <div class="offers-inner-grid">
-                    {% for item in offers %}
-                    <a href="{% url 'vault:detail' item.category item.slug %}" class="vault-item" style="border-top: 5px solid #f97316;">
-                        <div style="margin-bottom: 8px;">
-                            <span style="font-size: 10px; font-weight: 800; color: #ea580c; background: #fff7ed; padding: 2px 8px; border-radius: 4px;">OFFER</span>
+                            {% if item.is_new %}
+                            <span class="new-badge">NEW</span>
+                            {% endif %}
                         </div>
-                        <span class="vault-title" style="font-size: 19px;">{{ item.title }}</span>
-                    </a>
-                    {% endfor %}
-                </div>
+
+
+                        <div class="vault-time">{{ item.created_at|timesince }} ago</div>
+                    </div>
+                    <span class="arrow">→</span>
+                </a>
+                {% endfor %}
             </div>
         </div>
+
+        <div class="vault-card-new fixed-card">
+            <h2>✍️ Blogs</h2>
+            <div class="vault-list scroll-area">
+                {% for item in blogs %}
+                <a href="{% url 'vault:detail' item.category item.slug %}" class="vault-row blog">
+                    <div class="row-left">
+                        <div class="vault-title">{{ item.title }}</div>
+                        <div class="tag-container">
+                            {% if item.is_pinned %}
+                            <span class="pin-badge">📌 PINNED</span>
+                            {% endif %}
+
+                            {% if item.is_new %}
+                            <span class="new-badge">NEW</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="vault-time">{{ item.created_at|timesince }} ago</div>
+                    </div>
+                    <span class="arrow">→</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <aside class="side-banner-new">
+            <video autoplay muted loop playsinline class="banner-video">
+                <!-- <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4"> -->
+            </video>
+            <p class="banner-text">DevOpsVaultX</p>
+        </aside>
+
+        <div class="vault-card-new full-width">
+            <h2>🎁 Exclusive Offers</h2>
+            <div class="offers-grid-new">
+                {% for item in offers %}
+                <a href="{% url 'vault:detail' item.category item.slug %}" class="offer-card">
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
+                        {% if item.is_new %}
+                        <span class="offer-badge">NEW OFFER</span>
+                        {% else %}
+                        <span class="offer-badge"
+                            style="background: linear-gradient(45deg, #56c570, #025720);">OFFER</span>
+                        {% endif %}
+                    </div>
+
+                    <h3>{{ item.title }}</h3>
+
+                    <div class="vault-time" style="color: #cbd5e1; margin-top: 10px;">
+                        {{ item.created_at|timesince }} ago
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
     </div>
 </section>
+
 {% endblock %}
