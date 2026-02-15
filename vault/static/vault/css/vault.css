@@ -1,146 +1,229 @@
-.vault-wrapper {
-    flex: 1 0 auto;
-    width: 100%;
-    max-width: 100%;
-    padding: 20px 40px;
-    box-sizing: border-box;
+/* ===== NEW VAULT UI - FINAL FIXED ===== */
+
+.vault-wrapper-new {
+    padding: 30px 20px;
+    background: linear-gradient(135deg, #f0f4ff, #f8fafc);
 }
 
-/* ================= GRID SYSTEM ================= */
-.vault-grid {
+.vault-grid-new {
     display: grid;
-    grid-template-columns: 220px 1fr 1fr 220px;
-    gap: 25px;
-    align-items: start;
+    grid-template-columns: 200px 1fr 1fr 200px;
+    gap: 24px;
+    max-width: 1440px;
+    margin: auto;
 }
 
-/* Side Banners (Desktop Only) */
-.side-banner {
-    grid-row: 1;
-    min-height: 450px;
-    background: #ffffff;
+/* Card Base */
+.vault-card-new {
+    background: rgba(255, 255, 255, 0.95);
     border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px dashed #cbd5e1;
-    color: #94a3b8;
-    font-weight: 700;
-    font-size: 11px;
-    text-transform: uppercase;
-    position: relative;
-    top: 20px;
-}
-
-.side-left { grid-column: 1; }
-.side-right { grid-column: 4; }
-
-/* Main Cards */
-.vault-card {
-    background: #ffffff;
-    border-radius: 24px;
-    padding: 25px;
-    border: 1px solid #eef2f6;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
-
+    padding: 15px; /* Padding thoda vadhvla clarity sathi */
 }
 
-.vault-card h2 {
-    font-size: 1.4rem;
-    font-weight: 850;
-    margin-bottom: 20px;
-    color: #0f172a;
+.fixed-card {
+    height: 450px; /* Thoda height vadhvla 3 rows sathi */
 }
 
-.vault-content {
+.scroll-area {
+    position: relative;   /* 🔴 MUST */
     flex: 1;
     overflow-y: auto;
-    max-height: 450px;
-    padding-right: 8px;
+    overflow-x: hidden;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
 }
 
-/* Offer Section Full Width */
-.area-offers {
-    grid-row: 2;
-    grid-column: 1 / -1;
-    margin-top: 15px;
+.scroll-area::-webkit-scrollbar { display: none; }
+
+.vault-card-new h2 {
+    margin-bottom: 16px;
+    font-size: 20px;
+    color: #1e293b;
+    border-bottom: 2px solid #f1f5f9;
+    text-align: center;
+    padding-bottom: 10px;
+    text-transform: uppercase;
 }
 
-.offers-inner-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 20px;
+.vault-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-/* Item Styling */
-.vault-item {
-    display: block;
+/* Row Styling */
+.vault-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #0f172a, #334155);
     text-decoration: none;
-    background: rgb(190, 190, 187);
-    border-radius: 14px;
-    padding: 18px 22px;
-    margin-bottom: 12px;
-    border: 1px solid #f1f5f9;
-    transition: 0.2s ease;
+    color: #ffffff;
+    transition: 0.3s ease;
 }
 
-.vault-item:hover {
-    background: #ffffff;
-    border-color: #3b82f6;
+.row-left {
+    display: flex;
+    flex-direction: column; /* 1. Title, 2. Tag, 3. Time एकाखाली एक येतील */
+    gap: 6px;
+    flex: 1;
+}
+
+.vault-title {
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.4;
+}
+/* Pinned row stays on top inside scroll */
+.vault-row.pinned {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+
+    /* Visual separation */
+    background: linear-gradient(180deg, #020617, #1e293b);
+    border-left: 5px solid #3b82f6;
+
+    /* Smooth feel */
+    box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+}
+
+
+/* Tag container flexible */
+.tag-container {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;   /* Safety for small screens */
+    min-height: 22px;  /* Consistent spacing */
+}
+
+/* PIN Badge */
+.pin-badge {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 3px 8px rgba(37,99,235,0.4);
+}
+
+/* NEW Badge (thoda refine) */
+.new-badge {
+    background: linear-gradient(45deg, #ef4444, #f87171);
+    color: white;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+
+.vault-time {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+/* Color Accents */
+.vault-row.news { border-left: 5px solid #e1341a; }
+.vault-row.blog { border-left: 5px solid #35e71a; }
+
+.vault-row:hover {
+    background: #0b022f;
     transform: translateX(6px);
 }
 
-.vault-title { font-size: 16px; font-weight: 700; color: #1e293b; }
-.vault-meta { font-size: 11px; color: black; }
+.arrow { font-size: 18px; }
 
-/* ================= RESPONSIVE (FOR ALL SCREENS) ================= */
-
-/* Tablet View */
-@media (max-width: 1280px) {
-    .vault-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-    .side-banner { display: none; }
-    .area-offers { grid-column: 1 / span 2; }
-}
-
-/* Mobile View - Fixing Large Size Issue */
-@media (max-width: 768px) {
-    .vault-wrapper {
-        padding: 15px 20px;
-    }
-    .vault-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-    .vault-card {
-        padding: 20px; /* Mobile var padding kami keli */
-        border-radius: 18px;
-    }
-    .vault-card h2 {
-        font-size: 1.2rem; /* Heading thodi lahan keli */
-        margin-bottom: 15px;
-    }
-    .vault-item {
-        padding: 15px; /* Items thode barik kele */
-    }
-    .vault-title {
-        font-size: 14px; /* Title size kami keli */
-    }
-    .offers-inner-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Bottom Footer */
-.vault-footer {
+.side-banner-new {
+    position: relative;
+    width: 200px; /* <--- ही रुंदी वाढवा, म्हणजे बॅनर मोठा दिसेल */
     background: #0f172a;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.banner-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%; /* आता वाढवलेल्या रुंदीनुसार व्हिडिओ सेट होईल */
+    height: 100%;
+    object-fit: cover; /* व्हिडिओ स्ट्रेच न होता पूर्ण जागा भरेल */
+    z-index: 1;
+}
+
+.banner-text {
+    position: relative;
+    bottom: -215px;
+    z-index: 2;
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    padding: 5px;
+    border-radius: 5px;
     color: white;
-    padding: 20px 0;
-    text-align: center;
-    font-size: 13px;
-    width: 100%;
+    font-size: 0.5rem; /* <--- मजकूर लहान वाटत असेल तर साईज वाढवा */
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.full-width { grid-column: span 4; }
+.offers-grid-new {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
+}
+
+.offer-card {
+    background: linear-gradient(180deg, #0f172a, #334155);
+    padding: 25px; border-radius: 16px; color: white; text-decoration: none; border-left: 5px solid #f49e26;
+}
+.offer-card {
+    position: relative;
+}
+
+.offer-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 1px;
+    box-shadow: 0 8px 20px rgba(239,68,68,0.45);
+}
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.7); }
+    70% { box-shadow: 0 0 0 12px rgba(34,197,94,0); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+
+.offer-badge {
+    animation: pulse 2.5s infinite;
+}
+
+
+@media (max-width: 1200px) {
+    .vault-grid-new { grid-template-columns: 1fr 1fr; }
+    .side-banner-new { display: none; }
+    .full-width { grid-column: span 2; }
+}
+
+@media (max-width: 768px) {
+    .vault-grid-new { grid-template-columns: 1fr; }
+    .full-width { grid-column: span 1; }
+    .fixed-card { height: auto; }
 }

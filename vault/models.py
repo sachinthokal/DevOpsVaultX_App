@@ -50,8 +50,13 @@ class VaultPost(models.Model):
 
     @property
     def is_new(self):
-        # २ दिवसांच्या आतली पोस्ट 'New' दाखवण्यासाठी
-        return self.created_at >= timezone.now() - timedelta(days=2)
+        # १. जर Admin मधून 'mark_new' टिक केले असेल तर 'New' दाखवा
+        if self.mark_new:
+            return True
+        
+        # २. किंवा जर पोस्ट २ दिवसांच्या आतली असेल तर 'New' दाखवा
+        now = timezone.now()
+        return self.created_at >= now - timedelta(days=2)
 
     def __str__(self):
         return self.title
