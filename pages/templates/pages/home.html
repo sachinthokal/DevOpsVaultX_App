@@ -1,72 +1,71 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
-<!-- HERO SECTION -->
-<section class="hero" aria-label="DevOps Learning Hero Section">
-    <div class="hero-text">
-        <!-- ✅ ONE H1 (GOOD SEO) -->
+<div class="home-section" aria-label="DevOps Learning Home Section">
+    <img src="{% static 'images/hero-bg-3.png' %}" class="home-hero-image" alt="DevOps Learning Home Section"
+        loading="lazy">
+    <div class="home-text">
         <h1>Learn DevOps the Smart Way</h1>
-
         <p>
             Boost your DevOps skills with practical guides, tools, and real-world resources.
         </p>
-
-        <a href="/products/" class="btn-secondary" aria-label="Explore DevOps Products">
+        <a href="/products/" class="home-btn-primary" aria-label="Explore DevOps Products">
             Explore Products
         </a>
     </div>
-</section>
+</div>
 
-<!-- FEATURED PRODUCTS -->
-<section class="featured" aria-labelledby="featured-products-title">
-    <!-- ✅ H2 for section -->
-    <h2 id="featured-products-title" class="section-title">
+<section class="home-featured" aria-labelledby="featured-products-title">
+    <h2 id="featured-products-title" class="home-section-title">
         Featured DevOps Products
     </h2>
 
-    <div class="products-grid">
+    <div class="home-products-grid">
         {% if products %}
         {% for product in products %}
         {% if product.is_new %}
-        <article class="product-card" data-category="{{ product.category|lower }}"
+        <article class="home-product-card" data-category="{{ product.category|lower }}"
             aria-label="Product {{ product.title }}">
 
-            <!-- NEW BADGE -->
-            <span class="badge-new" aria-label="New Product">
+            <span class="home-badge-new" aria-label="New Product">
                 NEW
             </span>
 
-            <div class="card-img-container">
+            <div class="home-card-img-container">
                 {% if product.image %}
-                <!-- ✅ ALT improved -->
-                <img src="{{ product.image.url }}" alt="{{ product.title }} - DevOps Product" class="card-thumbnail"
-                    loading="lazy">
+                <img src="{{ product.image.url }}" alt="{{ product.title }} - DevOps Product"
+                    class="home-card-thumbnail" loading="lazy">
                 {% else %}
-                <div class="no-image-text" aria-hidden="true">
+                <div class="home-no-image-text" aria-hidden="true">
                     No Preview
                 </div>
                 {% endif %}
             </div>
 
-            <div class="card-body">
-                <!-- ✅ H3 for card title -->
-                <h3 class="product-title">
-                    {{ product.title }}
-                </h3>
-
-                <p class="product-desc">
+            <div class="home-card-body">
+                <h3 class="home-product-title">{{ product.title }}</h3>
+                <p class="home-product-desc">
                     {{ product.description|truncatechars:80 }}
                 </p>
 
-                <div class="price-row">
-                    <span class="price-tag">
+                <div class="home-price-row">
+                    <span class="home-price-tag">
+                        {% if product.price == 0 %}
+                        FREE
+                        {% else %}
                         ₹ {{ product.price }}
+                        {% endif %}
                     </span>
 
-                    <a href="{% url 'products:buy_now' product.pk %}" class="btn-secondary"
+                    <a href="{% url 'products:buy_now' product.pk %}" class="home-btn-secondary"
                         aria-label="Buy {{ product.title }}">
+                        {% if product.price == 0 %}
+                        Get Now
+                        {% else %}
                         Buy Now
+                        {% endif %}
                     </a>
                 </div>
             </div>
@@ -74,7 +73,7 @@
         {% endif %}
         {% endfor %}
         {% else %}
-        <p>No products found.</p>
+        <p style="text-align: center; width: 100%;">No products found.</p>
         {% endif %}
     </div>
 </section>
