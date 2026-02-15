@@ -2,10 +2,9 @@
 {% load static %}
 
 {% block content %}
-<!-- Toast -->
 <div id="toast" class="toast">
   <div class="icon">✔️</div>
-  <div class="message">Processing payment...</div>
+  <div class="message">Processing...</div>
   {% if file_url %}
   <button class="btn-download" id="downloadBtn">Download</button>
   {% endif %}
@@ -40,14 +39,8 @@
     transform: translate(-50%, -50%) scale(1);
   }
 
-  .toast .icon {
-    font-size: 2rem;
-  }
-
-  .toast .message {
-    font-size: 1.1rem;
-    font-weight: 500;
-  }
+  .toast .icon { font-size: 2rem; }
+  .toast .message { font-size: 1.1rem; font-weight: 500; }
 
   .toast .btn-download {
     background: #4caf50;
@@ -60,18 +53,12 @@
     transition: background 0.2s ease;
   }
 
-  .toast .btn-download:hover {
-    background: #45a049;
-  }
+  .toast .btn-download:hover { background: #45a049; }
 
-  /* Success / Failed colors */
-  .toast.success {
-    background: #1e462f;
-  }
-
-  .toast.failed {
-    background: #46201e;
-  }
+  /* Colors */
+  .toast.success { background: #1e462f; }
+  .toast.failed { background: #46201e; }
+  .toast.free { background: #1e3a46; } /* Optional: Free sathi blue tint */
 </style>
 
 <script>
@@ -80,14 +67,21 @@
   const message = toast.querySelector(".message");
   const downloadBtn = document.getElementById("downloadBtn");
 
-  // Get payment status from Django
+  // Django kadun alela status ani is_free flag
   const paymentStatus = "{{ status|default:'failed' }}";
+  const isFree = "{{ is_free|yesno:'true,false' }}"; 
 
   // Update toast based on status
   if (paymentStatus === "success") {
     toast.classList.add("success");
     icon.textContent = "✅";
-    message.textContent = "Payment successful !!   Download your file now ➜";
+    
+    // Check kara jar mofat asel tar
+    if (isFree === "true") {
+        message.textContent = "It's Free !! Download your file now...";
+    } else {
+        message.textContent = "Payment successful !! Download your file now...";
+    }
   } else {
     toast.classList.add("failed");
     icon.textContent = "❌";
@@ -101,13 +95,16 @@
   if (downloadBtn) {
     downloadBtn.addEventListener("click", () => {
       document.getElementById("downloadLink").click();
-      // Auto-hide toast after 5s
-      setTimeout(() => toast.classList.remove("show"), 5200);
-      window.location.href = "{% url 'products:list' %}";
+      
+      // Download suru zalya nantr redirect kara
+      setTimeout(() => {
+          toast.classList.remove("show");
+          window.location.href = "{% url 'products:list' %}";
+      }, 2000);
     });
   }
 
-  // Redirect to product list on failure after 5s
+  // Redirect on failure
   if (paymentStatus === "failed") {
     setTimeout(() => {
       window.location.href = "{% url 'products:list' %}";
