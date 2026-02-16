@@ -3,7 +3,6 @@
 
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="product-detail-wrapper">
     <div class="container">
         <a href="{% url 'products:list' %}" class="back-link">
@@ -31,10 +30,17 @@
                 <h1 class="detail-title">{{ product.title }}</h1>
                 
                 <div class="detail-meta">
-                    <div class="price-tag">
-                        <span class="currency">₹</span>
-                        <span class="amount">{{ product.price }}</span>
-                    </div>
+                    <div class="p-price">
+                            {% if product.price == 0 %}
+                            <div class="free-container">
+                                <span class="free-spike">FREE</span>
+                                <span class="free-glow"></span>
+                            </div>
+                            {% else %}
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                            <span class="amt"> {{ product.price }}</span>
+                            {% endif %}
+                        </div>
                     <span class="stock-status"><i class="fas fa-check-circle"></i> Instant Delivery</span>
                 </div>
 
@@ -50,8 +56,8 @@
                 </div>
 
                 <div class="features-list">
-                    <div class="f-item"><i class="fas fa-bolt"></i> Life-time Access</div>
-                    <div class="f-item"><i class="fas fa-sync"></i> Free Updates</div>
+                    <div class="f-item"><i class="fas fa-bolt"></i> Five Time Access</div>
+                    <div class="f-item"><i class="fas fa-sync"></i> Free Support</div>
                 </div>
 
                 <div class="cta-section">
