@@ -311,24 +311,3 @@ def send_payment_success_email(user_email, product_title, customer_name):
         print(f"ERROR: Failed to send email! Details: {e}")
         logger.error(f"Email sending failed: {e}")
         return False
-    
-# ======================
-# 🔐 User Vault
-# ======================
-def user_vault(request):
-    session_id = request.session.session_key
-    # डेटाबेस मधून युजरचे शेवटचे पेमेंट रेकॉर्ड काढा जेणेकरून नाव/ईमेल मिळेल
-    last_payment = Payment.objects.filter(session_id=session_id, status="SUCCESS").order_by('-created_at').first()
-    
-    purchased_payments = Payment.objects.filter(
-        session_id=session_id,
-        status="SUCCESS",
-        paid=True,
-        retry_count__lt=5 
-    ).select_related('product')
-
-    return render(request, "user_vault/vault.html", {
-        "payments": purchased_payments,
-        "customer_name": last_payment.customer_name if last_payment else "Developer",
-        "customer_email": last_payment.email if last_payment else ""
-    })

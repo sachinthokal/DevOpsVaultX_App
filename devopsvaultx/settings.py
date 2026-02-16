@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'payments',
     'db_monitor',
     'vault',
+    'vaultx',
 ]
 
 # ==================================================

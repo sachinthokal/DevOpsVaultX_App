@@ -63,11 +63,18 @@
         </a>
 
         <nav class="nav-links" aria-label="Main Navigation">
-            <a href="/" class="{% if request.path == '/' %}active{% endif %}">HOME</a>
-            <a href="/products/" class="{% if request.path == '/products/' %}active{% endif %}">PRODUCTS</a>
-            <a href="/vault/" class="{% if request.path == '/vault/' %}active{% endif %}">THE VAULT</a>
-            <a href="/about/" class="{% if request.path == '/about/' %}active{% endif %}">ABOUT</a>
-            <a href="/contact/" class="{% if request.path == '/contact/' %}active{% endif %}">CONTACT</a>
+            <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">HOME</a>
+
+            <a href="{% url 'products:list' %}"
+                class="{% if request.path|slice:':10' == '/products/' %}active{% endif %}">PRODUCTS</a>
+
+            <a href="{% url 'vault:home' %}" class="{% if request.path == '/vault/' %}active{% endif %}">INSIGHTS</a>
+
+            <a href="{% url 'vaultx:index' %}" class="{% if 'vaultx' in request.path %}active{% endif %}">VAULTX</a>
+
+            <a href="{% url 'about' %}" class="{% if request.path == '/about/' %}active{% endif %}">ABOUT</a>
+
+            <a href="{% url 'contact' %}" class="{% if request.path == '/contact/' %}active{% endif %}">CONTACT</a>
         </nav>
 
     </header>
