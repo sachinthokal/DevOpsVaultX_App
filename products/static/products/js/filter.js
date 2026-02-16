@@ -1,38 +1,33 @@
 document.addEventListener("DOMContentLoaded", function() {
     const filterButtons = document.querySelectorAll('.filter-btn');
-    const productCards = document.querySelectorAll('.product-card');
+    const productCards = document.querySelectorAll('.p-card');
     const noDataMsg = document.getElementById('js-no-data');
 
     filterButtons.forEach(button => {
         button.addEventListener('click', () => {
-            // 1. Active button color chanage
+            // Active Tab UI switch
             filterButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
 
-            // 2. Filttered value
-            const filterValue = button.getAttribute('data-filter');
+            const filterValue = button.getAttribute('data-filter').toLowerCase();
+            let visibleCount = 0;
 
-            // 3. Cards show / hide
+            // Filter Logic
             productCards.forEach(card => {
-                const cardCategory = card.getAttribute('data-category');
-
+                const cardCategory = card.getAttribute('data-category').toLowerCase();
+                
                 if (filterValue === 'all' || filterValue === cardCategory) {
-                    card.style.display = 'flex'; // show
+                    card.style.display = 'flex'; // Important: Keep flex for card layout
+                    visibleCount++;
                 } else {
-                    card.style.display = 'none'; // hide
+                    card.style.display = 'none';
                 }
             });
 
-            // 4. "No Data" Message
-            const visibleCardsCount = Array.from(productCards).filter(card => card.style.display !== 'none').length;
-
-            if (visibleCardsCount === 0) {
-                noDataMsg.style.display = 'block'; // Message show
-            } else {
-                noDataMsg.style.display = 'none';  // Message hide
+            // Handle "No Data" visibility
+            if (noDataMsg) {
+                noDataMsg.style.display = (visibleCount === 0) ? 'block' : 'none';
             }
         });
     });
 });
-
-

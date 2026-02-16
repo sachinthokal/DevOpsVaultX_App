@@ -2,43 +2,65 @@
 {% load static %}
 
 {% block content %}
-<div class="product-detail-container">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <div class="detail-grid">
+<div class="product-detail-wrapper">
+    <div class="container">
+        <a href="{% url 'products:list' %}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Resources
+        </a>
 
-        <!-- LEFT -->
-        <div class="detail-left">
-            <div class="badge-category">{{ product.category|upper }}</div>
-
-            <div class="product-image-preview">
-                {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.title }}">
-                {% else %}
-                <div class="no-image-box">No Image Available</div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- RIGHT -->
-        <div class="detail-right">
-            <h1 class="detail-title">{{ product.title }}</h1>
-
-            <p class="detail-price"><strong>Price:</strong> ₹ {{ product.price }}</p>
-
-
-            <div class="detail-description">
-                {% if product.description %}
-                {{ product.description|linebreaks }}
-                {% else %}
-                <p>No Description Available.</p>
-                {% endif %}
+        <div class="detail-grid">
+            <div class="detail-left">
+                <div class="image-card">
+                    <div class="detail-badge">{{ product.category|upper }}</div>
+                    <div class="product-image-preview">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.title }}">
+                        {% else %}
+                        <div class="no-image-box">
+                            <i class="fas fa-file-code"></i>
+                            <p>Preview Not Available</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
 
-            <!-- Fixed Buy Now button -->
-            <a href="{% url 'products:buy_now' product.pk %}" class="btn-secondary">Buy Now
-            </a>
-        </div>
+            <div class="detail-right">
+                <h1 class="detail-title">{{ product.title }}</h1>
+                
+                <div class="detail-meta">
+                    <div class="price-tag">
+                        <span class="currency">₹</span>
+                        <span class="amount">{{ product.price }}</span>
+                    </div>
+                    <span class="stock-status"><i class="fas fa-check-circle"></i> Instant Delivery</span>
+                </div>
 
+                <div class="detail-info-card">
+                    <h3><i class="fas fa-info-circle"></i> Description</h3>
+                    <div class="description-text">
+                        {% if product.description %}
+                            {{ product.description|linebreaks }}
+                        {% else %}
+                            <p>No detailed description provided for this resource.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="features-list">
+                    <div class="f-item"><i class="fas fa-bolt"></i> Life-time Access</div>
+                    <div class="f-item"><i class="fas fa-sync"></i> Free Updates</div>
+                </div>
+
+                <div class="cta-section">
+                    <a href="{% url 'products:buy_now' product.pk %}" class="buy-btn-large">
+                        Buy Now & Download <i class="fas fa-shopping-cart"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
