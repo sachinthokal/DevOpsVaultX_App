@@ -11,5 +11,4 @@ urlpatterns = [
     path("failed/", views.payment_failed, name="payment_failed"),
     path("retry/<str:order_id>/", views.retry_payment, name="retry_payment"),
     path("webhook/razorpay/", views.razorpay_webhook, name="razorpay_webhook"),
-    path('vault/', views.user_vault, name='user_vault'),
 ]
