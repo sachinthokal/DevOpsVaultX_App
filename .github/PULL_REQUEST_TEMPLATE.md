@@ -1,13 +1,13 @@
 ## PR Summary
-<!-- Briefly describe what this PR does -->
+<!-- Issue Deatils -->
 
 ## Related Issue
 <!-- Link issue here: #123 -->
 
 ## Changes
-- Change 1
-- Change 2
-- Change 3
+### 1. <!-- Changes 1 -->
+### 2. <!-- Changes 2 -->
+### 3. <!-- Changes 3 -->
 
 ## Checklist
 - [ ] Code builds correctly

@@ -6,9 +6,19 @@ labels: bug
 assignees:
 ---
 
+## 📝 Description
+<!-- Explain issue details ? -->
 
-## Issue Details
+## 🚩 Current Behavior
+<!-- Explain what is current behavior ? -->
 
-**Steps to Reproduce:**  
-**Expected vs Actual:**  
+## 🎯 Expected Behavior
+<!-- Explain what is expected behavior ? -->
+
+## 🛠️ Proposed Fix
+<!-- Any suggestion to fix the issue (if any)? -->
+---
+**Labels:** `bug`, `ui`, `frontend`, `etc`
+---
+
 **Attachments / Logs / Screenshots:**
