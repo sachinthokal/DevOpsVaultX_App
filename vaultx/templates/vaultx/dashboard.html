@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'vaultx/css/dashboard.css' %}">
+
+<div class="vault-wrapper">
+    <div class="vault-header">
+        <div class="container">
+            <h1>DEVOPSVAULTX</h1>
+            <div class="user-info-pill">
+                <span>👤 <strong>{{ customer_name }}</strong></span>
+                <span style="margin: 0 15px; opacity: 0.3;">|</span>
+                <span style="opacity: 0.9;">📧 {{ customer_email }}</span>
+            </div>
+            <p style="margin-top: 20px; opacity: 0.8;">
+                Your premium resources are safely secured in the vault. ⬇️
+            </p>
+        </div>
+    </div>
+
+    <div class="vault-grid">
+        {% for payment in payments %}
+            <div class="asset-card">
+                <div class="card-top"></div>
+                <div class="card-content">
+                    <span class="status-tag">Premium Access</span>
+                    <h4 class="card-title">{{ payment.product.title }}</h4>
+                    <div class="usage-box">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                            <span>Downloads Used</span>
+                            <strong>{{ payment.retry_count|default:0 }} / 5</strong>
+                        </div>
+                        <div class="progress-wrap">
+                            <div class="progress-fill" style="width: {% widthratio payment.retry_count 5 100 %}%"></div>
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'products:download_file' payment.product.id %}" class="btn-action">
+                    Download Now ⬇️
+                </a>
+            </div>
+        {% empty %}
+            <div class="empty-vault-card">
+                <div style="font-size: 80px; margin-bottom: 20px;">🔓</div>
+                <h2 style="color: var(--vault-primary); font-size: 28px; font-weight: 800;">Your Vault is Locked !!</h2>
+                <p style="color: #64748b; margin: 15px 0 30px; font-size: 16px;">
+                    No premium resources found. Buy a product to unlock your DevOps journey.
+                </p>
+                <a href="{% url 'products:list' %}" 
+                   style="background: var(--vault-primary); color: white; padding: 15px 40px; border-radius: 50px; text-decoration: none; font-weight: 700; display: inline-block; box-shadow: 0 10px 20px rgba(30, 60, 114, 0.2);">
+                    Explore Products 🚀
+                </a>
+            </div>
+        {% endfor %}
+    </div> </div> {% endblock %}
