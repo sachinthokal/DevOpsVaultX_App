@@ -42,8 +42,8 @@
     <link rel="stylesheet" href="{% static 'products/css/toast.css' %}">
     <link rel="stylesheet" href="{% static 'payments/css/payments.css' %}">
     <link rel="stylesheet" href="{% static 'db_monitor/css/db_size.css' %}">
-    <link rel="stylesheet" href="{% static 'vault/css/vault.css' %}">
-    <link rel="stylesheet" href="{% static 'vault/css/vault_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'insights/css/insights_home.css' %}">
+    <link rel="stylesheet" href="{% static 'insights/css/insights_detail.css' %}">
 
 
     <!-- JS (defer = performance boost) -->
@@ -68,7 +68,7 @@
             <a href="{% url 'products:list' %}"
                 class="{% if request.path|slice:':10' == '/products/' %}active{% endif %}">PRODUCTS</a>
 
-            <a href="{% url 'vault:home' %}" class="{% if request.path == '/vault/' %}active{% endif %}">INSIGHTS</a>
+            <a href="{% url 'insights:home' %}" class="{% if request.path == '/insights/' %}active{% endif %}">INSIGHTS</a>
 
             <a href="{% url 'vaultx:index' %}" class="{% if 'vaultx' in request.path %}active{% endif %}">VAULTX</a>
 

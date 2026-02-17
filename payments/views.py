@@ -141,7 +141,7 @@ def payment_success(request, pk):
                     pass
 
         request.session[f"paid_{pk}"] = True
-        return redirect(reverse("products:payment_result", args=[pk]))
+        return redirect(reverse("payments:payment_result", args=[pk]))
 
     # 2. जर प्रॉडक्ट PAID असेल तर (Razorpay Flow)
     razorpay_order_id = request.POST.get("razorpay_order_id")
@@ -184,12 +184,12 @@ def payment_success(request, pk):
                 pass
 
         request.session[f"paid_{pk}"] = True
-        return redirect(reverse("products:payment_result", args=[pk]))
+        return redirect(reverse("payments:payment_result", args=[pk]))
 
     except razorpay.errors.SignatureVerificationError:
         payment.status = "FAILED"
         payment.save()
-        return redirect(reverse("products:payment_result", args=[pk]))
+        return redirect(reverse("payments:payment_result", args=[pk]))
 
 # ======================
 # PAYMENT FAILED
@@ -311,3 +311,34 @@ def send_payment_success_email(user_email, product_title, customer_name):
         print(f"ERROR: Failed to send email! Details: {e}")
         logger.error(f"Email sending failed: {e}")
         return False
+    
+
+# ======================
+# Payment Result Page
+# ======================
+def payment_result(request, pk):
+    session_key = f"paid_{pk}"
+    product = get_object_or_404(Product, pk=pk, is_active=True)
+
+    # 1. Check kara product Free aahe ka
+    is_free = product.price == 0
+
+    # 2. Database check (Paid products sathi)
+    db_paid = Payment.objects.filter(product=product, status="SUCCESS", paid=True).exists()
+
+    # 3. Success condition: Jar Free asel OR Session madhe entry asel OR DB madhe entry asel
+    if is_free or request.session.get(session_key) or db_paid:
+        status = "success"
+        file_url = reverse("products:download_file", args=[pk])
+        # Download access sathi session set kara
+        request.session[session_key] = True 
+    else:
+        status = "failed"
+        file_url = None
+    
+    return render(request, "payments/payment_result.html", {
+        "status": status,
+        "product": product,
+        "file_url": file_url,
+        "is_free": product.price == 0, # <--- He add kara
+    })

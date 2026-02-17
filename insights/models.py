@@ -3,7 +3,7 @@ from django.utils.text import slugify
 from django.utils import timezone
 from datetime import timedelta
 
-class VaultPost(models.Model):
+class InsightsPost(models.Model):
     CATEGORY_CHOICES = [
         ('news', 'News'),
         ('blog', 'Blog'),
@@ -26,12 +26,12 @@ class VaultPost(models.Model):
 
     class Meta:
         # 1. डेटाबेस टेबलचे नाव बदलण्यासाठी (तुमच्या आवडीचे नाव द्या)
-        db_table = 'devopsvaultx_vault_posts' # सध्या हे 'vault_vaultpost' आहे
+        db_table = 'devopsvaultx_insights_posts' # सध्या हे 'InsightsPost' आहे
         
         # 2. ऑर्डरिंग आणि नावे
         ordering = ['-is_pinned', 'priority', '-created_at']
-        verbose_name = "DevOpsVaultX Vault Post"
-        verbose_name_plural = "DevOpsVaultX Vault Posts"
+        verbose_name = "DevOpsVaultX Insights Post"
+        verbose_name_plural = "DevOpsVaultX Insights Posts"
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -40,7 +40,7 @@ class VaultPost(models.Model):
             counter = 1
 
             # ड्युप्लिकेट स्लग टाळण्यासाठी लॉजिक
-            while VaultPost.objects.filter(slug=slug).exists():
+            while InsightsPost.objects.filter(slug=slug).exists():
                 slug = f"{base_slug}-{counter}"
                 counter += 1
 

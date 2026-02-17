@@ -1,11 +1,11 @@
-/* ===== NEW VAULT UI - FINAL FIXED ===== */
+/* ===== NEW insights UI - FINAL FIXED ===== */
 
-.vault-wrapper-new {
+.insights-wrapper-new {
     padding: 30px 20px;
     background: linear-gradient(135deg, #f0f4ff, #f8fafc);
 }
 
-.vault-grid-new {
+.insights-grid-new {
     display: grid;
     grid-template-columns: 200px 1fr 1fr 200px;
     gap: 24px;
@@ -14,7 +14,7 @@
 }
 
 /* Card Base */
-.vault-card-new {
+.insights-card-new {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 20px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -38,7 +38,7 @@
 
 .scroll-area::-webkit-scrollbar { display: none; }
 
-.vault-card-new h2 {
+.insights-card-new h2 {
     margin-bottom: 16px;
     font-size: 20px;
     color: #1e293b;
@@ -48,14 +48,14 @@
     text-transform: uppercase;
 }
 
-.vault-list {
+.insights-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
 /* Row Styling */
-.vault-row {
+.insights-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -74,13 +74,13 @@
     flex: 1;
 }
 
-.vault-title {
+.insights-title {
     font-weight: 700;
     font-size: 15px;
     line-height: 1.4;
 }
 /* Pinned row stays on top inside scroll */
-.vault-row.pinned {
+.insights-row.pinned {
     position: sticky;
     top: 0;
     z-index: 5;
@@ -127,16 +127,16 @@
 }
 
 
-.vault-time {
+.insights-time {
     font-size: 11px;
     color: #94a3b8;
 }
 
 /* Color Accents */
-.vault-row.news { border-left: 5px solid #e1341a; }
-.vault-row.blog { border-left: 5px solid #35e71a; }
+.insights-row.news { border-left: 5px solid #e1341a; }
+.insights-row.blog { border-left: 5px solid #35e71a; }
 
-.vault-row:hover {
+.insights-row:hover {
     background: #0b022f;
     transform: translateX(6px);
 }
@@ -217,13 +217,13 @@
 
 
 @media (max-width: 1200px) {
-    .vault-grid-new { grid-template-columns: 1fr 1fr; }
+    .insights-grid-new { grid-template-columns: 1fr 1fr; }
     .side-banner-new { display: none; }
     .full-width { grid-column: span 2; }
 }
 
 @media (max-width: 768px) {
-    .vault-grid-new { grid-template-columns: 1fr; }
+    .insights-grid-new { grid-template-columns: 1fr; }
     .full-width { grid-column: span 1; }
     .fixed-card { height: auto; }
 }

@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'pages',
     'payments',
     'db_monitor',
-    'vault',
+    'insights',
     'vaultx',
 ]
 
