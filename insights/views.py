@@ -1,9 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
-from .models import VaultPost
+from .models import InsightsPost
 
 def vault_home(request):
-    posts = VaultPost.objects.filter(is_published=True)
+    posts = InsightsPost.objects.filter(is_published=True)
 
     context = {
         "news": posts.filter(category="news"),
@@ -14,7 +14,7 @@ def vault_home(request):
 
 
 def vault_detail(request,category, slug):
-    post = get_object_or_404(VaultPost,slug=slug,category=category,is_published=True)
+    post = get_object_or_404(InsightsPost,slug=slug,category=category,is_published=True)
 
     response = render(
         request,

@@ -14,7 +14,7 @@ urlpatterns = [
     path('', include('pages.urls')),
     path('products/', include('products.urls')),
     path('payments/', include('payments.urls')),
-    path('vault/', include('vault.urls')),
+    path('insights/', include('insights.urls')),
     path('vaultx/', include('vaultx.urls')),
 
     # SEO REQUIRED FILES
