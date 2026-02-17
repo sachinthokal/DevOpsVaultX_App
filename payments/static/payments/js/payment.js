@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let customerName = "";
   let customerEmail = "";
 
+  // पेमेंट डेटा सबमिट करण्यासाठी फंक्शन
   function submitPaymentData(p_id, o_id, s_id) {
     Swal.fire({
       title: "Finalizing Access...",
@@ -44,10 +45,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const payButton = document.getElementById("pay-button");
   if (payButton) {
-    payButton.addEventListener("click", function (e) {
+    payButton.addEventListener("click", async function (e) {
       e.preventDefault();
 
-      Swal.fire({
+      // पायरी १: नाव आणि ईमेल मिळवणे
+      const { value: formValues } = await Swal.fire({
         title: "CONFIRM DETAILS 🚀",
         html: `
             <div style="text-align: left; padding: 0 5px;">
@@ -58,30 +60,67 @@ document.addEventListener("DOMContentLoaded", function () {
                 <input id="swal-input-email" class="swal2-input" style="width: 100%; box-sizing: border-box; margin: 5px 0;" placeholder="Enter Email">
             </div>
         `,
-        confirmButtonText: config.isFree ? "Get Free Access" : "Pay Now",
+        confirmButtonText: "Send OTP",
         confirmButtonColor: "#1e3c72",
         showCancelButton: true,
         preConfirm: () => {
-          // IDs synced with HTML above
-          const nameField = document.getElementById("swal-input-name");
-          const emailField = document.getElementById("swal-input-email");
-
-          if (!nameField || !emailField) return;
-
-          const name = nameField.value.trim();
-          const email = emailField.value.trim();
-
+          const name = document.getElementById("swal-input-name").value.trim();
+          const email = document.getElementById("swal-input-email").value.trim();
           if (!name || !email || !email.includes("@")) {
             Swal.showValidationMessage(`Please enter a valid name and email`);
             return false;
           }
-          return { name: name, email: email };
+          return { name, email };
         },
-      }).then((result) => {
-        if (result.isConfirmed) {
-          customerName = result.value.name;
-          customerEmail = result.value.email;
+      });
 
+      if (!formValues) return;
+
+      customerName = formValues.name;
+      customerEmail = formValues.email;
+
+      // पायरी २: OTP पाठवणे
+      Swal.fire({ title: "Sending OTP...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        const response = await fetch("/payments/send-otp/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-CSRFToken": config.csrfToken },
+          body: JSON.stringify({ email: customerEmail }),
+        });
+        const data = await response.json();
+
+        if (data.status !== "success") throw new Error(data.message);
+
+        // पायरी ३: OTP विचारणे
+        const { value: otp } = await Swal.fire({
+          title: "Verify Email",
+          text: `Enter the OTP sent to ${customerEmail}`,
+          input: "text",
+          inputAttributes: { maxlength: 6, autofocus: "autofocus" },
+          confirmButtonText: "Verify & Proceed",
+          showCancelButton: true,
+          preConfirm: async (enteredOtp) => {
+            if (!enteredOtp) {
+                Swal.showValidationMessage("Please enter OTP");
+                return false;
+            }
+            const verifyRes = await fetch("/payments/verify-otp/", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "X-CSRFToken": config.csrfToken },
+              body: JSON.stringify({ email: customerEmail, otp: enteredOtp }),
+            });
+            const verifyData = await verifyRes.json();
+            if (verifyData.status !== "success") {
+              Swal.showValidationMessage("Invalid or Expired OTP");
+              return false;
+            }
+            return true;
+          },
+        });
+
+        // पायरी ४: व्हेरिफिकेशन यशस्वी झाले तर पेमेंट सुरु करा
+        if (otp) {
           if (config.isFree) {
             submitPaymentData();
           } else {
@@ -106,7 +145,9 @@ document.addEventListener("DOMContentLoaded", function () {
             razorpay.open();
           }
         }
-      });
+      } catch (error) {
+        Swal.fire("Error", error.message || "Failed to send OTP", "error");
+      }
     });
   }
 });

@@ -1,4 +1,4 @@
-/* DevOpsVaultX - Premium Dashboard Styles */
+/* DevOpsVaultX - Modern Premium Dashboard */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
 :root {
@@ -10,22 +10,10 @@
     --premium-gold: #ffd700;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background-color: var(--vault-bg); font-family: 'Inter', sans-serif; }
 
-body {
-    background-color: var(--vault-bg);
-    font-family: 'Inter', sans-serif;
-}
-
-.vault-wrapper {
-    min-height: 100vh;
-    padding-bottom: 80px;
-    overflow-x: hidden;
-}
+.vault-wrapper { min-height: 100vh; padding-bottom: 80px; }
 
 /* --- Header Section --- */
 .vault-header {
@@ -38,188 +26,105 @@ body {
 }
 
 .vault-header h1 {
-    font-weight: 900;
-    font-size: clamp(32px, 5vw, 48px);
-    letter-spacing: -2px;
-    margin-bottom: 15px;
-    text-transform: uppercase;
+    font-weight: 900; font-size: clamp(32px, 5vw, 48px);
+    letter-spacing: -2px; text-transform: uppercase; margin-bottom: 20px;
 }
 
+/* --- User Info & Update UI (FIXED FOR TWO LINES) --- */
 .user-info-pill {
-    display: inline-flex;
-    align-items: center;
+    display: inline-flex; 
+    align-items: center; /* सर्व मजकूर आणि बटण सेंटरमध्ये ठेवते */
     background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 10px 24px;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    padding: 12px 28px; /* उंची थोडी वाढवली आहे */
     border-radius: 100px;
-    border: 1px solid rgba(255, 215, 0, 0.3); /* Premium Gold Border */
-    font-size: 14px;
-    margin-bottom: 20px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    font-size: 14px; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    min-height: 54px; /* पिलला एक स्थिर आकार दिला */
 }
 
-/* --- Grid Container --- */
-.vault-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 25px;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 30px;
-    position: relative;
-    z-index: 10;
-}
+.divider { margin: 0 15px; opacity: 0.3; height: 20px; border-left: 1px solid white; }
 
-/* --- Asset Card Styling --- */
-.asset-card {
-    background: white;
-    border-radius: 20px;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    box-shadow: var(--card-shadow);
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.asset-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-}
-
-.card-top { 
-    height: 6px; 
-    background: linear-gradient(90deg, var(--vault-primary), #2a5298); 
-}
-
-.card-content { 
-    padding: 25px; 
-    flex-grow: 1; 
-}
-
-.status-tag {
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: var(--status-success);
-    background: #e8fcf0;
-    padding: 5px 12px;
-    border-radius: 20px;
-    display: inline-block;
-}
-
-.card-title { 
-    font-size: 18px; 
-    font-weight: 700; 
-    color: #1a202c; 
-    margin: 15px 0 20px; 
-    line-height: 1.4;
-    min-height: 50px;
-}
-
-/* --- Download Usage Box --- */
-.usage-box { 
-    background: #f8fafc; 
-    border-radius: 15px; 
-    padding: 18px; 
-    border: 1px solid #edf2f7;
-}
-
-.usage-text { 
-    display: flex; 
-    justify-content: space-between; 
-    font-size: 12px; 
-    margin-bottom: 10px; 
-    color: #718096; 
-    font-weight: 600;
-}
-
-.progress-wrap { 
-    height: 8px; 
-    background: #e2e8f0; 
-    border-radius: 10px; 
-    overflow: hidden; 
-}
-
-.progress-fill { 
-    height: 100%; 
-    background: linear-gradient(90deg, #2ecc71, #27ae60); 
-    border-radius: 10px;
-    transition: width 1s ease-in-out;
-}
-
-/* --- Action Button --- */
-.btn-action {
-    background: var(--vault-primary);
-    color: white !important;
-    text-decoration: none;
-    padding: 16px;
-    text-align: center;
-    font-weight: 700;
-    font-size: 15px;
-    transition: background 0.3s ease;
-}
-
-.btn-action:hover {
-    background: var(--vault-dark);
-}
-
-/* --- Empty State Fix (As seen in your screenshot) --- */
-.empty-vault-card {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 80px 40px;
-    background: white;
-    border-radius: 30px;
-    box-shadow: var(--card-shadow);
-    margin: 40px auto;
-    max-width: 800px;
-}
-
-.empty-vault-card h2 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1a202c;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-}
-
-.lock-icon {
-    font-size: 70px;
-    margin-bottom: 20px;
-    animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-.btn-explore {
-    background: linear-gradient(135deg, var(--vault-primary), #2a5298);
-    color: white !important;
-    padding: 14px 35px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 700;
-    margin-top: 20px;
-    display: inline-block;
-    box-shadow: 0 10px 20px rgba(30, 60, 114, 0.2);
+.btn-edit-trigger {
+    background: var(--premium-gold); color: var(--vault-dark);
+    border: none; width: 28px; height: 28px; border-radius: 50%;
+    margin-left: 15px; cursor: pointer; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
     transition: 0.3s;
+    flex-shrink: 0; /* बटण दबणार नाही याची खात्री करते */
 }
 
-.btn-explore:hover {
-    transform: scale(1.05);
-    background: var(--vault-dark);
+.btn-edit-trigger:hover { transform: scale(1.2) rotate(15deg); }
+
+/* --- Email Update Card --- */
+.update-container {
+    max-width: 420px; margin: 30px auto 0;
+    animation: slideDown 0.4s ease-out;
 }
 
-/* --- Responsive Helpers --- */
-@media (max-width: 768px) {
-    .vault-grid { padding: 0 15px; }
-    .vault-header { padding: 60px 15px 120px; }
+.update-card {
+    background: white; border-radius: 20px; padding: 25px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2); color: #333;
+}
+
+.update-card h4 { color: var(--vault-primary); margin-bottom: 10px; font-weight: 700; }
+.update-card p { font-size: 13px; color: #666; margin-bottom: 15px; }
+
+.input-group { margin-bottom: 15px; }
+.input-group input {
+    width: 100%; padding: 12px 15px; border: 2px solid #eee;
+    border-radius: 10px; outline: none; transition: 0.3s; font-size: 15px;
+}
+.input-group input:focus { border-color: var(--vault-primary); }
+
+.btn-primary-custom {
+    width: 100%; background: var(--vault-primary); color: white;
+    border: none; padding: 12px; border-radius: 10px;
+    font-weight: 700; cursor: pointer; transition: 0.3s;
+}
+
+.btn-primary-custom:hover { background: var(--vault-dark); transform: translateY(-2px); }
+.btn-verify { background: var(--status-success); }
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Grid & Cards --- */
+.vault-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px; max-width: 1300px; margin: 0 auto; padding: 0 30px;
+    position: relative; z-index: 10;
+}
+
+.asset-card {
+    background: white; border-radius: 20px; overflow: hidden;
+    transition: 0.4s; box-shadow: var(--card-shadow);
+    display: flex; flex-direction: column;
+}
+
+.asset-card:hover { transform: translateY(-10px); }
+.card-top { height: 6px; background: var(--vault-primary); }
+.card-content { padding: 25px; flex-grow: 1; }
+.status-tag {
+    font-size: 10px; font-weight: 800; color: var(--status-success);
+    background: #e8fcf0; padding: 5px 12px; border-radius: 20px;
+}
+.card-title { font-size: 18px; font-weight: 700; margin: 15px 0; min-height: 50px;}
+
+.usage-box { background: #f8fafc; border-radius: 15px; padding: 15px; border: 1px solid #eee; }
+.progress-wrap { height: 8px; background: #e2e8f0; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--status-success); transition: 1s; }
+
+.btn-action {
+    background: var(--vault-primary); color: white !important;
+    text-decoration: none; padding: 15px; text-align: center; font-weight: 700;
+}
+
+/* Empty State */
+.empty-vault-card {
+    grid-column: 1 / -1; text-align: center; padding: 60px;
+    background: white; border-radius: 20px; box-shadow: var(--card-shadow);
 }

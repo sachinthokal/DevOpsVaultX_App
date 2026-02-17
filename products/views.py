@@ -1,17 +1,16 @@
 import os
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import FileResponse, HttpResponseForbidden
-from django.urls import reverse
-from django.contrib import messages  # मेसेज दाखवण्यासाठी
-from payments.models import Payment
+from django.http import FileResponse, JsonResponse
+from django.contrib import messages
+from django.db.models import Q
 from .models import Product
 
+# टीप: Payment मॉडेलला वर इम्पोर्ट करू नका, त्यामुळे ImportError येतो.
 
 # ======================
 # Home Page
 # ======================
 def home(request):
-    # Top 3 active products
     products = Product.objects.filter(is_active=True).order_by('-created_at')[:3]
     return render(request, 'home.html', {'products': products})
 
@@ -37,76 +36,84 @@ def buy_now(request, pk):
     return redirect('payments:buy_product', pk=product.id)
 
 # ======================
-# Payment Success Callback (Session Based)
+# Payment Success Callback
 # ======================
 def confirm_payment(request, pk):
     request.session[f'paid_{pk}'] = True
     return redirect('products:download_file', pk=pk)
 
 # ======================
-# Secure File Download (Final Optimized Fix)
-# ======================
-# ======================
-# Secure File Download (Fix: 5th Download Allowed)
+# Secure File Download (Final & Clean Fix)
 # ======================
 def download_file(request, pk):
-    session_id = request.session.session_key
-    session_key = f"paid_{pk}"
+    # Circular Import टाळण्यासाठी local import
+    from payments.models import Payment
+    import os
 
-    # १. डेटाबेसमध्ये पेमेंट तपासा
+    # १. Session आणि User Details
+    if not request.session.session_key:
+        request.session.create()
+    
+    session_id = request.session.session_key
+    session_email = request.session.get('customer_email')
+    user_email = request.user.email if request.user.is_authenticated else None
+    
+    # force_download फ्लॅग (हा JavaScript मधून येतो)
+    is_forcing = request.GET.get('force_download') == '1'
+
+    # २. पेमेंट शोधणे (Updated Query)
+    search_query = Q(session_id=session_id)
+    if session_email:
+        search_query |= Q(email=session_email)
+    if user_email:
+        search_query |= Q(email=user_email)
+
     payment = Payment.objects.filter(
         product_id=pk, 
-        status="SUCCESS", 
-        paid=True,
-        session_id=session_id
-    ).first()
+        status="SUCCESS"
+    ).filter(search_query).first()
 
-    # २. जर पेमेंट सापडले, तर आधी लिमिट तपासा
-    if payment:
-        # ✅ बदल: जोपर्यंत काउंट ५ पेक्षा कमी आहे तोपर्यंत डाऊनलोड करू द्या
-        # जर काउंट आधीच ५ झाला असेल, तरच बाहेर काढा
+    # ३. पेमेंट नसेल तर ॲक्सेस नाकारा
+    if not payment:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({"status": "error", "message": "Access Denied. पेमेंट सापडले नाही."}, status=403)
+        messages.error(request, "कृपया हे उत्पादन आधी खरेदी करा.")
+        return redirect('products:detail', pk=pk)
+
+    # ४. डाउनलोड लिमिट चेक (फक्त AJAX कॉलमध्ये काऊंट वाढवायचा)
+    if not is_forcing:
         if payment.retry_count >= 5:
-            payment.paid = False
-            payment.save()
-            messages.warning(request, "Your download limit (5 times) has been reached. Please purchase again for access.")
-            return redirect('products:detail', pk=pk)
-            
-    # ३. जर पेमेंट नसेल आणि सेशनमध्ये 'Free Access' नसेल, तर रिडरेक्ट करा
-    elif not request.session.get(session_key):
-        messages.error(request, "Access Denied. Please purchase the product first.")
-        return redirect('products:detail', pk=pk)
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({"status": "error", "message": "Limit reached!"}, status=400)
+            return redirect('vaultx:index')
 
-    # ४. प्रॉडक्ट आणि फाईलची उपलब्धता तपासा
-    product = get_object_or_404(Product, pk=pk, is_active=True)
-    
+        # ५. काउंट वाढवा आणि सेव्ह करा
+        payment.retry_count += 1
+        # जर ५ झाला तर ॲक्सेस बंद करण्यासाठी 'paid' फ्लॅग False करू शकतोस (Optional)
+        # if payment.retry_count >= 5: payment.paid = False 
+        payment.save()
+
+    # ६. प्रॉडक्ट आणि फाईल पाथ तपासणे
+    product = get_object_or_404(Product, pk=pk)
     if not product.file or not os.path.exists(product.file.path):
-        messages.error(request, "Resource file is currently unavailable on server.")
-        return redirect('products:detail', pk=pk)
+        return JsonResponse({"status": "error", "message": "फाईल सर्व्हरवर उपलब्ध नाही."}, status=404)
 
-    file_path = product.file.path
+    # ७. AJAX विनंती असल्यास JSON पाठवा (हा UI अपडेट करतो)
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' and not is_forcing:
+        return JsonResponse({
+            "status": "success",
+            "new_count": payment.retry_count,
+            "download_url": f"/products/{pk}/download/?force_download=1" # Hardcoded safe URL
+        })
 
-    # ५. डाऊनलोड काउंट वाढवा
-    if payment:
-        # काउंट वाढवण्यापूर्वी तो ५ आहे का ते पुन्हा एकदा खात्री करा (Double Check)
-        if payment.retry_count < 5:
-            payment.retry_count += 1
-            
-            # ५ वा डाऊनलोड झाला असेल तरच 'paid' घालवा
-            if payment.retry_count >= 5:
-                payment.paid = False
-            
-            payment.save()
-        else:
-            # सुरक्षिततेसाठी जर चुकून काउंट वाढला असेल तर इथूनच रिडरेक्ट करा
-            return redirect('products:detail', pk=pk)
-
-    # ६. FileResponse पाठवा
+    # ८. प्रत्यक्ष फाईल डाऊनलोड (Binary Response)
     try:
-        file_handle = open(file_path, "rb")
-        response = FileResponse(file_handle, as_attachment=True)
-        original_filename = os.path.basename(file_path)
-        response["Content-Disposition"] = f'attachment; filename="{original_filename}"'
+        # FileResponse सुरक्षितपणे पाठवणे
+        response = FileResponse(open(product.file.path, "rb"), as_attachment=True)
+        filename = os.path.basename(product.file.path)
+        # फाईल नावातील स्पेस काढून टाकणे अधिक सुरक्षित असते
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
         return response
     except Exception as e:
-        messages.error(request, f"Download failed: {str(e)}")
-        return redirect('products:detail', pk=pk)
+        # जर फाईल उघडताना एरर आला तर
+        return JsonResponse({"status": "error", "message": f"Server Error: {str(e)}"}, status=500)
