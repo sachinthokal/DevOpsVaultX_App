@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { margin: 0; padding: 0; background-color: #f4f7fa; }
+        .wrapper { width: 100%; table-layout: fixed; background-color: #f4f7fa; padding-bottom: 40px; }
+        .main { background-color: #ffffff; margin: 40px auto; width: 100%; max-width: 500px; border-radius: 12px; border: 1px solid #e1e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
+        .header { background-color: #1e3c72; padding: 30px; text-align: center; color: #ffffff; }
+        .header h1 { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; letter-spacing: 1px; }
+        .body-content { padding: 40px 30px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; text-align: center; color: #334155; }
+        .otp-box { background-color: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 8px; font-size: 36px; font-weight: bold; color: #1e3c72; padding: 20px; margin: 25px 0; letter-spacing: 8px; display: inline-block; min-width: 200px; }
+        .text { font-size: 16px; line-height: 1.6; margin-bottom: 20px; }
+        .footer { background-color: #f8fafc; padding: 20px; text-align: center; font-family: Arial, sans-serif; font-size: 12px; color: #94a3b8; }
+        .divider { height: 1px; background-color: #e2e8f0; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="main">
+            <div class="header">
+                <h1>DevOpsVaultX</h1>
+            </div>
+            <div class="body-content">
+                <h2 style="color: #1e293b; margin-top: 0;">Verify Your Purchase</h2>
+                <p class="text">Please use the verification code below to complete your order. This code is valid for <strong>5 minutes</strong>.</p>
+                
+                <div class="otp-box">{{ otp }}</div>
+                
+                <p style="font-size: 14px; color: #64748b;">If you didn't request this code, you can safely ignore this email.</p>
+                <div class="divider"></div>
+                <p style="font-size: 13px;">Automated security message. Please do not reply.</p>
+            </div>
+            <div class="footer">
+                &copy; 2026 DevOpsVaultX. All rights reserved. <br>
+                Secure Digital Asset Delivery System
+            </div>
+        </div>
+    </div>
+</body>
+</html>

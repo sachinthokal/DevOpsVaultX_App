@@ -2,55 +2,218 @@
 {% load static %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <link rel="stylesheet" href="{% static 'vaultx/css/dashboard.css' %}">
 
 <div class="vault-wrapper">
     <div class="vault-header">
         <div class="container">
             <h1>DEVOPSVAULTX</h1>
+
             <div class="user-info-pill">
-                <span>👤 <strong>{{ customer_name }}</strong></span>
-                <span style="margin: 0 15px; opacity: 0.3;">|</span>
-                <span style="opacity: 0.9;">📧 {{ customer_email }}</span>
+                <span>👤 <strong>{{ customer_name|upper }}</strong></span>
+                <span class="divider"></span>
+
+                <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left;">
+                    <span class="email-text">📧 {{ customer_email }}</span>
+
+                    {% if payments.0.email_updated and payments.0.old_email %}
+                    <span style="font-size: 10px; color: var(--premium-gold); font-weight: 600; opacity: 0.8; margin-top: -2px;">
+                        🔄 Updated from: {{ payments.0.old_email }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <button onclick="toggleUpdateBox()" class="btn-edit-trigger" title="Update Email">✏️</button>
             </div>
-            <p style="margin-top: 20px; opacity: 0.8;">
-                Your premium resources are safely secured in the vault. ⬇️
-            </p>
+
+            <div id="email-update-box" class="update-container" style="display:none;">
+                <div class="update-card">
+                    <div id="step-email">
+                        <h4>Update Security Email</h4>
+                        <p>Verify your new email to sync your vault resources.</p>
+                        <div class="input-group">
+                            <input type="email" id="new-email-input" placeholder="Enter new email address">
+                        </div>
+                        <button onclick="requestOTP()" id="otp-btn" class="btn-primary-custom">Get Verification Code</button>
+                    </div>
+
+                    <div id="step-otp" style="display:none;">
+                        <h4>Verify Identity</h4>
+                        <p>Check your inbox for the 6-digit verification code.</p>
+                        <div class="input-group">
+                            <input type="text" id="otp-input" maxlength="6"
+                                style="text-align:center; letter-spacing:8px; font-weight: bold; font-size: 1.2rem;"
+                                placeholder="******">
+                        </div>
+                        <button onclick="verifyAndUpdateEmail()" id="verify-btn"
+                            class="btn-primary-custom btn-verify">Verify & Update Access</button>
+                    </div>
+
+                    <a href="javascript:void(0)" onclick="toggleUpdateBox()"
+                        style="display:block; margin-top:15px; color:#ff4d4d; font-size:12px; text-decoration:none; font-weight: 600;">
+                        Cancel
+                    </a>
+                </div>
+            </div>
+
+            <p style="margin-top: 25px; opacity: 0.8;">Your premium resources are safely secured. ⬇️</p>
         </div>
     </div>
 
     <div class="vault-grid">
         {% for payment in payments %}
-            <div class="asset-card">
-                <div class="card-top"></div>
-                <div class="card-content">
-                    <span class="status-tag">Premium Access</span>
-                    <h4 class="card-title">{{ payment.product.title }}</h4>
-                    <div class="usage-box">
-                        <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                            <span>Downloads Used</span>
-                            <strong>{{ payment.retry_count|default:0 }} / 5</strong>
-                        </div>
-                        <div class="progress-wrap">
-                            <div class="progress-fill" style="width: {% widthratio payment.retry_count 5 100 %}%"></div>
-                        </div>
+        <div class="asset-card">
+            <div class="card-top"></div>
+            <div class="card-content">
+                <span class="status-tag">Premium Access</span>
+                <h4 class="card-title">{{ payment.product.title }}</h4>
+                <div class="usage-box">
+                    <div style="display:flex; justify-content:space-between; font-size:12px;">
+                        <span>Downloads Used</span>
+                        <strong id="count-text-{{ payment.id }}">{{ payment.retry_count|default:0 }} / 5</strong>
+                    </div>
+                    <div class="progress-wrap">
+                        <div id="progress-fill-{{ payment.id }}" class="progress-fill"
+                            style="width: {% widthratio payment.retry_count 5 100 %}%"></div>
                     </div>
                 </div>
-                <a href="{% url 'products:download_file' payment.product.id %}" class="btn-action">
-                    Download Now ⬇️
-                </a>
             </div>
+
+            <div class="action-footer" style="padding: 15px; text-align: center;">
+                {% if payment.retry_count >= 5 %}
+                <div class="limit-box" style="background: rgba(255, 77, 77, 0.05); border: 1px dashed #ff4d4d; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                    <p style="color: #ff4d4d; font-size: 13px; margin: 0; font-weight: 600;">🔒 Access Locked: Limit Reached</p>
+                    <a href="{% url 'products:detail' payment.product.id %}"
+                        style="color: #1e3c72; font-size: 12px; text-decoration: underline; font-weight: bold; display: block; margin-top: 5px;">
+                        Buy product again to restore access 🚀
+                    </a>
+                </div>
+                <button class="btn-action" disabled style="background: #666; width: 100%; cursor: not-allowed;">
+                    Access Locked 🔒
+                </button>
+                {% else %}
+                <button onclick="handleDownload('{{ payment.product.id }}', '{{ payment.id }}')" class="btn-action"
+                    id="btn-{{ payment.id }}" style="width: 100%;">
+                    Download Resource ⬇️
+                </button>
+                {% endif %}
+            </div>
+        </div>
         {% empty %}
-            <div class="empty-vault-card">
-                <div style="font-size: 80px; margin-bottom: 20px;">🔓</div>
-                <h2 style="color: var(--vault-primary); font-size: 28px; font-weight: 800;">Your Vault is Locked !!</h2>
-                <p style="color: #64748b; margin: 15px 0 30px; font-size: 16px;">
-                    No premium resources found. Buy a product to unlock your DevOps journey.
-                </p>
-                <a href="{% url 'products:list' %}" 
-                   style="background: var(--vault-primary); color: white; padding: 15px 40px; border-radius: 50px; text-decoration: none; font-weight: 700; display: inline-block; box-shadow: 0 10px 20px rgba(30, 60, 114, 0.2);">
-                    Explore Products 🚀
-                </a>
-            </div>
+        <div class="empty-vault-card">
+            <div style="font-size:50px;">🔒</div>
+            <h2>Vault Locked</h2>
+            <p>No products found for this session or email.</p>
+            <a href="{% url 'products:list' %}" class="btn-explore">Explore Products 🚀</a>
+        </div>
         {% endfor %}
-    </div> </div> {% endblock %}
+    </div>
+</div>
+
+<script>
+    function notify(title, text, icon) {
+        Swal.fire({
+            title: title, text: text, icon: icon,
+            confirmButtonColor: '#1e3c72'
+        });
+    }
+
+    function toggleUpdateBox() {
+        const box = document.getElementById('email-update-box');
+        box.style.display = (box.style.display === 'none') ? 'block' : 'none';
+        if (box.style.display === 'block') box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function requestOTP() {
+        const email = document.getElementById('new-email-input').value;
+        const btn = document.getElementById('otp-btn');
+        if (!email || !email.includes('@')) return notify('Invalid Email', 'योग्य ईमेल टाका.', 'warning');
+
+        btn.innerText = "Sending...";
+        btn.disabled = true;
+
+        fetch('/payments/send-otp/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+            body: JSON.stringify({ email: email })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('step-email').style.display = 'none';
+                document.getElementById('step-otp').style.display = 'block';
+            } else {
+                notify('Error', data.message, 'error');
+                btn.innerText = "Get Code"; btn.disabled = false;
+            }
+        });
+    }
+
+    function verifyAndUpdateEmail() {
+        const email = document.getElementById('new-email-input').value;
+        const otp = document.getElementById('otp-input').value;
+        const btn = document.getElementById('verify-btn');
+
+        fetch('/payments/verify-otp/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+            body: JSON.stringify({ email: email, otp: otp, is_update: true })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            } else {
+                notify('Failed', data.message, 'error');
+                btn.disabled = false;
+            }
+        });
+    }
+
+    function handleDownload(productId, paymentId) {
+        const btn = document.getElementById(`btn-${paymentId}`);
+        const countTextElement = document.getElementById(`count-text-${paymentId}`);
+        
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = "Processing...";
+        btn.disabled = true;
+
+        fetch(`/products/${productId}/download/`, {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Server Error');
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                // फक्त संबंधित कार्डचा डेटा अपडेट होतोय
+                countTextElement.innerText = `${data.new_count} / 5`;
+                document.getElementById(`progress-fill-${paymentId}`).style.width = (data.new_count / 5 * 100) + "%";
+                
+                window.location.assign(data.download_url);
+
+                setTimeout(() => {
+                    if (data.new_count >= 5) {
+                        location.reload(); 
+                    } else {
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                    }
+                }, 1000);
+            } else {
+                notify('Error', data.message, 'error');
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        })
+        .catch(err => {
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+            notify('Server Error', 'डाऊनलोड होऊ शकले नाही.', 'error');
+        });
+    }
+</script>
+{% endblock %}
