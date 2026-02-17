@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
 
-<section class="vault-wrapper-new">
-    <div class="vault-grid-new">
+<section class="insights-wrapper-new">
+    <div class="insights-grid-new">
 
         <aside class="side-banner-new">
             <video autoplay muted loop playsinline class="banner-video">
                 <!-- <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4"> -->
             </video>
-            <p class="banner-text">DevOpsVaultX</p>
+            <p class="banner-text">DevOpsinsightsX</p>
         </aside>
 
-        <div class="vault-card-new fixed-card">
+        <div class="insights-card-new fixed-card">
             <h2>📰 DevOps News</h2>
-            <div class="vault-list scroll-area">
+            <div class="insights-list scroll-area">
                 {% for item in news %}
-                <a href="{% url 'vault:detail' item.category item.slug %}" class="vault-row news"
-                    class="vault-row news {% if item.is_pinned %}pinned{% endif %}">
+                <a href="{% url 'insights:detail' item.category item.slug %}" class="insights-row news"
+                    class="insights-row news {% if item.is_pinned %}pinned{% endif %}">
                     <div class="row-left">
-                        <div class="vault-title">{{ item.title }}</div>
+                        <div class="insights-title">{{ item.title }}</div>
 
                         <div class="tag-container">
                             {% if item.is_pinned %}
@@ -31,7 +31,7 @@
                         </div>
 
 
-                        <div class="vault-time">{{ item.created_at|timesince }} ago</div>
+                        <div class="insights-time">{{ item.created_at|timesince }} ago</div>
                     </div>
                     <span class="arrow">→</span>
                 </a>
@@ -39,13 +39,13 @@
             </div>
         </div>
 
-        <div class="vault-card-new fixed-card">
+        <div class="insights-card-new fixed-card">
             <h2>✍️ Blogs</h2>
-            <div class="vault-list scroll-area">
+            <div class="insights-list scroll-area">
                 {% for item in blogs %}
-                <a href="{% url 'vault:detail' item.category item.slug %}" class="vault-row blog">
+                <a href="{% url 'insights:detail' item.category item.slug %}" class="insights-row blog">
                     <div class="row-left">
-                        <div class="vault-title">{{ item.title }}</div>
+                        <div class="insights-title">{{ item.title }}</div>
                         <div class="tag-container">
                             {% if item.is_pinned %}
                             <span class="pin-badge">📌 PINNED</span>
@@ -56,7 +56,7 @@
                             {% endif %}
                         </div>
 
-                        <div class="vault-time">{{ item.created_at|timesince }} ago</div>
+                        <div class="insights-time">{{ item.created_at|timesince }} ago</div>
                     </div>
                     <span class="arrow">→</span>
                 </a>
@@ -68,14 +68,14 @@
             <video autoplay muted loop playsinline class="banner-video">
                 <!-- <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4"> -->
             </video>
-            <p class="banner-text">DevOpsVaultX</p>
+            <p class="banner-text">DevOpsinsightsX</p>
         </aside>
 
-        <div class="vault-card-new full-width">
+        <div class="insights-card-new full-width">
             <h2>🎁 Exclusive Offers</h2>
             <div class="offers-grid-new">
                 {% for item in offers %}
-                <a href="{% url 'vault:detail' item.category item.slug %}" class="offer-card">
+                <a href="{% url 'insights:detail' item.category item.slug %}" class="offer-card">
                     <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
                         {% if item.is_new %}
                         <span class="offer-badge">NEW OFFER</span>
@@ -87,7 +87,7 @@
 
                     <h3>{{ item.title }}</h3>
 
-                    <div class="vault-time" style="color: #cbd5e1; margin-top: 10px;">
+                    <div class="insights-time" style="color: #cbd5e1; margin-top: 10px;">
                         {{ item.created_at|timesince }} ago
                     </div>
                 </a>

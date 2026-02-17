@@ -1,4 +1,4 @@
-/* ================= VAULT DETAIL PAGE (FIT SCREEN + FOOTER) ================= */
+/* ================= insights DETAIL PAGE (FIT SCREEN + FOOTER) ================= */
 
 /* Main Container to manage Card + Footer */
 .page-container {
@@ -7,7 +7,7 @@
     max-height: max-content; /* Purna screen chi height */
 }
 
-.vault-detail-wrapper {
+.insights-detail-wrapper {
     flex: 1; /* Sagli urleli jagga content gheil */
     display: flex;
     align-items: center;
@@ -16,7 +16,7 @@
     box-sizing: border-box;
 }
 
-.vault-detail-card {
+.insights-detail-card {
     background: #ffffff;
     border-radius: 32px;
     padding: 40px 60px;
@@ -32,14 +32,14 @@
 }
 
 /* Header fix rahil */
-.vault-detail-header {
+.insights-detail-header {
     margin-bottom: 25px;
     border-bottom: 2px solid #f1f5f9;
     padding-bottom: 15px;
     flex-shrink: 0;
 }
 
-.vault-detail-header h1 {
+.insights-detail-header h1 {
     font-size: 42px;
     font-weight: 850;
     line-height: 1.2;
@@ -48,7 +48,7 @@
 }
 
 /* Fakt hya content area madhe scroll hoil */
-.vault-detail-content {
+.insights-detail-content {
     flex: 1;
     overflow-y: auto;
     font-size: 19px;
@@ -58,11 +58,11 @@
 }
 
 /* Custom Scrollbar */
-.vault-detail-content::-webkit-scrollbar { width: 5px; }
-.vault-detail-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+.insights-detail-content::-webkit-scrollbar { width: 5px; }
+.insights-detail-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
 /* Navigation Buttons fix rahtil */
-.vault-back-section {
+.insights-back-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -85,7 +85,7 @@
 .btn-products { background: #3b82f6; color: white; }
 
 /* --- Footer Styling --- */
-.vault-footer {
+.insights-footer {
     height: 50px;
     background: #0f172a;
     color: white;
@@ -104,9 +104,9 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .vault-detail-wrapper { padding: 10px; }
-    .vault-detail-card { padding: 25px 20px; max-height: 90vh; }
-    .vault-detail-header h1 { font-size: 26px; }
-    .vault-back-section { flex-direction: column; gap: 10px; }
+    .insights-detail-wrapper { padding: 10px; }
+    .insights-detail-card { padding: 25px 20px; max-height: 90vh; }
+    .insights-detail-header h1 { font-size: 26px; }
+    .insights-back-section { flex-direction: column; gap: 10px; }
     .btn-nav { width: 100%; text-align: center; }
 }

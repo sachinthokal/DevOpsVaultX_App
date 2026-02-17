@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-<section class="vault-detail-wrapper">
-    <article class="vault-detail-card">
-        <header class="vault-detail-header">
+<section class="insights-detail-wrapper">
+    <article class="insights-detail-card">
+        <header class="insights-detail-header">
             <h1>{{ post.title }}</h1>
             <div class="meta">
                 <span>📅 {{ post.created_at|date:"d M Y" }}</span> · 
@@ -10,13 +11,13 @@
             </div>
         </header>
 
-        <div class="vault-detail-content">
+        <div class="insights-detail-content">
             {{ post.content|linebreaks }}
         </div>
 
-        <div class="vault-back-section">
-            <a href="{% url 'vault:home' %}" class="btn-nav btn-back">
-                ← Back to Vault
+        <div class="insights-back-section">
+            <a href="{% url 'insights:home' %}" class="btn-nav btn-back">
+                ← Back to Insights
             </a>
             <a href="{% url 'products:list' %}" class="btn-nav btn-products">
                 Explore Products →
