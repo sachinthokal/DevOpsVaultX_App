@@ -8,296 +8,393 @@
     :root {
         --danger: #ff4757;
         --success: #2ed573;
-        --bg: #0f172a;
-        --card: #1e293b;
+        --bg: #0b0f1a;
+        /* Deeper Dark */
+        --card: #161e2e;
         --text-muted: #94a3b8;
         --accent: #38bdf8;
+        --accent-glow: rgba(56, 189, 248, 0.3);
+        --glass: rgba(255, 255, 255, 0.03);
     }
-    
-    body { 
-        background: var(--bg); 
-        color: white; 
-        font-family: 'Inter', sans-serif; 
+
+    body {
+        background: var(--bg);
+        color: white;
+        font-family: 'Inter', sans-serif;
         margin: 0;
+        background-image: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg) 80%);
     }
 
     .vault-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px; 
-        padding: 40px;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 30px;
+        padding: 50px 40px;
     }
 
+    /* Premium Asset Card */
     .asset-card {
         background: var(--card);
-        border-radius: 16px;
-        padding: 24px;
+        border-radius: 24px;
+        padding: 28px;
         position: relative;
-        border: 1px solid rgba(255,255,255,0.1);
-        transition: transform 0.3s ease, border-color 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 400px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .asset-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, rgba(56, 189, 248, 0.05) 0%, transparent 100%);
+        opacity: 0;
+        transition: 0.4s;
     }
 
     .asset-card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-10px);
         border-color: var(--accent);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--accent-glow);
     }
 
-    /* Expired Card Visuals */
-    .expired { 
-        opacity: 0.8; 
-        border-color: var(--danger) !important;
-        background: linear-gradient(145deg, #1e293b, #1a1a2e);
+    .asset-card:hover::before {
+        opacity: 1;
     }
-    
-    .btn-delete {
-        position: absolute; 
-        top: 15px; 
-        right: 15px;
-        background: rgba(255,255,255,0.05); 
-        border: none; 
-        color: #64748b;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        cursor: pointer; 
+
+    /* Top Actions */
+    .top-actions {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: 0.2s;
+        gap: 10px;
+        position: absolute;
+        top: 20px;
+        right: 20px;
         z-index: 10;
     }
 
-    .btn-delete:hover { 
-        background: var(--danger); 
+    .action-circle {
+        /* बेसिक स्ट्रक्चर */
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        cursor: pointer;
+
+        /* ग्लास इफेक्ट */
+        background: var(--glass);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        /* ब्लर वाढवला आहे */
+        -webkit-backdrop-filter: blur(10px);
+        /* Safari साठी */
+
+        /* कलर्स आणि ट्रान्झिशन */
+        color: var(--text-muted);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        /* एक्स्ट्रा फिक्स */
+        padding: 0;
+        outline: none;
+        overflow: hidden;
+    }
+
+    /* Hover Effect - थोडा ग्लो आणि कलर चेंज */
+    .action-circle:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Active/Click Effect */
+    .action-circle:active {
+        transform: translateY(1px);
+    }
+
+    .btn-history:hover {
+        background: var(--accent);
+        color: white;
+        transform: rotate(-15deg);
+    }
+
+    .btn-delete:hover {
+        background: var(--danger);
         color: white;
         transform: rotate(90deg);
     }
 
+    /* Content Styling */
+    .status-badge {
+        font-size: 10px;
+        text-transform: uppercase;
+        color: var(--accent);
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        margin-bottom: 12px;
+        background: rgba(56, 189, 248, 0.1);
+        padding: 4px 10px;
+        border-radius: 20px;
+        width: fit-content;
+    }
+
+    .product-title {
+        margin: 15px 0;
+        font-size: 1.4rem;
+        font-weight: 800;
+        line-height: 1.3;
+        background: linear-gradient(to right, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Premium Progress Bar */
+    .progress-section {
+        margin: 25px 0;
+    }
+
     .progress-container {
-        height: 10px; 
-        background: #334155;
-        border-radius: 10px; 
-        margin: 15px 0; 
+        height: 8px;
+        background: #0f172a;
+        border-radius: 10px;
+        margin: 12px 0;
         overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .progress-bar {
-        height: 100%; 
-        background: linear-gradient(90deg, var(--accent), #818cf8);
-        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+        background: linear-gradient(90deg, #38bdf8, #818cf8, #38bdf8);
+        background-size: 200% 100%;
+        animation: shimmer 2s infinite linear;
+        border-radius: 10px;
+        transition: width 1s ease-in-out;
     }
 
+    @keyframes shimmer {
+        0% {
+            background-position: 200% 0;
+        }
+
+        100% {
+            background-position: -200% 0;
+        }
+    }
+
+    /* Buttons */
     .btn-download {
-        width: 100%; 
-        padding: 14px; 
-        border-radius: 10px;
-        border: none; 
-        font-weight: 700; 
+        /* width: 100%; */
+        padding: 16px;
+        border-radius: 14px;
+        border: none;
+        font-weight: 800;
         cursor: pointer;
         transition: 0.3s;
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-top: 10px;
+        margin-top: auto;
+        position: relative;
+        overflow: hidden;
     }
 
-    .active-btn { 
-        background: white; 
-        color: black; 
+    .active-btn {
+        background: white;
+        color: black;
+        box-shadow: 0 4px 0px #cbd5e1;
     }
 
     .active-btn:hover {
-        background: var(--accent);
-        color: white;
-        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .active-btn:active {
+        transform: translateY(2px);
+        box-shadow: none;
     }
 
     .buy-again-btn {
-        background: var(--danger);
-        color: white;
+        background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
+        color: white !important;
         text-decoration: none;
-        display: block;
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .status-badge {
-        font-size: 11px; 
-        text-transform: uppercase; 
-        color: var(--accent);
-        font-weight: 800;
-        letter-spacing: 0.5px;
+    /* History Modal Styling */
+    .history-list {
+        text-align: left;
+        padding: 10px;
     }
 
-    .credit-text {
-        font-weight: 600;
-        color: var(--success);
+    .history-item {
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
     }
-    
-    .credit-exhausted {
-        color: var(--danger);
+
+    .history-label {
+        color: var(--text-muted);
+        font-size: 11px;
+        text-transform: uppercase;
+        margin-bottom: 4px;
     }
 </style>
 
 <div class="vault-grid">
     {% for payment in payments %}
-    <div class="asset-card {% if payment.download_used >= payment.download_limit %}expired{% endif %}" id="card-{{ payment.id }}">
-        
-        <button class="btn-delete" onclick="removeItem('{{ payment.id }}')" title="Remove from vault">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-            </svg>
-        </button>
-        
-        <span class="status-badge">Premium Resource</span>
-        <h3 style="margin: 10px 0; font-size: 1.25rem; font-weight: 700;">{{ payment.product.title }}</h3>
-        
-        <div class="progress-info" style="display:flex; justify-content:space-between; font-size: 13px;">
-            <span style="color: var(--text-muted);">Credit Usage</span>
-            <span class="{% if payment.download_used >= payment.download_limit %}credit-exhausted{% else %}credit-text{% endif %}">
-                {{ payment.download_used }}/{{ payment.download_limit }} Downloads
-            </span>
+    <div class="asset-card {% if payment.download_used >= payment.download_limit %}exhausted-state{% endif %}"
+        id="card-{{ payment.id }}">
+
+        <div class="top-actions">
+            <button class="action-circle btn-history"
+                onclick="showHistory('{{ payment.razorpay_order_id }}', '{{ payment.created_at|date:'d M Y, h:i A' }}', '{{ payment.updated_at|date:'d M Y, h:i A' }}', '{{ payment.download_used }}')"
+                title="History">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </button>
+            <button class="action-circle btn-delete" onclick="removeItem('{{ payment.id }}')" title="Remove">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
         </div>
-        
-        <div class="progress-container">
-            <div class="progress-bar" 
-                 style="width: {% if payment.download_used >= payment.download_limit %}100{% else %}{% widthratio payment.download_used payment.download_limit 100 %}{% endif %}%">
+
+        <span class="status-badge">
+            {% if payment.download_used >= payment.download_limit %}🔒 Limit Reached{% else %}✨ Premium Asset{% endif %}
+        </span>
+
+        <h3 class="product-title">{{ payment.product.title }}</h3>
+
+        <div class="progress-section">
+            <div style="display:flex; justify-content:space-between; font-size: 12px; margin-bottom: 8px;">
+                <span style="color: var(--text-muted);">Access Credits</span>
+                <span
+                    style="font-weight:700; color: {% if payment.download_used >= payment.download_limit %}var(--danger){% else %}var(--accent){% endif %};">
+                    {{ payment.download_used }} / {{ payment.download_limit }}
+                </span>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar {% if payment.download_used >= payment.download_limit %}bg-danger-bar{% endif %}"
+                    style="width: {% if payment.download_used >= payment.download_limit %}100{% else %}{% widthratio payment.download_used payment.download_limit 100 %}{% endif %}%">
+                </div>
             </div>
         </div>
 
-        {% if payment.download_used >= payment.download_limit %}
-            <p style="color: var(--danger); font-size: 12px; text-align: center; margin-bottom: 12px; font-weight: 600;">
-                🔒 Limit Reached. Re-purchase to get 5 more credits.
-            </p>
-            <a href="{% url 'products:detail' payment.product.id %}" class="btn-download buy-again-btn">
-                Buy Again 🚀
-            </a>
-        {% else %}
-            <button onclick="handleDownload('{{ payment.product.id }}', '{{ payment.id }}')" 
-                    class="btn-download active-btn" id="btn-{{ payment.id }}">
-                DOWNLOAD NOW
+        <div class="action-area" style="margin-top: auto;">
+            {% if payment.download_used >= payment.download_limit %}
+            <div class="limit-warning-box"
+                style="margin-bottom: 15px; background: rgba(255, 71, 87, 0.1); border: 1px dashed var(--danger); padding: 10px; border-radius: 12px; text-align: center; color: var(--danger); font-size: 12px;">
+                Download limit reached for this license.
+            </div>
+            <a href="{% url 'products:detail' payment.product.id %}" class="btn-download buy-again-btn">Renew License
+                🚀</a>
+            {% else %}
+            <button onclick="handleDownload('{{ payment.product.id }}', '{{ payment.id }}')"
+                class="btn-download active-btn" id="btn-{{ payment.id }}">
+                Download Now
             </button>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
     {% empty %}
-    <div style="grid-column: 1/-1; text-align: center; padding: 80px 20px;">
-        <h2 style="color: #64748b; font-size: 1.5rem;">तुमच्या व्हॉल्टमध्ये कोणतीही फाईल नाही.</h2>
-        <p style="color: var(--text-muted); margin-bottom: 25px;">तुमचे खरेदी केलेले प्रॉडक्ट्स येथे दिसतील.</p>
-        <a href="/" style="background: var(--accent); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 700;">Browse Products</a>
+    <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px;">
+        <div
+            style="background: var(--glass); display: inline-block; padding: 30px; border-radius: 50%; margin-bottom: 20px;">
+            <svg width="50" height="50" fill="none" stroke="#475569" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+        </div>
+        <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800;">तुमचा व्हॉल्ट रिकामा आहे</h2>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">प्रीमियम रिसोर्सेस खरेदी करा आणि ते येथे ॲक्सेस करा.
+        </p>
+        <a href="/"
+            style="background: var(--accent); color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; box-shadow: 0 10px 20px var(--accent-glow);">Explore
+            Store</a>
     </div>
     {% endfor %}
 </div>
 
 <script>
-// Logic to remove card from UI via AJAX
-function removeItem(paymentId) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "हे कार्ड तुमच्या डॅशबोर्डवरून लपवले जाईल!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ff4757',
-        cancelButtonColor: '#334155',
-        confirmButtonText: 'Yes, Delete it!',
-        background: '#1e293b',
-        color: '#fff'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // FIX: URL मध्ये 'vaultx' prefix जोडला आहे कारण app_name वापरला आहे
-            fetch(`/vaultx/delete-item/${paymentId}/`, {
-                method: 'GET',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return res.json();
-            })
-            .then(data => {
-                if(data.status === 'success') {
-                    const card = document.getElementById(`card-${paymentId}`);
-                    card.style.transition = "0.4s cubic-bezier(1, 0, 0, 1)";
-                    card.style.transform = "translateX(100px) scale(0.5)";
-                    card.style.opacity = "0";
-                    
-                    setTimeout(() => {
-                        card.remove();
-                        // जर डॅशबोर्डवर एकही कार्ड उरले नसेल तर पेज रिफ्रेश करा (Empty state दाखवण्यासाठी)
-                        if (document.querySelectorAll('.asset-card').length === 0) {
-                            location.reload();
+    // JavaScript Logic (removeItem, handleDownload, showHistory) Same as before but with enhanced animations
+    function showHistory(orderId, purchaseDate, lastDownload, used) {
+        Swal.fire({
+            title: '<span style="font-weight:800">License History</span>',
+            html: `
+            <div class="history-list">
+                <div class="history-item"><div class="history-label">Reference ID</div><div style="color:#38bdf8; font-family:monospace">${orderId}</div></div>
+                <div class="history-item"><div class="history-label">License Issued</div><div>${purchaseDate}</div></div>
+                <div class="history-item"><div class="history-label">Last Activity</div><div>${used > 0 ? lastDownload : "No downloads yet"}</div></div>
+                <div class="history-item"><div class="history-label">Usage Count</div><div style="font-weight:800; font-size:1.2rem">${used} Times</div></div>
+            </div>`,
+            background: '#161e2e', color: '#fff', confirmButtonColor: '#38bdf8',
+            showClass: { popup: 'animate__animated animate__fadeInDown' }
+        });
+    }
+
+    function removeItem(paymentId) {
+        Swal.fire({
+            title: 'Remove Asset?',
+            text: "हे कार्ड तुमच्या डॅशबोर्डवरून काढून टाकायचे का?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ff4757',
+            confirmButtonText: 'Yes, Remove',
+            background: '#161e2e', color: '#fff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/vaultx/delete-item/${paymentId}/`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            const card = document.getElementById(`card-${paymentId}`);
+                            card.style.transform = "scale(0.8) translateY(20px)";
+                            card.style.opacity = "0";
+                            setTimeout(() => {
+                                card.remove();
+                                if (document.querySelectorAll('.asset-card').length === 0) location.reload();
+                            }, 400);
                         }
-                    }, 400);
+                    });
+            }
+        });
+    }
 
-                    // छोटा सक्सेस मेसेज दाखवा (Optional)
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 2000,
-                        background: '#1e293b',
-                        color: '#fff'
-                    });
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'कार्ड काढले गेले आहे'
-                    });
+    function handleDownload(productId, paymentId) {
+        const btn = document.getElementById(`btn-${paymentId}`);
+        btn.innerHTML = '<span class="animate__animated animate__flash animate__infinite">Requesting Server...</span>';
+        btn.disabled = true;
+
+        fetch(`/products/${productId}/download/`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.href = data.download_url;
+                    setTimeout(() => { location.reload(); }, 3000);
+                } else {
+                    Swal.fire('Error', data.message, 'error');
+                    btn.innerText = "Download Now";
+                    btn.disabled = false;
                 }
-            })
-            .catch(err => {
-                console.error('Delete Error:', err);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'URL सापडली नाही (404). कृपया तुमचा पाथ तपासा.',
-                    background: '#1e293b',
-                    color: '#fff'
-                });
+            }).catch(() => {
+                Swal.fire('Error', 'Server failed to respond', 'error');
+                btn.innerText = "Download Now";
+                btn.disabled = false;
             });
-        }
-    });
-}
-
-// Logic to handle credit reduction and file download
-function handleDownload(productId, paymentId) {
-    const btn = document.getElementById(`btn-${paymentId}`);
-    const originalText = btn.innerText;
-    
-    btn.innerText = "Verifying Credits...";
-    btn.disabled = true;
-    btn.style.opacity = "0.7";
-    
-    fetch(`/products/${productId}/download/`, {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.status === 'success') {
-            btn.innerText = "Downloading...";
-            window.location.assign(data.download_url);
-            
-            // Reload after short delay to show updated credits (e.g., 1/5 -> 2/5)
-            setTimeout(() => {
-                location.reload();
-            }, 2500);
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Limit Exhausted',
-                text: data.message,
-                background: '#1e293b',
-                color: '#fff'
-            });
-            btn.innerText = originalText;
-            btn.disabled = false;
-            btn.style.opacity = "1";
-        }
-    })
-    .catch(err => {
-        Swal.fire('Error', 'सर्व्हरशी संपर्क होऊ शकला नाही.', 'error');
-        btn.innerText = originalText;
-        btn.disabled = false;
-        btn.style.opacity = "1";
-    });
-}
+    }
 </script>
 {% endblock %}
