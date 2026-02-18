@@ -1,53 +1,70 @@
-from django.shortcuts import render
-from payments.models import Payment
-from django.db.models import Q
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from django.db.models import Q, F
+from payments.models import Payment  # तुमचा मॉडेल पाथ तपासा
 
 def vaultx_home(request):
+    # १. युजर ओळख पटवणे (Session/Email)
     if not request.session.session_key:
         request.session.create()
-    
+        
     session_id = request.session.session_key
     session_email = request.session.get('customer_email')
+    user_email = request.user.email if request.user.is_authenticated else session_email
 
-    search_query = Q(session_id=session_id)
-    if session_email:
-        search_query |= Q(email=session_email)
-    if request.user.is_authenticated:
-        search_query |= Q(email=request.user.email)
+    # २. फक्त यशस्वी (SUCCESS) आणि युजरने डिलीट न केलेली पेमेंट्स मिळवा
+    payments_qs = Payment.objects.filter(
+        Q(session_id=session_id) | Q(email=user_email),
+        status="SUCCESS",
+        is_deleted_by_user=False
+    ).order_by('-id')
 
-    # १. आधी सर्व यशस्वी पेमेंट्सची लिस्ट मिळवा. 
-    # '-id' वापरल्यामुळे सर्वात नवीन पेमेंट (Latest Payment) सर्वात वर येईल.
-    all_success_payments = Payment.objects.filter(
-        search_query,
-        status="SUCCESS"
-    ).order_by('product_id', '-id')
-
-    # २. मॅन्युअल फिल्टर: प्रत्येक प्रॉडक्टचा फक्त लेटेस्ट रेकॉर्ड पकडणे.
-    distinct_payments = {}
-    for p in all_success_payments:
-        # जर प्रॉडक्ट आयडी आधीच आला नसेल, तर तो 'latest' आहे कारण आपण '-id' ने सॉर्ट केले आहे.
-        if p.product_id not in distinct_payments:
-            distinct_payments[p.product_id] = p
+    # ३. स्मार्ट रिसेट लॉजिक (प्रॉडक्ट वाईज क्रेडिट्स तपासणे)
+    final_items = {}
     
-    # डिक्शनरीमधून फक्त व्हॅल्यूजची लिस्ट बनवा
-    purchased_payments = list(distinct_payments.values())
+    # सर्व युनिक प्रॉडक्ट आयडी मिळवा जे युजरने खरेदी केले आहेत
+    unique_p_ids = payments_qs.values_list('product_id', flat=True).distinct()
 
-    # ३. युजर डिटेल्स लॉजिक
-    last_payment = purchased_payments[0] if purchased_payments else None
+    for p_id in unique_p_ids:
+        # आधी तपासा: या प्रॉडक्टसाठी क्रेडिट्स शिल्लक असलेले (Active) पेमेंट आहे का?
+        # येथे आपण retry_count ऐवजी download_used वापरत आहोत
+        active_p = payments_qs.filter(
+            product_id=p_id, 
+            download_used__lt=F('download_limit'),
+            is_active=True
+        ).first()
 
+        if active_p:
+            # जर नवीन/Active खरेदी असेल, तर तीच डॅशबोर्डवर दिसेल
+            final_items[p_id] = active_p
+        else:
+            # जर सर्व क्रेडिट्स संपले असतील, तर सर्वात नवीन Expired रेकॉर्ड दाखवा
+            final_items[p_id] = payments_qs.filter(product_id=p_id).first()
+
+    # ४. डिस्प्ले नाव सेट करणे
+    display_name = "Premium Member"
     if request.user.is_authenticated:
-        customer_name = request.user.get_full_name() or request.user.username
-        customer_email = request.user.email
-    elif last_payment:
-        customer_name = last_payment.customer_name or "Guest User"
-        customer_email = last_payment.email
-    else:
-        customer_name = "Guest User"
-        customer_email = session_email if session_email else "No Premium Access"
+        display_name = request.user.get_full_name() or request.user.username
+    elif payments_qs.exists():
+        display_name = payments_qs.first().customer_name or "Premium Member"
 
     context = {
-        "payments": purchased_payments,
-        "customer_name": customer_name,
-        "customer_email": customer_email,
+        "payments": list(final_items.values()),
+        "customer_email": user_email,
+        "customer_name": display_name,
     }
     return render(request, "vaultx/dashboard.html", context)
+
+# ५. कार्ड डिलीट (Hide) करण्याचे फंक्शन
+def delete_vault_item(request, payment_id):
+    # सुरक्षेसाठी फक्त GET किंवा POST विनंतीवर प्रक्रिया करा
+    payment = get_object_or_404(Payment, id=payment_id)
+    
+    # कार्ड पूर्णपणे डिलीट न करता फक्त डॅशबोर्डवरून लपवा (Hide)
+    payment.is_deleted_by_user = True
+    payment.save()
+    
+    return JsonResponse({
+        "status": "success", 
+        "message": "Item removed from dashboard successfully."
+    })
