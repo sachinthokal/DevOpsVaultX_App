@@ -47,6 +47,13 @@ def buy_product(request, pk):
     request.session['customer_email'] = customer_email
     request.session['customer_name'] = customer_name
 
+    # रिन्यूअल तपासणी: या ईमेलवर आधी यशस्वी पेमेंट झाले आहे का?
+    is_renewal_payment = Payment.objects.filter(
+        email=customer_email, 
+        product=product, 
+        status="SUCCESS"
+    ).exists()
+
     # ४. FREE PRODUCT LOGIC
     if product.price == 0:
         # random.randint(1000, 9999) वापरलाय जेणेकरून ID unique राहील
@@ -58,7 +65,8 @@ def buy_product(request, pk):
             email=customer_email,
             customer_name=customer_name,
             razorpay_order_id=unique_order_id,
-            amount=0, 
+            amount=0,
+            is_renewal=is_renewal_payment, # इथे रिन्यूअल मार्क करा
             status="SUCCESS", 
             paid=True, 
             download_limit=5, 
@@ -86,7 +94,8 @@ def buy_product(request, pk):
         email=customer_email, 
         customer_name=customer_name,
         razorpay_order_id=razorpay_order["id"], 
-        amount=amount, 
+        amount=amount,
+        is_renewal=is_renewal_payment, # इथे रिन्यूअल मार्क करा
         status="INIT", 
         download_limit=5, 
         download_used=0 # सुरुवातीला ० ठेवा

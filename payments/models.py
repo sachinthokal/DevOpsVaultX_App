@@ -30,6 +30,7 @@ class Payment(models.Model):
 
     is_deleted_by_user = models.BooleanField(default=False, help_text="Hide from UI")
     is_active = models.BooleanField(default=True)
+    is_renewal = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
