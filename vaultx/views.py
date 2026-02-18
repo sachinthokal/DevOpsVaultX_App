@@ -1,3 +1,4 @@
+# vultx/views.py
 import os
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
@@ -12,15 +13,15 @@ def vaultx_home(request):
     session_email = request.session.get('customer_email')
     user_email = request.user.email if request.user.is_authenticated else session_email
 
-    # १. युजरचे सर्व यशस्वी पेमेंट्स मिळवा
+    # 1. Fetch all successful payments for the user
     payments_qs = Payment.objects.filter(
         Q(session_id=session_id) | Q(email=user_email),
         status="SUCCESS",
         is_deleted_by_user=False
     ).order_by('-id')
 
-    # २. प्रत्येक प्रॉडक्ट किती वेळा खरेदी केला आहे (Purchase Count) त्याची मोजणी करा
-    # हे 'Renewal History' दाखवण्यासाठी लागेल
+    # 2. Count how many times each product has been purchased (Purchase Count)
+    # This is required to display the 'Renewal History'
     purchase_counts = payments_qs.values('product_id').annotate(total=Count('id'))
     counts_dict = {item['product_id']: item['total'] for item in purchase_counts}
 
@@ -28,18 +29,18 @@ def vaultx_home(request):
     unique_p_ids = payments_qs.values_list('product_id', flat=True).distinct()
 
     for p_id in unique_p_ids:
-        # क्युरी सेटमधून ऍक्टिव्ह पेमेंट शोधा (ज्याचे डाउनलोड शिल्लक आहेत)
+        # Search for an active payment from the queryset (where downloads are remaining)
         active_p = payments_qs.filter(
             product_id=p_id, 
             download_used__lt=F('download_limit'),
             is_active=True
         ).first()
 
-        # जर ऍक्टिव्ह नसेल तर लेटेस्ट एक्सपायर झालेलं पेमेंट घ्या
+        # If no active payment exists, take the latest expired payment
         display_payment = active_p if active_p else payments_qs.filter(product_id=p_id).first()
         
         if display_payment:
-            # टेम्पलेटमध्ये वापरण्यासाठी purchase_count डेटा जोडा
+            # Add purchase_count data to be used in the template
             display_payment.purchase_count = counts_dict.get(p_id, 1)
             final_items[p_id] = display_payment
 
