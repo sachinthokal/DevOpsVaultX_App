@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% load static %} {% block content %}
+{% extends 'base.html' %}
+{# path: vaultx/templates/vaultx/dashboard.html #}
+{% load static %} {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <link
   rel="stylesheet"
@@ -33,7 +35,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 30px;
-    padding: 50px 40px;
+    padding: 30px;
   }
 
   .asset-card {
@@ -283,7 +285,7 @@
   }
 
   .vault-gradient-popup {
-    /* तुमच्या थीमशी मॅच होणारा डार्क ग्रॅडियंट */
+    /* Dark gradient matching your theme */
     background: radial-gradient(
       circle at top,
       #1e293b 0%,
@@ -445,10 +447,10 @@
       </svg>
     </div>
     <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">
-      तुमचा व्हॉल्ट रिकामा आहे
+      Your Vault is Empty
     </h2>
     <p style="color: var(--text-muted); margin-bottom: 30px">
-      प्रीमियम रिसोर्सेस खरेदी करा आणि ते येथे ॲक्सेस करा.
+      Purchase premium resources to access them here.
     </p>
     <a
       href="/"
@@ -538,8 +540,8 @@
 }
   function removeItem(paymentId) {
     Swal.fire({
-      title: "Remove Asset?",
-      text: "हे कार्ड डॅशबोर्डवरून काढून टाकायचे का?",
+      title: "REMOVE ITEM",
+      text: "Do you want to remove this product from your dashboard?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#ff4757",
