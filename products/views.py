@@ -1,9 +1,11 @@
 import os
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import FileResponse, JsonResponse
-from django.contrib import messages
-from django.db.models import Q
-from .models import Product
+from django.http import FileResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseServerError, JsonResponse
+from django.db.models import Q, F
+from payments.models import Payment
+from products.models import Product
+
+
 
 # टीप: Payment मॉडेलला वर इम्पोर्ट करू नका, त्यामुळे ImportError येतो.
 
@@ -43,14 +45,9 @@ def confirm_payment(request, pk):
     return redirect('products:download_file', pk=pk)
 
 # ======================
-# Secure File Download (Final & Clean Fix)
+# Secure File Download (Final Verified Version)
 # ======================
 def download_file(request, pk):
-    # Circular Import टाळण्यासाठी local import
-    from payments.models import Payment
-    import os
-
-    # १. Session आणि User Details
     if not request.session.session_key:
         request.session.create()
     
@@ -58,62 +55,65 @@ def download_file(request, pk):
     session_email = request.session.get('customer_email')
     user_email = request.user.email if request.user.is_authenticated else None
     
-    # force_download फ्लॅग (हा JavaScript मधून येतो)
+    # १. ओळख पटवण्यासाठी सर्च क्वेरी
+    search_query = Q(session_id=session_id)
+    if session_email: search_query |= Q(email=session_email)
+    if user_email: search_query |= Q(email=user_email)
+
     is_forcing = request.GET.get('force_download') == '1'
 
-    # २. पेमेंट शोधणे (Updated Query)
-    search_query = Q(session_id=session_id)
-    if session_email:
-        search_query |= Q(email=session_email)
-    if user_email:
-        search_query |= Q(email=user_email)
+    # २. AJAX विनंती: क्रेडिट चेक आणि वजा करणे
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' and not is_forcing:
+        # फक्त Active आणि क्रेडिट शिल्लक असलेले पेमेंट शोधा
+        payment = Payment.objects.filter(
+            search_query,
+            product_id=pk, 
+            status="SUCCESS",
+            is_active=True,
+            download_used__lt=F('download_limit')
+        ).order_by('-id').first()
 
-    payment = Payment.objects.filter(
-        product_id=pk, 
-        status="SUCCESS"
-    ).filter(search_query).first()
+        if not payment:
+            print("=============================================",payment)  # Debugging line
+            return JsonResponse({
+                "status": "error", 
+                "message": "डाउनलोड क्रेडिट्स संपले आहेत किंवा खरेदी सापडली नाही."
+            }, status=400)
 
-    # ३. पेमेंट नसेल तर ॲक्सेस नाकारा
-    if not payment:
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({"status": "error", "message": "Access Denied. पेमेंट सापडले नाही."}, status=403)
-        messages.error(request, "कृपया हे उत्पादन आधी खरेदी करा.")
-        return redirect('products:detail', pk=pk)
-
-    # ४. डाउनलोड लिमिट चेक (फक्त AJAX कॉलमध्ये काऊंट वाढवायचा)
-    if not is_forcing:
-        if payment.retry_count >= 5:
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({"status": "error", "message": "Limit reached!"}, status=400)
-            return redirect('vaultx:index')
-
-        # ५. काउंट वाढवा आणि सेव्ह करा
-        payment.retry_count += 1
-        # जर ५ झाला तर ॲक्सेस बंद करण्यासाठी 'paid' फ्लॅग False करू शकतोस (Optional)
-        # if payment.retry_count >= 5: payment.paid = False 
+        # क्रेडिट वजा करा
+        payment.download_used += 1
+        if payment.download_used >= payment.download_limit:
+            payment.is_active = False
         payment.save()
 
-    # ६. प्रॉडक्ट आणि फाईल पाथ तपासणे
-    product = get_object_or_404(Product, pk=pk)
-    if not product.file or not os.path.exists(product.file.path):
-        return JsonResponse({"status": "error", "message": "फाईल सर्व्हरवर उपलब्ध नाही."}, status=404)
-
-    # ७. AJAX विनंती असल्यास JSON पाठवा (हा UI अपडेट करतो)
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest' and not is_forcing:
         return JsonResponse({
             "status": "success",
-            "new_count": payment.retry_count,
-            "download_url": f"/products/{pk}/download/?force_download=1" # Hardcoded safe URL
+            "download_url": f"/products/{pk}/download/?force_download=1"
         })
 
-    # ८. प्रत्यक्ष फाईल डाऊनलोड (Binary Response)
-    try:
-        # FileResponse सुरक्षितपणे पाठवणे
-        response = FileResponse(open(product.file.path, "rb"), as_attachment=True)
-        filename = os.path.basename(product.file.path)
-        # फाईल नावातील स्पेस काढून टाकणे अधिक सुरक्षित असते
-        response["Content-Disposition"] = f'attachment; filename="{filename}"'
-        return response
-    except Exception as e:
-        # जर फाईल उघडताना एरर आला तर
-        return JsonResponse({"status": "error", "message": f"Server Error: {str(e)}"}, status=500)
+    # ३. Direct Download (force_download=1): फक्त फाईल डिलिव्हरी
+    if is_forcing:
+        # येथे फक्त "SUCCESS" पेमेंट आहे की नाही एवढेच तपासा (क्रेडिट्स आधीच वजा झालेत)
+        has_paid = Payment.objects.filter(
+            search_query,
+            product_id=pk,
+            status="SUCCESS"
+        ).exists()
+
+        if not has_paid:
+            return HttpResponseForbidden("Access Denied.")
+
+        product = get_object_or_404(Product, pk=pk)
+        if not product.file or not os.path.exists(product.file.path):
+            return HttpResponseNotFound("फाईल सर्व्हरवर उपलब्ध नाही.")
+
+        try:
+            response = FileResponse(open(product.file.path, "rb"), as_attachment=True)
+            filename = os.path.basename(product.file.path)
+            response["Content-Disposition"] = f'attachment; filename="{filename}"'
+            return response
+        except Exception as e:
+            return HttpResponseServerError(f"Server Error: {str(e)}")
+
+    # जर कुणी डायरेक्ट URL हिट केली तर प्रॉक्ट डिटेलवर पाठवा
+    return redirect('products:detail', pk=pk)

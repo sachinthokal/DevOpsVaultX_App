@@ -1,13 +1,15 @@
 import json
 import razorpay
 import logging
+import os
+import random
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, FileResponse, HttpResponseNotFound
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import F
-from django.core.mail import EmailMultiAlternatives
+from django.db.models import F, Q
+from django.core.mail import EmailMultiAlternatives, send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from products.models import Product
@@ -21,7 +23,7 @@ client = razorpay.Client(
 )
 
 # ======================
-# 1. BUY PRODUCT (Initial Entry)
+# 1. BUY PRODUCT (Fixed: Random ID & Credit Reset)
 # ======================
 def buy_product(request, pk):
     product = get_object_or_404(Product, pk=pk, is_active=True)
@@ -30,64 +32,84 @@ def buy_product(request, pk):
         request.session.create()
     session_id = request.session.session_key
 
-    # GET request वर फक्त पेमेंट पेज दाखवा, POST वर डेटा प्रोसेस करा (जर फॉर्म वापरत असाल तर)
-    customer_email = request.POST.get('email')
-    customer_name = request.POST.get('customer_name')
+    # १. नाव/ईमेल मिळवण्याचा प्रयत्न (POST > Session)
+    customer_email = request.POST.get('email') or request.session.get('customer_email')
+    customer_name = request.POST.get('customer_name') or request.session.get('customer_name')
 
-    # जर प्रॉडक्ट FREE असेल तर
+    # २. जर अजूनही नाव मिळालं नसेल (Buy Again केस), तर DB मधून मागील रेकॉर्ड शोधा
+    if not customer_name or not customer_email:
+        last_payment = Payment.objects.filter(session_id=session_id).exclude(customer_name__isnull=True).exclude(customer_name="").order_by('-created_at').first()
+        if last_payment:
+            customer_name = customer_name or last_payment.customer_name
+            customer_email = customer_email or last_payment.email
+
+    # ३. भविष्यासाठी सेशन अपडेट करा
+    request.session['customer_email'] = customer_email
+    request.session['customer_name'] = customer_name
+
+    # रिन्यूअल तपासणी: या ईमेलवर आधी यशस्वी पेमेंट झाले आहे का?
+    is_renewal_payment = Payment.objects.filter(
+        email=customer_email, 
+        product=product, 
+        status="SUCCESS"
+    ).exists()
+
+    # ४. FREE PRODUCT LOGIC
     if product.price == 0:
-        payment, created = Payment.objects.get_or_create(
+        # random.randint(1000, 9999) वापरलाय जेणेकरून ID unique राहील
+        unique_order_id = f"FREE_{product.id}_{session_id[:5]}_{random.randint(1000,9999)}"
+        
+        Payment.objects.create(
             product=product, 
             session_id=session_id,
-            defaults={
-                'email': customer_email,
-                'customer_name': customer_name,
-                'razorpay_order_id': f"FREE_{product.id}_{session_id[:5]}",
-                'amount': 0,
-                'status': "SUCCESS",
-                'paid': True
-            }
+            email=customer_email,
+            customer_name=customer_name,
+            razorpay_order_id=unique_order_id,
+            amount=0,
+            is_renewal=is_renewal_payment, # इथे रिन्यूअल मार्क करा
+            status="SUCCESS", 
+            paid=True, 
+            download_limit=5, 
+            download_used=0, # नवीन खरेदीसाठी क्रेडिट्स रिसेट
+            is_active=True    # नवीन खरेदी असल्यामुळे ऍक्टिव्ह असणे गरजेचे आहे
         )
-        if not created:
-            payment.retry_count = F('retry_count') + 1
-            payment.save()
+        request.session[f"paid_{pk}"] = True
+        # payment_result वर रिडायरेक्ट करा जेणेकरून UI आणि टोस्ट दिसेल
+        return redirect(reverse("payments:payment_result", args=[pk]))
 
-        return render(request, "payments/payment.html", {
-            "product": product,
-            "is_free": True,
-            "razorpay_order_id": "FREE_ORDER",
-        })
-
-    # जर प्रॉडक्ट PAID असेल तर Razorpay Order तयार करा
+    # ५. PAID PRODUCT LOGIC
     amount = int(product.price * 100)
+    # Razorpay order create
     razorpay_order = client.order.create({
-        "amount": amount,
-        "currency": "INR",
-        "receipt": f"product_{product.id}",
+        "amount": amount, 
+        "currency": "INR", 
+        "receipt": f"p_{product.id}_{random.randint(10,99)}", 
         "payment_capture": 1
     })
 
-    # पेमेंट रेकॉर्ड तयार करा
+    # पेमेंट रेकॉर्ड तयार करा (Customer डेटासह)
     Payment.objects.create(
-        product=product,
-        session_id=session_id,
-        email=customer_email,
+        product=product, 
+        session_id=session_id, 
+        email=customer_email, 
         customer_name=customer_name,
-        razorpay_order_id=razorpay_order["id"],
+        razorpay_order_id=razorpay_order["id"], 
         amount=amount,
-        status="INIT"
+        is_renewal=is_renewal_payment, # इथे रिन्यूअल मार्क करा
+        status="INIT", 
+        download_limit=5, 
+        download_used=0 # सुरुवातीला ० ठेवा
     )
 
     return render(request, "payments/payment.html", {
-        "product": product,
-        "amount": amount,
+        "product": product, 
+        "amount": amount, 
         "razorpay_key_id": settings.RAZORPAY_KEY_ID,
-        "razorpay_order_id": razorpay_order["id"],
+        "razorpay_order_id": razorpay_order["id"], 
         "is_free": False,
-        "customer_email": customer_email,
+        "customer_email": customer_email, 
         "customer_name": customer_name,
     })
-
 # ======================
 # 2. PAYMENT SUCCESS HANDLER
 # ======================
@@ -96,58 +118,77 @@ def payment_success(request, pk):
         return HttpResponseForbidden()
 
     product = get_object_or_404(Product, pk=pk)
-    session_id = request.session.session_key
+    razorpay_order_id = request.POST.get("razorpay_order_id")
     
-    customer_name = request.POST.get('customer_name')
-    customer_email = request.POST.get('email')
+    # नाव आणि ईमेल पुन्हा एकदा खात्री करून घ्या
+    c_name = request.POST.get('customer_name') or request.session.get('customer_name')
+    c_email = request.POST.get('email') or request.session.get('customer_email')
 
-    # FREE Product Success Logic
-    if product.price == 0:
-        Payment.objects.filter(product=product, session_id=session_id).update(
-            status="SUCCESS", 
-            paid=True,
-            customer_name=customer_name,
-            email=customer_email
-        )
-    
-    # PAID Product Razorpay Verification
-    else:
-        razorpay_order_id = request.POST.get("razorpay_order_id")
-        payment = Payment.objects.filter(razorpay_order_id=razorpay_order_id).first()
+    payment = Payment.objects.filter(razorpay_order_id=razorpay_order_id).first()
+    if not payment:
+        return HttpResponseForbidden("Payment record not found.")
 
-        if not payment:
-            return HttpResponseForbidden("Payment record not found.")
+    try:
+        client.utility.verify_payment_signature({
+            "razorpay_payment_id": request.POST.get("razorpay_payment_id"),
+            "razorpay_order_id": razorpay_order_id,
+            "razorpay_signature": request.POST.get("razorpay_signature"),
+        })
+        payment.razorpay_payment_id = request.POST.get("razorpay_payment_id")
+        payment.razorpay_signature = request.POST.get("razorpay_signature")
+        payment.status, payment.paid, payment.is_active = "SUCCESS", True, True
+        
+        # जर पेमेंट एन्ट्री वेळी नाव नसेल तर इथे अपडेट करा
+        if not payment.customer_name: payment.customer_name = c_name
+        if not payment.email: payment.email = c_email
+        payment.save()
+        
+    except razorpay.errors.SignatureVerificationError:
+        payment.status = "FAILED"
+        payment.save()
+        return redirect(reverse("payments:payment_result", args=[pk]))
 
-        try:
-            client.utility.verify_payment_signature({
-                "razorpay_payment_id": request.POST.get("razorpay_payment_id"),
-                "razorpay_order_id": razorpay_order_id,
-                "razorpay_signature": request.POST.get("razorpay_signature"),
-            })
-            payment.razorpay_payment_id = request.POST.get("razorpay_payment_id")
-            payment.razorpay_signature = request.POST.get("razorpay_signature")
-            payment.status = "SUCCESS"
-            payment.paid = True
-            payment.customer_name = customer_name
-            payment.email = customer_email
-            payment.save()
-        except razorpay.errors.SignatureVerificationError:
-            payment.status = "FAILED"
-            payment.save()
-            return redirect(reverse("payments:payment_result", args=[pk]))
-
-    # Success Email पाठवा
-    recipient_email = customer_email or (request.user.email if request.user.is_authenticated else None)
-    recipient_name = customer_name or (request.user.get_full_name() if request.user.is_authenticated else "Developer")
-    
-    if recipient_email:
-        send_payment_success_email(recipient_email, product.title, recipient_name)
+    if c_email:
+        send_payment_success_email(c_email, product.title, c_name)
 
     request.session[f"paid_{pk}"] = True
     return redirect(reverse("payments:payment_result", args=[pk]))
 
 # ======================
-# 3. RETRY & FAILURE HANDLERS
+# 3. SECURE DOWNLOAD (Credit Logic)
+# ======================
+def download_file(request, pk):
+    session_id = request.session.session_key
+    session_email = request.session.get('customer_email')
+    user_email = request.user.email if request.user.is_authenticated else None
+    
+    search_query = Q(session_id=session_id)
+    if session_email: search_query |= Q(email=session_email)
+    if user_email: search_query |= Q(email=user_email)
+
+    is_forcing = request.GET.get('force_download') == '1'
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' and not is_forcing:
+        payment = Payment.objects.filter(search_query, product_id=pk, status="SUCCESS", is_active=True, download_used__lt=F('download_limit')).order_by('-created_at').first()
+        if not payment:
+            return JsonResponse({"status": "error", "message": "Limit Exceeded"}, status=400)
+
+        payment.download_used += 1
+        if payment.download_used >= payment.download_limit: payment.is_active = False
+        payment.save()
+        return JsonResponse({"status": "success", "download_url": f"/products/{pk}/download/?force_download=1"})
+
+    if is_forcing:
+        if not Payment.objects.filter(search_query, product_id=pk, status="SUCCESS").exists():
+            return HttpResponseForbidden()
+        product = get_object_or_404(Product, pk=pk)
+        response = FileResponse(open(product.file.path, "rb"), as_attachment=True)
+        response["Content-Disposition"] = f'attachment; filename="{os.path.basename(product.file.path)}"'
+        return response
+    return redirect('products:detail', pk=pk)
+
+# ======================
+# 4. RETRY & FAILURE
 # ======================
 @csrf_exempt
 def payment_failed(request):
@@ -157,177 +198,65 @@ def payment_failed(request):
 
 def retry_payment(request, order_id):
     old = get_object_or_404(Payment, razorpay_order_id=order_id, status="FAILED")
-    
-    new_order = client.order.create({
-        "amount": old.amount,
-        "currency": "INR",
-        "receipt": f"retry_{old.product.id}",
-        "payment_capture": 1
-    })
-
-    Payment.objects.create(
-        product=old.product,
-        session_id=request.session.session_key,
-        razorpay_order_id=new_order["id"],
-        amount=old.amount,
-        retry_count=old.retry_count + 1,
-        status="INIT"
-    )
-    return render(request, "payments/payment.html", {
-        "product": old.product,
-        "amount": old.amount,
-        "razorpay_key_id": settings.RAZORPAY_KEY_ID,
-        "razorpay_order_id": new_order["id"],
-    })
+    new_order = client.order.create({"amount": old.amount, "currency": "INR", "receipt": f"retry_{old.product.id}", "payment_capture": 1})
+    Payment.objects.create(product=old.product, session_id=request.session.session_key, razorpay_order_id=new_order["id"], amount=old.amount, status="INIT", email=old.email, customer_name=old.customer_name)
+    return render(request, "payments/payment.html", {"product": old.product, "amount": old.amount, "razorpay_key_id": settings.RAZORPAY_KEY_ID, "razorpay_order_id": new_order["id"]})
 
 # ======================
-# 4. WEBHOOK & RESULTS
+# 5. WEBHOOK & RESULTS
 # ======================
 @csrf_exempt
 def razorpay_webhook(request):
-    payload = request.body
-    signature = request.headers.get("X-Razorpay-Signature")
-
+    payload, sig = request.body, request.headers.get("X-Razorpay-Signature")
     try:
-        client.utility.verify_webhook_signature(payload, signature, settings.RAZORPAY_WEBHOOK_SECRET)
+        client.utility.verify_webhook_signature(payload, sig, settings.RAZORPAY_WEBHOOK_SECRET)
         data = json.loads(payload)
         if data.get("event") == "payment.captured":
-            entity = data["payload"]["payment"]["entity"]
-            Payment.objects.filter(razorpay_order_id=entity["order_id"]).update(
-                razorpay_payment_id=entity["id"], status="SUCCESS", paid=True
-            )
+            Payment.objects.filter(razorpay_order_id=data["payload"]["payment"]["entity"]["order_id"]).update(status="SUCCESS", paid=True, is_active=True)
         return HttpResponse(status=200)
-    except:
-        return HttpResponse("Invalid Signature", status=400)
+    except: return HttpResponse(status=400)
 
 def payment_result(request, pk):
     product = get_object_or_404(Product, pk=pk)
-    session_key = f"paid_{pk}"
-    
-    # Success Condition
     db_paid = Payment.objects.filter(product=product, session_id=request.session.session_key, status="SUCCESS").exists()
-    
-    if product.price == 0 or request.session.get(session_key) or db_paid:
-        status, file_url = "success", reverse("products:download_file", args=[pk])
-        request.session[session_key] = True 
-    else:
-        status, file_url = "failed", None
-    
-    return render(request, "payments/payment_result.html", {
-        "status": status, "product": product, "file_url": file_url, "is_free": product.price == 0,
-    })
+    return render(request, "payments/payment_result.html", {"status": "success" if db_paid else "failed", "product": product, "is_free": product.price == 0})
 
 # ======================
-# 5. EMAIL UTILITY
-# ======================
-def send_payment_success_email(user_email, product_title, customer_name):
-    subject = f'Order Confirmed: {product_title} - DevOpsVaultX'
-    from_email = settings.EMAIL_HOST_USER
-    
-    try:
-        html_content = render_to_string('emails/payment_success_email.html', {
-            'product_title': product_title,
-            'customer_name': customer_name or "Developer",
-        })
-        text_content = strip_tags(html_content) 
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [user_email])
-        msg.attach_alternative(html_content, "text/html")
-        msg.send(fail_silently=False)
-        return True
-    except Exception as e:
-        logger.error(f"Email failure: {e}")
-        return False
-    
-import random
-from django.core.cache import cache
-from django.core.mail import send_mail
-
-# ... (तुमचे इतर इम्पोर्ट्स जसे आहेत तसेच राहतील)
-
-# ======================
-# 🔐 OTP SYSTEM (SEND & VERIFY) - हे अ‍ॅड करा
+# 6. OTP SYSTEM
 # ======================
 @csrf_exempt
 def send_otp(request):
     if request.method == "POST":
         try:
-            data = json.loads(request.body)
-            email = data.get('email')
+            email = json.loads(request.body).get('email')
             otp = str(random.randint(100000, 999999))
             cache.set(f"otp_{email}", otp, timeout=300)
-
-            # HTML Template Render करा
-            context = {'otp': otp}
-            html_message = render_to_string('emails/otp_email.html', context)
-            plain_message = f"Your verification code is: {otp}. It is valid for 5 minutes."
-
-            send_mail(
-                subject="Verification Code: " + otp + " - DevOpsVaultX", # English Subject
-                message=plain_message,
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[email],
-                html_message=html_message, # हा HTML UI पाठवेल
-                fail_silently=False,
-            )
+            send_mail(f"OTP: {otp}", f"Your OTP is {otp}", settings.EMAIL_HOST_USER, [email], html_message=render_to_string('emails/otp_email.html', {'otp': otp}))
             return JsonResponse({"status": "success"})
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+        except Exception as e: return JsonResponse({"status": "error", "message": str(e)}, status=500)
     return HttpResponseForbidden()
 
-
-
-# ======================
-# Verify OTP (Fixed with email_otp_verified)
-# ======================
 @csrf_exempt
 def verify_otp(request):
     if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            email = data.get('email')  # हा नवीन ईमेल आहे
-            user_otp = data.get('otp')
-            is_update_request = data.get('is_update', False) 
-            
-            saved_otp = cache.get(f"otp_{email}")
-            
-            if saved_otp and str(saved_otp) == str(user_otp):
-                if is_update_request:
-                    session_id = request.session.session_key
-                    if session_id:
-                        # १. सध्याचा ईमेल (जो आता 'Old' होणार आहे) मिळवा
-                        old_payment = Payment.objects.filter(
-                            session_id=session_id, 
-                            status="SUCCESS"
-                        ).first()
-                        
-                        current_old_email = old_payment.email if old_payment else "Unknown"
-
-                        # २. डेटाबेसमध्ये सर्व पेमेंट्स अपडेट करा (email_otp_verified सह)
-                        Payment.objects.filter(
-                            session_id=session_id, 
-                            status="SUCCESS"
-                        ).update(
-                            old_email=current_old_email,     # जुना ईमेल सेव्ह होतोय
-                            email=email,                    # नवीन ईमेल अपडेट होतोय
-                            email_updated=True,             # ईमेल बदलल्याचा मार्क
-                            email_otp_verified=True         # 🔥 आता हा ईमेल व्हेरिफाईड आहे!
-                        )
-                        
-                        # ३. सर्वात महत्त्वाचे: Django Session अपडेट करा
-                        request.session['customer_email'] = email
-                        request.session.modified = True 
-                        
-                        return JsonResponse({"status": "success", "message": "Email Updated successfully!"})
-                    else:
-                        return JsonResponse({"status": "error", "message": "Session Expired"}, status=400)
-
-                # नॉर्मल पेमेंट व्हेरिफिकेशनसाठी (जेव्हा युजर पहिल्यांदा येतो)
-                cache.set(f"verified_{email}", True, timeout=600)
-                return JsonResponse({"status": "success", "message": "Verified"})
-            
-            else:
-                return JsonResponse({"status": "error", "message": "चुकीचा OTP!"}, status=400)
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
-            
+        data = json.loads(request.body)
+        email, user_otp, is_upd = data.get('email'), data.get('otp'), data.get('is_update', False)
+        if str(cache.get(f"otp_{email}")) == str(user_otp):
+            if is_upd and request.session.session_key:
+                old_p = Payment.objects.filter(session_id=request.session.session_key, status="SUCCESS").first()
+                Payment.objects.filter(session_id=request.session.session_key, status="SUCCESS").update(old_email=old_p.email if old_p else "", email=email, email_updated=True, email_otp_verified=True)
+                request.session['customer_email'] = email
+            return JsonResponse({"status": "success"})
+        return JsonResponse({"status": "error"}, status=400)
     return HttpResponseForbidden()
+
+# ======================
+# 7. EMAIL UTILITY
+# ======================
+def send_payment_success_email(u_email, p_title, c_name):
+    try:
+        html = render_to_string('emails/payment_success_email.html', {'product_title': p_title, 'customer_name': c_name or "Developer"})
+        msg = EmailMultiAlternatives(f'Confirmed: {p_title}', strip_tags(html), settings.EMAIL_HOST_USER, [u_email])
+        msg.attach_alternative(html, "text/html")
+        msg.send()
+    except Exception as e: logger.error(e)

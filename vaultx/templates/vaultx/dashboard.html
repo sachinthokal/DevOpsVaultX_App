@@ -1,219 +1,594 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<link rel="stylesheet" href="{% static 'vaultx/css/dashboard.css' %}">
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
 
-<div class="vault-wrapper">
-    <div class="vault-header">
-        <div class="container">
-            <h1>DEVOPSVAULTX</h1>
+<style>
+  :root {
+    --danger: #ff4757;
+    --success: #2ed573;
+    --bg: #0b0f1a;
+    --card: #161e2e;
+    --text-muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-glow: rgba(56, 189, 248, 0.3);
+    --glass: rgba(255, 255, 255, 0.03);
+  }
 
-            <div class="user-info-pill">
-                <span>👤 <strong>{{ customer_name|upper }}</strong></span>
-                <span class="divider"></span>
+  body {
+    background: var(--bg);
+    color: white;
+    font-family: "Inter", sans-serif;
+    margin: 0;
+    background-image: radial-gradient(
+      circle at 50% -20%,
+      #1e293b 0%,
+      var(--bg) 80%
+    );
+  }
 
-                <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left;">
-                    <span class="email-text">📧 {{ customer_email }}</span>
+  .vault-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+    padding: 50px 40px;
+  }
 
-                    {% if payments.0.email_updated and payments.0.old_email %}
-                    <span style="font-size: 10px; color: var(--premium-gold); font-weight: 600; opacity: 0.8; margin-top: -2px;">
-                        🔄 Updated from: {{ payments.0.old_email }}
-                    </span>
-                    {% endif %}
-                </div>
+  .asset-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 28px;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 420px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
 
-                <button onclick="toggleUpdateBox()" class="btn-edit-trigger" title="Update Email">✏️</button>
-            </div>
+  .asset-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--accent);
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.4),
+      0 0 20px var(--accent-glow);
+  }
 
-            <div id="email-update-box" class="update-container" style="display:none;">
-                <div class="update-card">
-                    <div id="step-email">
-                        <h4>Update Security Email</h4>
-                        <p>Verify your new email to sync your vault resources.</p>
-                        <div class="input-group">
-                            <input type="email" id="new-email-input" placeholder="Enter new email address">
-                        </div>
-                        <button onclick="requestOTP()" id="otp-btn" class="btn-primary-custom">Get Verification Code</button>
-                    </div>
+  .top-actions {
+    display: flex;
+    gap: 10px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+  }
 
-                    <div id="step-otp" style="display:none;">
-                        <h4>Verify Identity</h4>
-                        <p>Check your inbox for the 6-digit verification code.</p>
-                        <div class="input-group">
-                            <input type="text" id="otp-input" maxlength="6"
-                                style="text-align:center; letter-spacing:8px; font-weight: bold; font-size: 1.2rem;"
-                                placeholder="******">
-                        </div>
-                        <button onclick="verifyAndUpdateEmail()" id="verify-btn"
-                            class="btn-primary-custom btn-verify">Verify & Update Access</button>
-                    </div>
+  .action-circle {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    background: var(--glass);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    padding: 0;
+  }
 
-                    <a href="javascript:void(0)" onclick="toggleUpdateBox()"
-                        style="display:block; margin-top:15px; color:#ff4d4d; font-size:12px; text-decoration:none; font-weight: 600;">
-                        Cancel
-                    </a>
-                </div>
-            </div>
+  .action-circle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-color: var(--accent);
+  }
 
-            <p style="margin-top: 25px; opacity: 0.8;">Your premium resources are safely secured. ⬇️</p>
-        </div>
+  .status-badge {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+    background: rgba(56, 189, 248, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    width: fit-content;
+  }
+
+  .product-title {
+    margin: 15px 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    line-height: 1.3;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .progress-container {
+    height: 8px;
+    background: #0f172a;
+    border-radius: 10px;
+    margin: 12px 0;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #38bdf8, #818cf8, #38bdf8);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite linear;
+    border-radius: 10px;
+    transition: width 1s ease;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  .btn-download {
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: auto;
+  }
+
+  .active-btn {
+    background: white;
+    color: black;
+  }
+
+  .active-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+  }
+
+  .buy-again-btn {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* SweetAlert Premium Classes */
+  .vault-modal-container {
+    text-align: left;
+    font-family: "Inter", sans-serif;
+  }
+
+  .vault-modal-subtitle {
+    font-size: 0.75rem;
+    color: #38bdf8;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .vault-modal-title {
+    font-weight: 800;
+    font-size: 1.8rem;
+    color: #fff;
+    letter-spacing: -0.5px;
+    margin-bottom: 25px;
+  }
+
+  .vault-status-box {
+    background: rgba(56, 189, 248, 0.05);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+
+  .vault-status-icon {
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: #38bdf8;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+  }
+
+  .vault-label {
+    color: #94a3b8;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .vault-value {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .vault-order-box {
+    background: #000;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+
+  .vault-grid-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .vault-stat-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .vault-progress-bg {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    height: 6px;
+    width: 100%;
+    margin-bottom: 30px;
+    overflow: hidden;
+  }
+
+  .vault-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #38bdf8, #818cf8);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+  }
+
+  .vault-btn-ack {
+    width: 100%;
+    background: #38bdf8;
+    color: #000 !important;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  .vault-gradient-popup {
+    /* तुमच्या थीमशी मॅच होणारा डार्क ग्रॅडियंट */
+    background: radial-gradient(
+      circle at top,
+      #1e293b 0%,
+      #0b0f1a 100%
+    ) !important;
+    border: 1px solid rgba(56, 189, 248, 0.2) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+  }
+</style>
+
+<div class="vault-grid">
+  {% for payment in payments %}
+  <div class="asset-card" id="card-{{ payment.id }}">
+    <div class="top-actions">
+      <button
+        class="action-circle btn-history"
+        onclick="showHistory(
+    '{{ payment.razorpay_order_id }}', 
+    '{{ payment.created_at|date:'d M Y' }}', 
+    '{{ payment.updated_at|date:'d M Y' }}', 
+    '{{ payment.download_used }}', 
+    '{{ payment.purchase_count|default:1 }}',
+    '{{ request.user.get_full_name|default:request.user.username|default:"New User" }}', 
+    '{{ request.user.email|default:"Not Linked" }}'
+)"
+        title="History"
+      >
+        <svg
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </button>
+      <button
+        class="action-circle btn-delete"
+        onclick="removeItem('{{ payment.id }}')"
+        title="Remove"
+      >
+        <svg
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
     </div>
 
-    <div class="vault-grid">
-        {% for payment in payments %}
-        <div class="asset-card">
-            <div class="card-top"></div>
-            <div class="card-content">
-                <span class="status-tag">Premium Access</span>
-                <h4 class="card-title">{{ payment.product.title }}</h4>
-                <div class="usage-box">
-                    <div style="display:flex; justify-content:space-between; font-size:12px;">
-                        <span>Downloads Used</span>
-                        <strong id="count-text-{{ payment.id }}">{{ payment.retry_count|default:0 }} / 5</strong>
-                    </div>
-                    <div class="progress-wrap">
-                        <div id="progress-fill-{{ payment.id }}" class="progress-fill"
-                            style="width: {% widthratio payment.retry_count 5 100 %}%"></div>
-                    </div>
-                </div>
-            </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap">
+      <span class="status-badge">
+        {% if payment.download_used >= payment.download_limit %}🔒 Limit
+        Reached{% else %}✨ Premium Asset{% endif %}
+      </span>
 
-            <div class="action-footer" style="padding: 15px; text-align: center;">
-                {% if payment.retry_count >= 5 %}
-                <div class="limit-box" style="background: rgba(255, 77, 77, 0.05); border: 1px dashed #ff4d4d; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
-                    <p style="color: #ff4d4d; font-size: 13px; margin: 0; font-weight: 600;">🔒 Access Locked: Limit Reached</p>
-                    <a href="{% url 'products:detail' payment.product.id %}"
-                        style="color: #1e3c72; font-size: 12px; text-decoration: underline; font-weight: bold; display: block; margin-top: 5px;">
-                        Buy product again to restore access 🚀
-                    </a>
-                </div>
-                <button class="btn-action" disabled style="background: #666; width: 100%; cursor: not-allowed;">
-                    Access Locked 🔒
-                </button>
-                {% else %}
-                <button onclick="handleDownload('{{ payment.product.id }}', '{{ payment.id }}')" class="btn-action"
-                    id="btn-{{ payment.id }}" style="width: 100%;">
-                    Download Resource ⬇️
-                </button>
-                {% endif %}
-            </div>
-        </div>
-        {% empty %}
-        <div class="empty-vault-card">
-            <div style="font-size:50px;">🔒</div>
-            <h2>Vault Locked</h2>
-            <p>No products found for this session or email.</p>
-            <a href="{% url 'products:list' %}" class="btn-explore">Explore Products 🚀</a>
-        </div>
-        {% endfor %}
+      {% if payment.purchase_count > 1 %}
+      <span
+        class="status-badge"
+        style="
+          background: rgba(46, 213, 115, 0.1);
+          color: #2ed573;
+          border: 1px solid rgba(46, 213, 115, 0.2);
+        "
+      >
+        RENEWED x{{ payment.purchase_count }}
+      </span>
+      {% endif %}
     </div>
+
+    <h3 class="product-title">{{ payment.product.title }}</h3>
+
+    <div class="progress-section">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          font-size: 12px;
+          margin-bottom: 8px;
+        "
+      >
+        <span style="color: var(--text-muted)">Access Credits</span>
+        <span
+          style="font-weight:700; color: {% if payment.download_used >= payment.download_limit %}var(--danger){% else %}var(--accent){% endif %};"
+        >
+          {{ payment.download_used }} / {{ payment.download_limit }}
+        </span>
+      </div>
+
+      <div class="progress-container">
+        <div
+          class="progress-bar"
+          style="width: {% widthratio payment.download_used payment.download_limit 100 %}%"
+        ></div>
+      </div>
+    </div>
+
+    <div class="action-area" style="margin-top: auto">
+      {% if payment.download_used >= payment.download_limit %}
+      <div
+        class="limit-warning-box"
+        style="
+          margin-bottom: 15px;
+          background: rgba(255, 71, 87, 0.05);
+          border: 1px dashed var(--danger);
+          padding: 10px;
+          border-radius: 12px;
+          text-align: center;
+          color: var(--danger);
+          font-size: 11px;
+        "
+      >
+        Download limit reached for this license.
+      </div>
+      <a
+        href="{% url 'products:detail' payment.product.id %}"
+        class="btn-download buy-again-btn"
+        >Renew License 🚀</a
+      >
+      {% else %}
+      <button
+        onclick="handleDownload('{{ payment.product.id }}', '{{ payment.id }}')"
+        class="btn-download active-btn"
+        id="btn-{{ payment.id }}"
+      >
+        Download Now
+      </button>
+      {% endif %}
+    </div>
+  </div>
+  {% empty %}
+  <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px">
+    <div
+      style="
+        background: var(--glass);
+        display: inline-block;
+        padding: 30px;
+        border-radius: 50%;
+        margin-bottom: 20px;
+      "
+    >
+      <svg
+        width="50"
+        height="50"
+        fill="none"
+        stroke="#475569"
+        stroke-width="1.5"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+        ></path>
+      </svg>
+    </div>
+    <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">
+      तुमचा व्हॉल्ट रिकामा आहे
+    </h2>
+    <p style="color: var(--text-muted); margin-bottom: 30px">
+      प्रीमियम रिसोर्सेस खरेदी करा आणि ते येथे ॲक्सेस करा.
+    </p>
+    <a
+      href="/"
+      style="
+        background: var(--accent);
+        color: white;
+        padding: 15px 40px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 800;
+      "
+      >Explore Store</a
+    >
+  </div>
+  {% endfor %}
 </div>
 
 <script>
-    function notify(title, text, icon) {
-        Swal.fire({
-            title: title, text: text, icon: icon,
-            confirmButtonColor: '#1e3c72'
-        });
-    }
+  function showHistory(orderId, purchaseDate, lastDownload, used, count, userName, userEmail) {
+    const usagePercent = (used / 5) * 100;
+    
+    Swal.fire({
+      customClass: {
+        popup: "vault-gradient-popup",
+      },
+      color: "#ffffff",
+      width: "480px",
+      padding: "2rem",
+      showConfirmButton: false,
+      html: `
+            <div class="vault-modal-container" style="text-align: left; font-family: 'Inter', sans-serif;">
+                <div style="border-left: 3px solid #38bdf8; padding-left: 15px; margin-bottom: 25px;">
+                    <div class="vault-modal-subtitle" style="letter-spacing: 2px; opacity: 0.6; font-size: 0.7rem; text-transform: uppercase;">HISTORY</div>
+                    <div class="vault-modal-title" style="font-size: 1.6rem; font-weight: 800; color: #fff;">PURCHASE SUMMARY</div>
+                </div>
 
-    function toggleUpdateBox() {
-        const box = document.getElementById('email-update-box');
-        box.style.display = (box.style.display === 'none') ? 'block' : 'none';
-        if (box.style.display === 'block') box.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+                <div style="display: flex; flex-direction: column; gap: 12px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
+                        <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">OWNER NAME</span>
+                        <span style="color: #fff; font-weight: 600; font-size: 0.85rem;">${userName.toUpperCase()}</span>
+                    </div>
 
-    function requestOTP() {
-        const email = document.getElementById('new-email-input').value;
-        const btn = document.getElementById('otp-btn');
-        if (!email || !email.includes('@')) return notify('Invalid Email', 'योग्य ईमेल टाका.', 'warning');
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
+                        <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">SECURE EMAIL</span>
+                        <span style="color: #38bdf8; font-size: 0.85rem;">${userEmail}</span>
+                    </div>
 
-        btn.innerText = "Sending...";
-        btn.disabled = true;
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
+                        <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">LICENSE STATUS</span>
+                        <span style="color: #fff; font-size: 0.85rem;">${count > 1 ? "RENEWED" : "ORIGINAL"}</span>
+                    </div>
 
-        fetch('/payments/send-otp/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-            body: JSON.stringify({ email: email })
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
+                        <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">PURCHASE CYCLES</span>
+                        <span style="color: #38bdf8; font-weight: 800; font-size: 0.9rem;">x${count}</span>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">LAST ACTIVITY</span>
+                        <span style="color: #fff; font-size: 0.85rem;">${used > 0 ? lastDownload : "Pending"}</span>
+                    </div>
+                </div>
+                <div style="display: flex; margin-top: 12px; flex-direction: column; gap: 12px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">ORDER_ID</span>
+                        <span style="color: #38bdf8; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">#${orderId}</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px; margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: rgba(255,255,255,0.5); font-size: 0.7rem; text-transform: uppercase;">Credit Usage</span>
+                        <span style="color: #fff; font-size: 0.75rem; font-weight: 700;">${used} / 5 Units</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="width: ${usagePercent}%; background: linear-gradient(90deg, #38bdf8, #818cf8); height: 100%; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);"></div>
+                    </div>
+                </div>
+
+                <button onclick="Swal.close()" class="vault-btn-ack" style="width: 100%; background: linear-gradient(135deg, #38bdf8, #2563eb); color: #fff; border: none; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);">Close Terminal</button>
+            </div>`,
+      showClass: {
+        popup: "animate__animated animate__fadeInUp animate__faster",
+      },
+    });
+}
+  function removeItem(paymentId) {
+    Swal.fire({
+      title: "Remove Asset?",
+      text: "हे कार्ड डॅशबोर्डवरून काढून टाकायचे का?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ff4757",
+      background: "#161e2e",
+      color: "#fff",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/vaultx/delete-item/${paymentId}/`, {
+          headers: { "X-Requested-With": "XMLHttpRequest" },
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                document.getElementById('step-email').style.display = 'none';
-                document.getElementById('step-otp').style.display = 'block';
-            } else {
-                notify('Error', data.message, 'error');
-                btn.innerText = "Get Code"; btn.disabled = false;
-            }
-        });
-    }
-
-    function verifyAndUpdateEmail() {
-        const email = document.getElementById('new-email-input').value;
-        const otp = document.getElementById('otp-input').value;
-        const btn = document.getElementById('verify-btn');
-
-        fetch('/payments/verify-otp/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-            body: JSON.stringify({ email: email, otp: otp, is_update: true })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.status === "success") {
+              const card = document.getElementById(`card-${paymentId}`);
+              card.classList.add("animate__animated", "animate__zoomOut");
+              setTimeout(() => {
                 location.reload();
-            } else {
-                notify('Failed', data.message, 'error');
-                btn.disabled = false;
+              }, 500);
             }
-        });
-    }
+          });
+      }
+    });
+  }
 
-    function handleDownload(productId, paymentId) {
-        const btn = document.getElementById(`btn-${paymentId}`);
-        const countTextElement = document.getElementById(`count-text-${paymentId}`);
-        
-        const originalHtml = btn.innerHTML;
-        btn.innerHTML = "Processing...";
-        btn.disabled = true;
+  function handleDownload(productId, paymentId) {
+    const btn = document.getElementById(`btn-${paymentId}`);
+    btn.innerHTML = "Processing...";
+    btn.disabled = true;
 
-        fetch(`/products/${productId}/download/`, {
-            method: 'GET',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Server Error');
-            return response.json();
-        })
-        .then(data => {
-            if (data.status === 'success') {
-                // फक्त संबंधित कार्डचा डेटा अपडेट होतोय
-                countTextElement.innerText = `${data.new_count} / 5`;
-                document.getElementById(`progress-fill-${paymentId}`).style.width = (data.new_count / 5 * 100) + "%";
-                
-                window.location.assign(data.download_url);
-
-                setTimeout(() => {
-                    if (data.new_count >= 5) {
-                        location.reload(); 
-                    } else {
-                        btn.innerHTML = originalHtml;
-                        btn.disabled = false;
-                    }
-                }, 1000);
-            } else {
-                notify('Error', data.message, 'error');
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
-            }
-        })
-        .catch(err => {
-            btn.innerHTML = originalHtml;
-            btn.disabled = false;
-            notify('Server Error', 'डाऊनलोड होऊ शकले नाही.', 'error');
-        });
-    }
+    fetch(`/products/${productId}/download/`, {
+      headers: { "X-Requested-With": "XMLHttpRequest" },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "success") {
+          window.location.href = data.download_url;
+          setTimeout(() => {
+            location.reload();
+          }, 2000);
+        } else {
+          Swal.fire("Error", data.message, "error");
+          btn.innerText = "Download Now";
+          btn.disabled = false;
+        }
+      })
+      .catch(() => {
+        btn.disabled = false;
+        btn.innerText = "Download Now";
+      });
+  }
 </script>
 {% endblock %}
