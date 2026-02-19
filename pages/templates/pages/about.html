@@ -2,51 +2,61 @@
 {% load static %}
 
 {% block content %}
+<section class="brutalist-about">
+    <div class="grid-overlay"></div>
 
-<section class="about-hero">
-    <img src="{% static 'images/favicon.png' %}" alt="DevOpsVaultX Logo" class="about-logo">
-    <h1>Why Choose <span>DevOpsVaultX?</span></h1>
-    <p>
-        Empowering DevOps professionals with real-world experience, easy-to-follow notes, and affordable pricing.
-    </p>
-</section>
+    <div class="main-container">
+        <div class="hero-split">
+            <div class="hero-text-block">
+                <div class="status-badge">SYSTEM_STATUS: <span style="color: #32FC20;">OPERATIONAL</span></div>
+                <h1 class="glitch-h1">DEVOPS<span>VAULTX</span></h1>
+                <p class="hero-desc">
+                    Bridging the gap between manual infrastructure and automated excellence. Real-world insights for the modern engineer.
+                </p>
+            </div>
+            <div class="hero-image-block">
+                <div class="logo-frame">
+                    <video autoplay loop muted playsinline class="screen-content">
+                        <source src="{% static 'images/dashboard_preview.mp4' %}" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </div>
 
-<section class="about-features">
-    <div class="feature-card">
-        <span class="icon"><img width="60" height="60" src="https://img.icons8.com/emoji/48/globe-showing-americas-emoji.png" alt="globe-showing-americas-emoji"/></span>
-        <h3>Real World Expertise</h3>
-        <p>
-            Our content is created by industry professionals with hands-on
-            experience in real production environments, not just theory.
-        </p>
+        <div class="bento-grid">
+            <div class="bento-item expertise">
+                <div class="bento-tag">01 / EXPERTISE</div>
+                <h3>Real-World <br>Production Insight</h3>
+                <p>Our content is created by industry professionals with hands-on experience in real production environments, not just theory.</p>
+                <img src="https://img.icons8.com/3d-fluency/94/data-configuration.png" alt="Icon">
+            </div>
+
+            <div class="bento-item notes">
+                <div class="bento-tag">02 / DOCUMENTATION</div>
+                <h3>Simplified Architecture</h3>
+                <p>Complex YAMLs and K8s manifests broken down into step-by-step logic.</p>
+                <img src="https://img.icons8.com/3d-fluency/94/code.png" alt="Icon">
+            </div>
+
+            <div class="bento-item pricing">
+                <div class="bento-tag">03 / ACCESSIBILITY</div>
+                <h3>Affordable Pricing</h3>
+                <p>High-quality DevOps resources at beginner-friendly prices, because learning should be accessible to everyone.</p>
+                <img src="https://img.icons8.com/3d-fluency/94/wallet.png" alt="Icon">
+            </div>
+        </div>
+
+        <div class="mission-strip">
+            <div class="strip-content">
+                <marquee scrollamount="10"> 
+                    OUR MISSION: To empower engineers with practical DevOps knowledge and tools, enabling them to build, deploy, and manage modern applications with confidence.
+                </marquee>
+            </div>
+            <div class="mission-text-box">
+                <h2>The Protocol</h2>
+                <p>We provide the templates, the guides, and the mental models required to thrive in a DevOps culture.</p>
+            </div>
+        </div>
     </div>
-
-    <div class="feature-card">
-        <span class="icon"><img width="60" height="60" src="https://img.icons8.com/plasticine/100/task.png" alt="task"/></span>
-        <h3>Easy to Follow Notes</h3>
-        <p>
-            Simple explanations, step-by-step guides, and practical examples
-            that make complex DevOps concepts easy to understand.
-        </p>
-    </div>
-
-    <div class="feature-card">
-        <span class="icon"><img width="60" height="60" src="https://img.icons8.com/external-flaticons-flat-flat-icons/64/external-pricing-auction-house-flaticons-flat-flat-icons-2.png" alt="external-pricing-auction-house-flaticons-flat-flat-icons-2"/></span>
-        <h3>Affordable Pricing</h3>
-        <p>
-            High-quality DevOps resources at beginner-friendly prices,
-            because learning should be accessible to everyone.
-        </p>
-    </div>
 </section>
-
-<section class="about-mission">
-    <h2>OUR MISSION</h2>
-    <p>
-        DevOpsVaultX aims to bridge the gap between theory and real-world DevOps
-        practices by providing practical notes, templates, and guides that help
-        engineers grow faster and smarter.
-    </p>
-</section>
-
 {% endblock %}
