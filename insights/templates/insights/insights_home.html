@@ -1,36 +1,29 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-
+<link rel="stylesheet" href="{% static 'insights/css/insights_home.css' %}">
 <section class="insights-wrapper-new">
     <div class="insights-grid-new">
 
         <aside class="side-banner-new">
             <video autoplay muted loop playsinline class="banner-video">
-                <!-- <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4"> -->
+                <source src="{% static 'videos/banner-bg.mp4' %}" type="video/mp4">
             </video>
-            <p class="banner-text">DevOpsinsightsX</p>
+            <p class="banner-text">VaultX Live</p>
         </aside>
 
         <div class="insights-card-new fixed-card">
             <h2>📰 DevOps News</h2>
             <div class="insights-list scroll-area">
                 {% for item in news %}
-                <a href="{% url 'insights:detail' item.category item.slug %}" class="insights-row news"
-                    class="insights-row news {% if item.is_pinned %}pinned{% endif %}">
+                <a href="{% url 'insights:detail' item.category item.slug %}" 
+                   class="insights-row news {% if item.is_pinned %}pinned{% endif %}">
                     <div class="row-left">
                         <div class="insights-title">{{ item.title }}</div>
-
                         <div class="tag-container">
-                            {% if item.is_pinned %}
-                            <span class="pin-badge">📌 PINNED</span>
-                            {% endif %}
-
-                            {% if item.is_new %}
-                            <span class="new-badge">NEW</span>
-                            {% endif %}
+                            {% if item.is_pinned %}<span class="pin-badge">📌 PINNED</span>{% endif %}
+                            {% if item.is_new %}<span class="new-badge">NEW</span>{% endif %}
                         </div>
-
-
                         <div class="insights-time">{{ item.created_at|timesince }} ago</div>
                     </div>
                     <span class="arrow">→</span>
@@ -43,19 +36,14 @@
             <h2>✍️ Blogs</h2>
             <div class="insights-list scroll-area">
                 {% for item in blogs %}
-                <a href="{% url 'insights:detail' item.category item.slug %}" class="insights-row blog">
+                <a href="{% url 'insights:detail' item.category item.slug %}" 
+                   class="insights-row blog {% if item.is_pinned %}pinned{% endif %}">
                     <div class="row-left">
                         <div class="insights-title">{{ item.title }}</div>
                         <div class="tag-container">
-                            {% if item.is_pinned %}
-                            <span class="pin-badge">📌 PINNED</span>
-                            {% endif %}
-
-                            {% if item.is_new %}
-                            <span class="new-badge">NEW</span>
-                            {% endif %}
+                            {% if item.is_pinned %}<span class="pin-badge">📌 PINNED</span>{% endif %}
+                            {% if item.is_new %}<span class="new-badge">NEW</span>{% endif %}
                         </div>
-
                         <div class="insights-time">{{ item.created_at|timesince }} ago</div>
                     </div>
                     <span class="arrow">→</span>
@@ -66,9 +54,9 @@
 
         <aside class="side-banner-new">
             <video autoplay muted loop playsinline class="banner-video">
-                <!-- <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4"> -->
+                <source src="{% static 'videos/banner-bg-2.mp4' %}" type="video/mp4">
             </video>
-            <p class="banner-text">DevOpsinsightsX</p>
+            <p class="banner-text">DevOpsInsightsX</p>
         </aside>
 
         <div class="insights-card-new full-width">
@@ -80,13 +68,10 @@
                         {% if item.is_new %}
                         <span class="offer-badge">NEW OFFER</span>
                         {% else %}
-                        <span class="offer-badge"
-                            style="background: linear-gradient(45deg, #56c570, #025720);">OFFER</span>
+                        <span class="offer-badge" style="background: linear-gradient(45deg, #56c570, #025720);">OFFER</span>
                         {% endif %}
                     </div>
-
                     <h3>{{ item.title }}</h3>
-
                     <div class="insights-time" style="color: #cbd5e1; margin-top: 10px;">
                         {{ item.created_at|timesince }} ago
                     </div>

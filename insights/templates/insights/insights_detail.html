@@ -1,28 +1,80 @@
 {% extends "base.html" %}
 {% load static %}
+<link rel="stylesheet" href="{% static 'insights/css/insights_detail.css' %}">
 {% block content %}
 <section class="insights-detail-wrapper">
-    <article class="insights-detail-card">
-        <header class="insights-detail-header">
-            <h1>{{ post.title }}</h1>
-            <div class="meta">
-                <span>📅 {{ post.created_at|date:"d M Y" }}</span> · 
-                <span style="color: #3b82f6; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">{{ post.category }}</span>
+    <div class="ultra-container">
+        
+        <aside class="ultra-sidebar">
+            <div class="sidebar-top">
+                <div class="status-badge">
+                    <span style="animation: pulse 2s infinite;">●</span> NODE_ACTIVE_SYS_{{ post.id }}
+                </div>
+                
+                <div class="sidebar-meta-grid">
+                    <div class="meta-item">
+                        <span class="sidebar-label">Classification</span>
+                        <span class="sidebar-data" style="color: var(--vault-neon-blue);">{{ post.category | upper}}</span>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="sidebar-label">Word Count</span>
+                        <span id="js-word-count" class="sidebar-data">Calculating...</span>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="sidebar-label">Line Count</span>
+                        <span id="js-line-count" class="sidebar-data">Calculating...</span>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="sidebar-label">Reading Time</span>
+                        <span id="js-read-time" class="sidebar-data" style="color: var(--vault-neon-orange);">Calculating...</span>
+                    </div>
+                </div>
             </div>
-        </header>
+            
+            <a href="{% url 'insights:home' %}" class="btn-return">← EXIT TERMINAL</a>
+        </aside>
 
-        <div class="insights-detail-content">
-            {{ post.content|linebreaks }}
-        </div>
+        <main class="ultra-main-card">
+            <div class="ultra-content-box">
+                <h1 id="article-title">{{ post.title }}</h1>
+                <article class="ultra-article" id="article-content">
+                    {{ post.content|linebreaks }}
+                </article>
+            </div>
 
-        <div class="insights-back-section">
-            <a href="{% url 'insights:home' %}" class="btn-nav btn-back">
-                ← Back to Insights
-            </a>
-            <a href="{% url 'products:list' %}" class="btn-nav btn-products">
-                Explore Products →
-            </a>
-        </div>
-    </article>
+            <footer class="ultra-footer">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 10px; height: 10px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e;"></div>
+                    <span style="color: #64748b; font-size: 10px; font-weight: 800;">ENCRYPTED_VAULT_NODE</span>
+                </div>
+                <a href="{% url 'products:list' %}" class="btn-glow">Access Products →</a>
+            </footer>
+        </main>
+    </div>
 </section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const content = document.getElementById("article-content").innerText;
+        
+        // 1. Word Count Fix (Regex treats multiple spaces/newlines as one)
+        const words = content.trim().split(/\s+/).filter(word => word.length > 0);
+        const wordCount = words.length;
+
+        // 2. Line Count (Based on visible text wrap and breaks)
+        const lines = content.split(/\r\n|\r|\n/).filter(line => line.trim().length > 0);
+        const lineCount = lines.length;
+
+        // 3. Read Time (Average speed: 200 words per minute)
+        const readTime = Math.ceil(wordCount / 200);
+
+        // Injecting into UI
+        document.getElementById("js-word-count").innerText = `📑 ${wordCount} Words`;
+        document.getElementById("js-line-count").innerText = `📂 ${lineCount} Lines`;
+        document.getElementById("js-read-time").innerText = `⏱️ ${readTime < 10 ? '0' + readTime : readTime}:00 MINS`;
+    });
+</script>
 {% endblock %}
