@@ -1,596 +1,82 @@
 {% extends 'base.html' %}
 {# path: vaultx/templates/vaultx/dashboard.html #}
-{% load static %} {% block content %}
+{% load static %} 
+
+{% block content %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<link rel="stylesheet" href="{% static 'vaultx/css/dashboard.css' %}">
+<script src="{% static 'vaultx/js/dashboard.js' %}"></script>
 
-<style>
-  :root {
-    --danger: #ff4757;
-    --success: #2ed573;
-    --bg: #0b0f1a;
-    --card: #161e2e;
-    --text-muted: #94a3b8;
-    --accent: #38bdf8;
-    --accent-glow: rgba(56, 189, 248, 0.3);
-    --glass: rgba(255, 255, 255, 0.03);
-  }
-
-  body {
-    background: var(--bg);
-    color: white;
-    font-family: "Inter", sans-serif;
-    margin: 0;
-    background-image: radial-gradient(
-      circle at 50% -20%,
-      #1e293b 0%,
-      var(--bg) 80%
-    );
-  }
-
-  .vault-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 30px;
-    padding: 30px;
-  }
-
-  .asset-card {
-    background: var(--card);
-    border-radius: 24px;
-    padding: 28px;
-    position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    min-height: 420px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  }
-
-  .asset-card:hover {
-    transform: translateY(-10px);
-    border-color: var(--accent);
-    box-shadow:
-      0 20px 40px rgba(0, 0, 0, 0.4),
-      0 0 20px var(--accent-glow);
-  }
-
-  .top-actions {
-    display: flex;
-    gap: 10px;
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 10;
-  }
-
-  .action-circle {
-    width: 38px;
-    height: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    cursor: pointer;
-    background: var(--glass);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    color: var(--text-muted);
-    transition: all 0.3s ease;
-    padding: 0;
-  }
-
-  .action-circle:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    border-color: var(--accent);
-  }
-
-  .status-badge {
-    font-size: 10px;
-    text-transform: uppercase;
-    color: var(--accent);
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    margin-bottom: 12px;
-    background: rgba(56, 189, 248, 0.1);
-    padding: 4px 10px;
-    border-radius: 20px;
-    width: fit-content;
-  }
-
-  .product-title {
-    margin: 15px 0;
-    font-size: 1.4rem;
-    font-weight: 800;
-    line-height: 1.3;
-    background: linear-gradient(to right, #fff, #94a3b8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .progress-container {
-    height: 8px;
-    background: #0f172a;
-    border-radius: 10px;
-    margin: 12px 0;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #38bdf8, #818cf8, #38bdf8);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite linear;
-    border-radius: 10px;
-    transition: width 1s ease;
-  }
-
-  @keyframes shimmer {
-    0% {
-      background-position: 200% 0;
-    }
-
-    100% {
-      background-position: -200% 0;
-    }
-  }
-
-  .btn-download {
-    padding: 16px;
-    border-radius: 14px;
-    border: none;
-    font-weight: 800;
-    cursor: pointer;
-    transition: 0.3s;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: auto;
-  }
-
-  .active-btn {
-    background: white;
-    color: black;
-  }
-
-  .active-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
-  }
-
-  .buy-again-btn {
-    background: linear-gradient(135deg, #ef4444, #b91c1c);
-    color: white;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* SweetAlert Premium Classes */
-  .vault-modal-container {
-    text-align: left;
-    font-family: "Inter", sans-serif;
-  }
-
-  .vault-modal-subtitle {
-    font-size: 0.75rem;
-    color: #38bdf8;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 800;
-    margin-bottom: 8px;
-  }
-
-  .vault-modal-title {
-    font-weight: 800;
-    font-size: 1.8rem;
-    color: #fff;
-    letter-spacing: -0.5px;
-    margin-bottom: 25px;
-  }
-
-  .vault-status-box {
-    background: rgba(56, 189, 248, 0.05);
-    border: 1px solid rgba(56, 189, 248, 0.2);
-    border-radius: 12px;
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 15px;
-  }
-
-  .vault-status-icon {
-    background: rgba(56, 189, 248, 0.1);
-    border: 1px solid rgba(56, 189, 248, 0.3);
-    color: #38bdf8;
-    padding: 10px;
-    border-radius: 10px;
-    display: flex;
-  }
-
-  .vault-label {
-    color: #94a3b8;
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .vault-value {
-    color: #fff;
-    font-weight: 700;
-    font-size: 1rem;
-  }
-
-  .vault-order-box {
-    background: #000;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 15px;
-  }
-
-  .vault-grid-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .vault-stat-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 12px;
-  }
-
-  .vault-progress-bg {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    height: 6px;
-    width: 100%;
-    margin-bottom: 30px;
-    overflow: hidden;
-  }
-
-  .vault-progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #38bdf8, #818cf8);
-    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
-  }
-
-  .vault-btn-ack {
-    width: 100%;
-    background: #38bdf8;
-    color: #000 !important;
-    border: none;
-    padding: 15px;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    cursor: pointer;
-    text-transform: uppercase;
-  }
-
-  .vault-gradient-popup {
-    /* Dark gradient matching your theme */
-    background: radial-gradient(
-      circle at top,
-      #1e293b 0%,
-      #0b0f1a 100%
-    ) !important;
-    border: 1px solid rgba(56, 189, 248, 0.2) !important;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
-  }
-</style>
+{% if messages %}
+  {% for message in messages %}
+    <div class="django-message" data-type="{{ message.tags }}" data-text="{{ message }}"></div>
+  {% endfor %}
+{% endif %}
 
 <div class="vault-grid">
   {% for payment in payments %}
   <div class="asset-card" id="card-{{ payment.id }}">
+    
     <div class="top-actions">
-      <button
-        class="action-circle btn-history"
-        onclick="showHistory(
-    '{{ payment.razorpay_order_id }}', 
-    '{{ payment.created_at|date:'d M Y' }}', 
-    '{{ payment.updated_at|date:'d M Y' }}', 
-    '{{ payment.download_used }}', 
-    '{{ payment.purchase_count|default:1 }}',
-    '{{ request.user.get_full_name|default:request.user.username|default:"New User" }}', 
-    '{{ request.user.email|default:"Not Linked" }}'
-)"
-        title="History"
-      >
-        <svg
-          width="20"
-          height="20"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
+      <button class="action-circle btn-history" 
+              onclick="showHistory('{{ payment.razorpay_order_id }}', '{{ payment.created_at|date:'d M Y' }}', '{{ payment.updated_at|date:'d M Y' }}', '{{ payment.download_used }}', '{{ payment.purchase_count|default:1 }}','{{ request.user.get_full_name|default:request.user.username|default:'New User' }}', '{{ request.user.email|default:'Not Linked' }}')" 
+              title="History">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
       </button>
-      <button
-        class="action-circle btn-delete"
-        onclick="removeItem('{{ payment.id }}')"
-        title="Remove"
-      >
-        <svg
-          width="18"
-          height="18"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
+      
+      <button class="action-circle btn-delete" onclick="removeItem('{{ payment.id }}')" title="Remove">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
     </div>
 
-    <div style="display: flex; gap: 8px; flex-wrap: wrap">
+    <div style="display: flex; gap: 6px; flex-wrap: wrap">
       <span class="status-badge">
-        {% if payment.download_used >= payment.download_limit %}🔒 Limit
-        Reached{% else %}✨ Premium Asset{% endif %}
+        {% if payment.download_used >= payment.download_limit %}🔒 Locked{% else %}✨ Active{% endif %}
       </span>
-
       {% if payment.purchase_count > 1 %}
-      <span
-        class="status-badge"
-        style="
-          background: rgba(46, 213, 115, 0.1);
-          color: #2ed573;
-          border: 1px solid rgba(46, 213, 115, 0.2);
-        "
-      >
-        RENEWED x{{ payment.purchase_count }}
-      </span>
+      <span class="status-badge" style="background: rgba(46, 213, 115, 0.1); color: #2ed573;">x{{ payment.purchase_count }}</span>
       {% endif %}
     </div>
 
     <h3 class="product-title">{{ payment.product.title }}</h3>
 
     <div class="progress-section">
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          font-size: 12px;
-          margin-bottom: 8px;
-        "
-      >
-        <span style="color: var(--text-muted)">Access Credits</span>
-        <span
-          style="font-weight:700; color: {% if payment.download_used >= payment.download_limit %}var(--danger){% else %}var(--accent){% endif %};"
-        >
+      <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px;">
+        <span style="color: var(--text-muted)">Credits</span>
+        <span style="font-weight:700; color: {% if payment.download_used >= payment.download_limit %}var(--danger){% else %}var(--accent){% endif %};">
           {{ payment.download_used }} / {{ payment.download_limit }}
         </span>
       </div>
-
       <div class="progress-container">
-        <div
-          class="progress-bar"
-          style="width: {% widthratio payment.download_used payment.download_limit 100 %}%"
-        ></div>
+        <div class="progress-bar" style="width: {% widthratio payment.download_used payment.download_limit 100 %}%"></div>
       </div>
     </div>
 
     <div class="action-area" style="margin-top: auto">
+      
       {% if payment.download_used >= payment.download_limit %}
-      <div
-        class="limit-warning-box"
-        style="
-          margin-bottom: 15px;
-          background: rgba(255, 71, 87, 0.05);
-          border: 1px dashed var(--danger);
-          padding: 10px;
-          border-radius: 12px;
-          text-align: center;
-          color: var(--danger);
-          font-size: 11px;
-        "
-      >
-        Download limit reached for this license.
-      </div>
-      <a
-        href="{% url 'products:detail' payment.product.id %}"
-        class="btn-download buy-again-btn"
-        >Renew License 🚀</a
-      >
+        <a href="{% url 'products:detail' payment.product.id %}" class="btn-download buy-again-btn">Renew Access</a>
+      
+      {% elif not payment.file_exists %}
+        <button class="btn-download" style="background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.2); cursor: not-allowed; width: 100%;" disabled>
+            ⚠️ ASSET EXPIRED
+        </button>
+        <p style="font-size: 10px; color: #ff4757; text-align: center; margin-top: 5px; font-weight: 800; letter-spacing: 0.5px;">FILE REMOVED FROM DATABASE</p>
+      
       {% else %}
-      <button
-        onclick="handleDownload('{{ payment.product.id }}', '{{ payment.id }}')"
-        class="btn-download active-btn"
-        id="btn-{{ payment.id }}"
-      >
-        Download Now
-      </button>
+        <button onclick="handleDownload('{{ payment.product.id }}', '{{ payment.id }}')" class="btn-download active-btn" id="btn-{{ payment.id }}">Download</button>
       {% endif %}
+
     </div>
   </div>
+
   {% empty %}
   <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px">
-    <div
-      style="
-        background: var(--glass);
-        display: inline-block;
-        padding: 30px;
-        border-radius: 50%;
-        margin-bottom: 20px;
-      "
-    >
-      <svg
-        width="50"
-        height="50"
-        fill="none"
-        stroke="#475569"
-        stroke-width="1.5"
-        viewBox="0 0 24 24"
-      >
-        <path
-          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-        ></path>
-      </svg>
-    </div>
-    <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">
-      Your Vault is Empty
-    </h2>
-    <p style="color: var(--text-muted); margin-bottom: 30px">
-      Purchase premium resources to access them here.
-    </p>
-    <a
-      href="/"
-      style="
-        background: var(--accent);
-        color: white;
-        padding: 15px 40px;
-        border-radius: 12px;
-        text-decoration: none;
-        font-weight: 800;
-      "
-      >Explore Store</a
-    >
+    <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">VAULT EMPTY</h2>
+    <a href="/" style="background: var(--accent); color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800;">Explore Store</a>
   </div>
   {% endfor %}
 </div>
 
-<script>
-  function showHistory(orderId, purchaseDate, lastDownload, used, count, userName, userEmail) {
-    const usagePercent = (used / 5) * 100;
-    
-    Swal.fire({
-      customClass: {
-        popup: "vault-gradient-popup",
-      },
-      color: "#ffffff",
-      width: "480px",
-      padding: "2rem",
-      showConfirmButton: false,
-      html: `
-            <div class="vault-modal-container" style="text-align: left; font-family: 'Inter', sans-serif;">
-                <div style="border-left: 3px solid #38bdf8; padding-left: 15px; margin-bottom: 25px;">
-                    <div class="vault-modal-subtitle" style="letter-spacing: 2px; opacity: 0.6; font-size: 0.7rem; text-transform: uppercase;">HISTORY</div>
-                    <div class="vault-modal-title" style="font-size: 1.6rem; font-weight: 800; color: #fff;">PURCHASE SUMMARY</div>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 12px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                    
-                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
-                        <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">OWNER NAME</span>
-                        <span style="color: #fff; font-weight: 600; font-size: 0.85rem;">${userName.toUpperCase()}</span>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
-                        <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">SECURE EMAIL</span>
-                        <span style="color: #38bdf8; font-size: 0.85rem;">${userEmail}</span>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
-                        <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">LICENSE STATUS</span>
-                        <span style="color: #fff; font-size: 0.85rem;">${count > 1 ? "RENEWED" : "ORIGINAL"}</span>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
-                        <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">PURCHASE CYCLES</span>
-                        <span style="color: #38bdf8; font-weight: 800; font-size: 0.9rem;">x${count}</span>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">LAST ACTIVITY</span>
-                        <span style="color: #fff; font-size: 0.85rem;">${used > 0 ? lastDownload : "Pending"}</span>
-                    </div>
-                </div>
-                <div style="display: flex; margin-top: 12px; flex-direction: column; gap: 12px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">ORDER_ID</span>
-                        <span style="color: #38bdf8; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">#${orderId}</span>
-                    </div>
-                </div>
-
-                <div style="margin-top: 25px; margin-bottom: 25px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="color: rgba(255,255,255,0.5); font-size: 0.7rem; text-transform: uppercase;">Credit Usage</span>
-                        <span style="color: #fff; font-size: 0.75rem; font-weight: 700;">${used} / 5 Units</span>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
-                        <div style="width: ${usagePercent}%; background: linear-gradient(90deg, #38bdf8, #818cf8); height: 100%; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);"></div>
-                    </div>
-                </div>
-
-                <button onclick="Swal.close()" class="vault-btn-ack" style="width: 100%; background: linear-gradient(135deg, #38bdf8, #2563eb); color: #fff; border: none; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);">Close Terminal</button>
-            </div>`,
-      showClass: {
-        popup: "animate__animated animate__fadeInUp animate__faster",
-      },
-    });
-}
-  function removeItem(paymentId) {
-    Swal.fire({
-      title: "REMOVE ITEM",
-      text: "Do you want to remove this product from your dashboard?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#ff4757",
-      background: "#161e2e",
-      color: "#fff",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch(`/vaultx/delete-item/${paymentId}/`, {
-          headers: { "X-Requested-With": "XMLHttpRequest" },
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.status === "success") {
-              const card = document.getElementById(`card-${paymentId}`);
-              card.classList.add("animate__animated", "animate__zoomOut");
-              setTimeout(() => {
-                location.reload();
-              }, 500);
-            }
-          });
-      }
-    });
-  }
-
-  function handleDownload(productId, paymentId) {
-    const btn = document.getElementById(`btn-${paymentId}`);
-    btn.innerHTML = "Processing...";
-    btn.disabled = true;
-
-    fetch(`/products/${productId}/download/`, {
-      headers: { "X-Requested-With": "XMLHttpRequest" },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.status === "success") {
-          window.location.href = data.download_url;
-          setTimeout(() => {
-            location.reload();
-          }, 2000);
-        } else {
-          Swal.fire("Error", data.message, "error");
-          btn.innerText = "Download Now";
-          btn.disabled = false;
-        }
-      })
-      .catch(() => {
-        btn.disabled = false;
-        btn.innerText = "Download Now";
-      });
-  }
-</script>
 {% endblock %}

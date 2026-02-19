@@ -2,23 +2,39 @@
 {% load static %}
 
 {% block content %}
-<div class="result-container">
-    <div id="toast" class="toast-box">
-        <div class="icon-wrapper">
-            <span id="statusIcon" class="status-icon">⌛</span>
-        </div>
-        <div class="content-wrapper">
-            <h2 id="statusTitle">Processing...</h2>
-            <p id="statusMessage">Please wait while we verify your request.</p>
-            
-            {% if file_url %}
-            <div id="actionArea" style="display: none;">
-                <button class="btn-download" id="downloadBtn">
-                    <i class="fas fa-download"></i> Download Manually
-                </button>
-                <p class="auto-msg">Redirecting to VaultX in a few seconds...</p>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<div class="result-page-wrapper">
+    <div class="bg-blur-purple"></div>
+    <div class="bg-blur-blue"></div>
+
+    <div class="result-container">
+        <div id="toast" class="nexus-toast">
+            <div class="status-visual">
+                <div class="icon-ring"></div>
+                <span id="statusIcon" class="main-icon">⌛</span>
             </div>
-            {% endif %}
+
+            <div class="content-wrapper">
+                <h2 id="statusTitle">Processing Node...</h2>
+                <p id="statusMessage">Syncing with DevOpsVaultX secure servers.</p>
+                
+                {% if file_url %}
+                <div id="actionArea" class="action-reveal" style="display: none;">
+                    <div class="download-container">
+                        <button class="nexus-btn-sm" id="downloadBtn">
+                            <i class="fas fa-download"></i> DOWNLOAD MANUALLY
+                        </button>
+                    </div>
+                    <div class="redirect-footer">
+                        <div class="nexus-loader-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <p class="auto-msg">Redirecting to Vault in <span id="timer">5</span>s</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
@@ -28,88 +44,138 @@
 {% endif %}
 
 <style>
-    /* Full Page Center */
-    .result-container {
-        min-height: 70vh;
+    /* Layout & Background */
+    .result-page-wrapper {
+        background: #050811;
+        min-height: 85vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        background: transparent;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Inter', sans-serif;
     }
 
-    /* Toast Box - Matching your Site Theme */
-    .toast-box {
-        background: #1e1e2f; /* Dark background matching your UI */
-        color: #ffffff;
-        padding: 40px;
-        border-radius: 24px;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
+    .bg-blur-purple {
+        position: absolute; top: -10%; left: -10%; width: 50%; height: 50%;
+        background: radial-gradient(circle, rgba(191, 3, 237, 0.12) 0%, transparent 70%);
+        filter: blur(100px);
+    }
+
+    .bg-blur-blue {
+        position: absolute; bottom: -10%; right: -10%; width: 50%; height: 50%;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+        filter: blur(100px);
+    }
+
+    /* Toast Box - Glassmorphism */
+    .nexus-toast {
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 40px;
+        padding: 60px 40px;
         width: 100%;
-        max-width: 450px;
-        opacity: 0;
-        transform: translateY(30px) scale(0.95);
-        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        max-width: 480px;
         text-align: center;
+        opacity: 0;
+        transform: translateY(40px) scale(0.98);
+        transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+        position: relative;
+        z-index: 10;
     }
 
-    .toast-box.show {
+    .nexus-toast.show {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
 
-    /* Icon Styling */
-    .icon-wrapper {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
+    /* Visual Icon Styling */
+    .status-visual {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 30px;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 40px;
-        margin-bottom: 10px;
-        transition: all 0.4s ease;
     }
 
-    .success-mode .icon-wrapper { background: rgba(76, 175, 80, 0.15); color: #4caf50; }
-    .failed-mode .icon-wrapper { background: rgba(244, 67, 54, 0.15); color: #f44336; }
+    .main-icon { font-size: 44px; z-index: 2; transition: 0.4s; color: #64748b; }
 
-    /* Text Styling */
-    h2 { margin: 0; font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
-    p { margin: 5px 0 0; color: #b0b0bc; font-size: 1rem; }
-    .auto-msg { font-size: 0.85rem; color: #6e6e7e; margin-top: 15px; }
+    .icon-ring {
+        position: absolute; width: 100%; height: 100%;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.05);
+        transition: 0.5s ease;
+    }
 
-    /* Download Button */
-    .btn-download {
-        background: linear-gradient(135deg, #ff4b5c 0%, #d63031 100%); /* Your Red Theme */
-        color: white;
+    /* Success/Failed Colors */
+    .success-mode .icon-ring { border-color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+    .success-mode .main-icon { color: #10b981; }
+    .success-mode { border-bottom: 4px solid #10b981; }
+
+    .failed-mode .icon-ring { border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+    .failed-mode .main-icon { color: #ef4444; }
+    .failed-mode { border-bottom: 4px solid #ef4444; }
+
+    /* Content Styling */
+    .content-wrapper h2 { font-size: 28px; font-weight: 800; margin-bottom: 10px; color: #fff; letter-spacing: -1px; }
+    .content-wrapper p { color: #94a3b8; font-size: 15px; margin-bottom: 0; line-height: 1.5; }
+
+    /* Action Reveal Area */
+    .action-reveal {
+        margin-top: 40px;
+        padding-top: 30px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    .nexus-btn-sm {
+        background: #fff;
+        color: #000;
         border: none;
-        padding: 14px 28px;
-        border-radius: 12px;
+        padding: 16px 32px;
+        border-radius: 14px;
+        font-size: 13px;
+        font-weight: 800;
         cursor: pointer;
-        font-weight: 600;
-        font-size: 1rem;
-        margin-top: 20px;
-        transition: all 0.3s ease;
-        display: flex;
+        transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: inline-flex;
         align-items: center;
         gap: 10px;
-        box-shadow: 0 8px 20px rgba(214, 48, 49, 0.3);
     }
 
-    .btn-download:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 25px rgba(214, 48, 49, 0.4);
-        filter: brightness(1.1);
+    .nexus-btn-sm:hover {
+        background: #bf03ed;
+        color: #fff;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(191, 3, 237, 0.4);
     }
 
-    /* Glow Effect for Success */
-    .success-mode { border-bottom: 4px solid #4caf50; }
-    .failed-mode { border-bottom: 4px solid #f44336; }
+    /* Progress & Redirect */
+    .redirect-footer { margin-top: 30px; }
+    .nexus-loader-bar {
+        width: 120px; height: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        margin: 0 auto 12px;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+    }
+    .progress-fill {
+        position: absolute; left: 0; top: 0; height: 100%; width: 0%;
+        background: #bf03ed;
+        border-radius: 10px;
+    }
+
+    .auto-msg { font-size: 12px !important; color: #475569 !important; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 <script>
@@ -121,6 +187,8 @@
         const actionArea = document.getElementById("actionArea");
         const downloadLink = document.getElementById("downloadLink");
         const downloadBtn = document.getElementById("downloadBtn");
+        const timerSpan = document.getElementById("timer");
+        const progressFill = document.querySelector(".progress-fill");
 
         const paymentStatus = "{{ status|default:'failed' }}";
         const isFree = "{{ is_free|yesno:'true,false' }}"; 
@@ -134,24 +202,35 @@
             statusIcon.textContent = "✓";
             
             if (isFree === "true") {
-                statusTitle.textContent = "It's Free!";
-                statusMessage.textContent = "We are preparing your resource...";
+                statusTitle.textContent = "Access Granted";
+                statusMessage.textContent = "The resource is free! Initializing your secure vault download...";
             } else {
-                statusTitle.textContent = "Payment Successful";
-                statusMessage.textContent = "Transaction confirmed! Your file is ready.";
+                statusTitle.textContent = "Payment Verified";
+                statusMessage.textContent = "Transaction confirmed. Your DevOps assets are ready for deployment.";
             }
 
-            // 3. Auto-Download Logic
+            // 3. Auto-Download & Action Reveal
             if (downloadLink) {
                 setTimeout(() => {
-                    downloadLink.click(); // Trigger auto download
-                    if(actionArea) actionArea.style.display = "flex";
-                    if(actionArea) actionArea.style.flexDirection = "column";
-                    if(actionArea) actionArea.style.alignItems = "center";
+                    downloadLink.click(); 
+                    if(actionArea) {
+                        actionArea.style.display = "block";
+                        // Start Progress Bar Animation (6 seconds)
+                        if(progressFill) progressFill.style.transition = "width 6s linear";
+                        if(progressFill) setTimeout(() => progressFill.style.width = "100%", 50);
+                        
+                        // Countdown Timer
+                        let timeLeft = 5;
+                        const countdown = setInterval(() => {
+                            timeLeft--;
+                            if(timerSpan) timerSpan.textContent = timeLeft;
+                            if(timeLeft <= 0) clearInterval(countdown);
+                        }, 1000);
+                    }
                 }, 1200);
             }
 
-            // 4. Final Redirect to VaultX
+            // 4. Final Redirect
             setTimeout(() => {
                 window.location.href = "{% url 'vaultx:index' %}";
             }, 6500);
@@ -160,8 +239,8 @@
             // Failure State
             toast.classList.add("failed-mode");
             statusIcon.textContent = "✕";
-            statusTitle.textContent = "Order Failed";
-            statusMessage.textContent = "Something went wrong with the transaction.";
+            statusTitle.textContent = "Node Error";
+            statusMessage.textContent = "Transaction failed or handshake timed out. Please try again.";
             
             setTimeout(() => {
                 window.location.href = "{% url 'products:list' %}";

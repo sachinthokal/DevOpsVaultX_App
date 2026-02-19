@@ -1,8 +1,9 @@
 import os
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import FileResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseServerError, JsonResponse
+from django.http import FileResponse, JsonResponse
 from django.db.models import Q, F
 from payments.models import Payment
+from django.contrib import messages
 from products.models import Product
 
 
@@ -45,7 +46,7 @@ def confirm_payment(request, pk):
     return redirect('products:download_file', pk=pk)
 
 # ======================
-# Secure File Download (Final Verified Version)
+# Secure File Download (Optimized & Fixed)
 # ======================
 def download_file(request, pk):
     if not request.session.session_key:
@@ -64,7 +65,6 @@ def download_file(request, pk):
 
     # २. AJAX विनंती: क्रेडिट चेक आणि वजा करणे
     if request.headers.get('x-requested-with') == 'XMLHttpRequest' and not is_forcing:
-        # फक्त Active आणि क्रेडिट शिल्लक असलेले पेमेंट शोधा
         payment = Payment.objects.filter(
             search_query,
             product_id=pk, 
@@ -74,7 +74,6 @@ def download_file(request, pk):
         ).order_by('-id').first()
 
         if not payment:
-            print("=============================================",payment)  # Debugging line
             return JsonResponse({
                 "status": "error", 
                 "message": "डाउनलोड क्रेडिट्स संपले आहेत किंवा खरेदी सापडली नाही."
@@ -93,7 +92,6 @@ def download_file(request, pk):
 
     # ३. Direct Download (force_download=1): फक्त फाईल डिलिव्हरी
     if is_forcing:
-        # येथे फक्त "SUCCESS" पेमेंट आहे की नाही एवढेच तपासा (क्रेडिट्स आधीच वजा झालेत)
         has_paid = Payment.objects.filter(
             search_query,
             product_id=pk,
@@ -101,11 +99,20 @@ def download_file(request, pk):
         ).exists()
 
         if not has_paid:
-            return HttpResponseForbidden("Access Denied.")
+            messages.error(request, "Access Denied: Payment not verified.")
+            return redirect('vaultx:index') # Tuzya dashboard cha path tak
 
         product = get_object_or_404(Product, pk=pk)
-        if not product.file or not os.path.exists(product.file.path):
-            return HttpResponseNotFound("फाईल सर्व्हरवर उपलब्ध नाही.")
+
+        # --- FIX: File Exist Check ---
+        if not product.file:
+            messages.error(request, "Product Expired: No file path found in database.")
+            
+        
+        if not os.path.exists(product.file.path):
+            messages.error(request, "Product Expired: File has been removed.")
+            return redirect('vaultx:index')
+        # -----------------------------
 
         try:
             response = FileResponse(open(product.file.path, "rb"), as_attachment=True)
@@ -113,7 +120,7 @@ def download_file(request, pk):
             response["Content-Disposition"] = f'attachment; filename="{filename}"'
             return response
         except Exception as e:
-            return HttpResponseServerError(f"Server Error: {str(e)}")
+            messages.error(request, f"Server Error: {str(e)}")
+            return redirect('vaultx:index')
 
-    # जर कुणी डायरेक्ट URL हिट केली तर प्रॉक्ट डिटेलवर पाठवा
     return redirect('products:detail', pk=pk)

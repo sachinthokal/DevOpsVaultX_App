@@ -1,13 +1,12 @@
-# vultx/views.py
 import os
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from django.db.models import Q, F
+from django.db.models import Count, Q, F
 from payments.models import Payment
 
-
-from django.db.models import Count, Q, F
-
+# ==========================================
+# VaultX Dashboard View (With File Check Fix)
+# ==========================================
 def vaultx_home(request):
     session_id = request.session.session_key
     session_email = request.session.get('customer_email')
@@ -18,10 +17,9 @@ def vaultx_home(request):
         Q(session_id=session_id) | Q(email=user_email),
         status="SUCCESS",
         is_deleted_by_user=False
-    ).order_by('-id')
+    ).select_related('product').order_by('-id')
 
-    # 2. Count how many times each product has been purchased (Purchase Count)
-    # This is required to display the 'Renewal History'
+    # 2. Count how many times each product has been purchased (Renewal History)
     purchase_counts = payments_qs.values('product_id').annotate(total=Count('id'))
     counts_dict = {item['product_id']: item['total'] for item in purchase_counts}
 
@@ -29,7 +27,7 @@ def vaultx_home(request):
     unique_p_ids = payments_qs.values_list('product_id', flat=True).distinct()
 
     for p_id in unique_p_ids:
-        # Search for an active payment from the queryset (where downloads are remaining)
+        # Search for an active payment (where downloads are remaining)
         active_p = payments_qs.filter(
             product_id=p_id, 
             download_used__lt=F('download_limit'),
@@ -40,7 +38,16 @@ def vaultx_home(request):
         display_payment = active_p if active_p else payments_qs.filter(product_id=p_id).first()
         
         if display_payment:
-            # Add purchase_count data to be used in the template
+            # --- CRITICAL FIX: File Existence Check ---
+            # Check if file path exists in DB and file exists on Disk
+            product = display_payment.product
+            if product.file and os.path.exists(product.file.path):
+                display_payment.file_exists = True
+            else:
+                display_payment.file_exists = False
+            # ------------------------------------------
+
+            # Add purchase_count data
             display_payment.purchase_count = counts_dict.get(p_id, 1)
             final_items[p_id] = display_payment
 
@@ -50,8 +57,14 @@ def vaultx_home(request):
     }
     return render(request, "vaultx/dashboard.html", context)
 
+
+# ==========================================
+# Delete Item from Vault
+# ==========================================
 def delete_vault_item(request, payment_id):
-    payment = get_object_or_404(Payment, id=payment_id)
-    payment.is_deleted_by_user = True
-    payment.save()
-    return JsonResponse({"status": "success"})
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        payment = get_object_or_404(Payment, id=payment_id)
+        payment.is_deleted_by_user = True
+        payment.save()
+        return JsonResponse({"status": "success"})
+    return JsonResponse({"status": "error"}, status=400)

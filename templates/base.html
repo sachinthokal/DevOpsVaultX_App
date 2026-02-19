@@ -1,95 +1,156 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <!-- Basic Meta -->
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Mobile Responsive (VERY IMPORTANT for SEO) -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- SEO Title -->
     <title>DevOpsVaultX | DevOps Tools, Scripts & Learning Resources</title>
 
     <!-- SEO Description -->
-    <meta name="description"
-        content="DevOpsVaultX provides DevOps tools, scripts, monitoring dashboards, and learning resources for DevOps engineers.">
+    <meta
+      name="description"
+      content="DevOpsVaultX provides DevOps tools, scripts, monitoring dashboards, and learning resources for DevOps engineers."
+    />
 
     <!-- SEO Keywords (optional but helps Lighthouse) -->
-    <meta name="keywords" content="DevOps, DevOps tools, monitoring, CI/CD, Docker, Kubernetes, DevOpsVaultX">
+    <meta
+      name="keywords"
+      content="DevOps, DevOps tools, monitoring, CI/CD, Docker, Kubernetes, DevOpsVaultX"
+    />
 
     <!-- Author -->
-    <meta name="author" content="DevOpsVaultX">
+    <meta name="author" content="DevOpsVaultX" />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon.png' %}"
+    />
 
     <!-- Google Font (performance optimized) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Project Global CSS -->
-    <link rel="stylesheet" href="{% static 'css/global.css' %}">
-    <link rel="stylesheet" href="{% static 'pages/css/home.css' %}">
-    <link rel="stylesheet" href="{% static 'pages/css/abouts.css' %}">
-    <link rel="stylesheet" href="{% static 'pages/css/contact.css' %}">
-    <link rel="stylesheet" href="{% static 'products/css/products.css' %}">
-    <link rel="stylesheet" href="{% static 'products/css/productview.css' %}">
-    <link rel="stylesheet" href="{% static 'products/css/download.css' %}">
-    <link rel="stylesheet" href="{% static 'products/css/toast.css' %}">
-    <link rel="stylesheet" href="{% static 'payments/css/payments.css' %}">
-    <link rel="stylesheet" href="{% static 'db_monitor/css/db_size.css' %}">
-    <link rel="stylesheet" href="{% static 'insights/css/insights_home.css' %}">
-    <link rel="stylesheet" href="{% static 'insights/css/insights_detail.css' %}">
-
+    <link rel="stylesheet" href="{% static 'css/global.css' %}" />
+    <link rel="stylesheet" href="{% static 'pages/css/home.css' %}" />
+    <link rel="stylesheet" href="{% static 'pages/css/abouts.css' %}" />
+    <link rel="stylesheet" href="{% static 'pages/css/contact.css' %}" />
+    <link rel="stylesheet" href="{% static 'products/css/products.css' %}" />
+    <link rel="stylesheet" href="{% static 'products/css/productview.css' %}" />
+    <link rel="stylesheet" href="{% static 'products/css/download.css' %}" />
+    <link rel="stylesheet" href="{% static 'products/css/toast.css' %}" />
+    <link rel="stylesheet" href="{% static 'payments/css/payments.css' %}" />
+    <link rel="stylesheet" href="{% static 'db_monitor/css/db_size.css' %}" />
+    <link
+      rel="stylesheet"
+      href="{% static 'insights/css/insights_home.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      href="{% static 'insights/css/insights_detail.css' %}"
+    />
 
     <!-- JS (defer = performance boost) -->
     <script src="{% static 'products/js/popup.js' %}" defer></script>
     <script src="{% static 'products/js/filter.js' %}" defer></script>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <header class="site-navbar">
-        <a href="/" aria-label="DevOpsVaultX Home">
-            <div class="logo-container">
-                <img src="{% static 'images/favicon.png' %}" alt="DevOpsVaultX Logo - DevOps Tools Platform"
-                    class="nav-logo" width="32" height="32">
-                <span class="brand-name">DevOps<span style="color: orangered;">VaultX</span></span>
-            </div>
-        </a>
+      <a href="/" aria-label="DevOpsVaultX Home">
+        <div class="logo-container">
+          <img
+            src="{% static 'images/favicon.png' %}"
+            alt="DevOpsVaultX Logo - DevOps Tools Platform"
+            class="nav-logo"
+            width="32"
+            height="32"
+          />
+          <span class="brand-name"
+            >DevOps<span style="color: orangered">VaultX</span></span
+          >
+        </div>
+      </a>
 
-        <nav class="nav-links" aria-label="Main Navigation">
-            <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">HOME</a>
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a
+          href="{% url 'home' %}"
+          class="{% if request.path == '/' %}active{% endif %}"
+          >HOME</a
+        >
 
-            <a href="{% url 'products:list' %}"
-                class="{% if request.path|slice:':10' == '/products/' %}active{% endif %}">PRODUCTS</a>
+        <a
+          href="{% url 'products:list' %}"
+          class="{% if request.path|slice:':10' == '/products/' %}active{% endif %}"
+          >PRODUCTS</a
+        >
 
-            <a href="{% url 'insights:home' %}" class="{% if request.path == '/insights/' %}active{% endif %}">INSIGHTS</a>
+        <a
+          href="{% url 'insights:home' %}"
+          class="{% if request.path == '/insights/' %}active{% endif %}"
+          >INSIGHTS</a
+        >
 
-            <a href="{% url 'vaultx:index' %}" class="{% if 'vaultx' in request.path %}active{% endif %}">VAULTX</a>
+        <a
+          href="{% url 'vaultx:index' %}"
+          class="{% if 'vaultx' in request.path %}active{% endif %}"
+          >VAULTX</a
+        >
 
-            <a href="{% url 'about' %}" class="{% if request.path == '/about/' %}active{% endif %}">ABOUT</a>
+        <a
+          href="{% url 'about' %}"
+          class="{% if request.path == '/about/' %}active{% endif %}"
+          >ABOUT</a
+        >
 
-            <a href="{% url 'contact' %}" class="{% if request.path == '/contact/' %}active{% endif %}">CONTACT</a>
-        </nav>
-
+        <a
+          href="{% url 'contact' %}"
+          class="{% if request.path == '/contact/' %}active{% endif %}"
+          >CONTACT</a
+        >
+      </nav>
     </header>
 
-    <main class="site-content-wrapper">
-        {% block content %}{% endblock %}
-    </main>
+    <main class="site-content-wrapper">{% block content %}{% endblock %}</main>
 
     <footer class="site-footer">
-        <div class="footer-inner">
-            <p>© 2026 DevOpsVaultX. All rights reserved.</p>
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <h2>DevOps<span>VaultX</span></h2>
         </div>
+
+        <div class="footer-center">
+          <p class="tagline">Secure. Automate. Scale.</p>
+          <p class="copyright"> &copy; DevOpsVaultX 2026</p>
+        </div>
+
+        <div class="footer-social">
+          <div class="icons">
+            <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+            <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+      </div>
     </footer>
-
-</body>
-
+  </body>
 </html>

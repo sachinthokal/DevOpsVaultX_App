@@ -1,121 +1,242 @@
 /* ================= GLOBAL & LAYOUT ================= */
-html, body {
-    margin: 0;
-    padding: 0;
-    /* background-color: #b7d1ea; */
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    box-sizing: border-box;
-    overflow-x: hidden; /* removes horizontal scroll */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  /* background-color: #b7d1ea; */
+  font-family: "Plus Jakarta Sans", sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow-x: hidden; /* removes horizontal scroll */
 }
 a {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 /* --- Navbar Container --- */
 .site-navbar {
-    display: flex;
-    flex-wrap: wrap; /* auto-wrap on smaller screens */
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    gap: 10px; /* spacing between items on wrap */
+  display: flex;
+  flex-wrap: wrap; /* auto-wrap on smaller screens */
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  gap: 10px; /* spacing between items on wrap */
 }
 
 /* --- Logo & Brand Name --- */
 .logo-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .nav-logo {
-    height: 40px;
-    width: auto;
-    object-fit: contain;
+  height: 40px;
+  width: auto;
+  object-fit: contain;
 }
 
 .brand-name {
-    font-size: clamp(16px, 2vw, 22px); /* automatic resizing */
-    font-weight: 700;
-    color: #1a1a1a;
-    font-family: 'Poppins', sans-serif;
-    white-space: nowrap;
+  font-size: clamp(16px, 2vw, 22px); /* automatic resizing */
+  font-weight: 700;
+  color: #1a1a1a;
+  font-family: "Poppins", sans-serif;
+  white-space: nowrap;
 }
 
 /* --- Navigation Links --- */
 .nav-links {
-    display: flex;
-    flex-wrap: wrap; /* wrap links automatically */
-    align-items: center;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    gap: clamp(10px, 2vw, 20px); /* responsive spacing */
+  display: flex;
+  flex-wrap: wrap; /* wrap links automatically */
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: clamp(10px, 2vw, 20px); /* responsive spacing */
 }
 
 .nav-links a {
-    color: #333;
-    font-weight: 500;
-    position: relative;
-    white-space: nowrap;
-    transition: color 0.3s;
+  color: #333;
+  font-weight: 500;
+  position: relative;
+  white-space: nowrap;
+  transition: color 0.3s;
 }
 
 .nav-links a:hover {
-    color: #1a73e8;
+  color: #1a73e8;
 }
 
 .nav-links a.active {
-    color: #1a73e8;
-    font-weight: 600;
+  color: #1a73e8;
+  font-weight: 600;
 }
 
 .nav-links a.active::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -6px;
-    width: 100%;
-    height: 2px;
-    background-color: #1a73e8;
-    border-radius: 2px;
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 2px;
+  background-color: #1a73e8;
+  border-radius: 2px;
 }
-
 
 /* --- Footer --- */
 .site-footer {
-    background-color: #0f172a;
-    color: white;
-    padding: 30px 20px;
+  background-color: #0f172a; /* Dark Navy from your code */
+  color: white;
+  padding: 40px 20px;
+  border-top: 4px solid #bf03ed;
+  width: 100%;
+  margin-top: auto;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* Mobile sathi responsive */
+}
+
+/* Brand Style */
+.footer-brand h2 {
+  font-size: 1.5rem;
+  margin: 0;
+  letter-spacing: 1px;
+}
+.footer-brand span {
+  color: #bf03ed;
+}
+
+/* Center Section with Vertical Line */
+.footer-center {
+  flex: 1;
+  margin-left: 40px;
+  padding-left: 40px;
+  border-left: 1px solid rgba(255, 255, 255, 0.2); /* Grey vertical line */
+  text-align: left;
+}
+
+.footer-links {
+  margin-bottom: 8px;
+}
+
+.footer-links a {
+  color: #cbd5e1;
+  text-decoration: none;
+  margin-right: 15px;
+  font-size: 0.9rem;
+  transition: 0.3s;
+}
+
+.footer-links a:hover {
+  color: #bf03ed;
+}
+
+.copyright {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* Right Section */
+.footer-social {
+  text-align: right;
+}
+
+.icons {
+  margin-bottom: 10px;
+}
+
+.icons a {
+  color: white;
+  font-size: 1.2rem;
+  margin-left: 15px;
+  transition: 0.3s;
+}
+
+.icons a:hover {
+  color: #bf03ed;
+}
+
+.support-email {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* Responsive Fix */
+@media (max-width: 768px) {
+  .footer-inner {
+    flex-direction: column;
     text-align: center;
-    border-top: 4px solid #bf03ed;
-    width: 100%;
-    margin-top: auto;
+    gap: 20px;
+  }
+  .footer-center {
+    border-left: none;
+    padding-left: 0;
+    margin-left: 0;
+    text-align: center;
+  }
+  .footer-social {
+    text-align: center;
+  }
+}
+.tagline {
+    font-size: 0.8rem;
+    letter-spacing: 3px; /* Words madhe space */
+    text-transform: uppercase; /* Purn Capital madhe */
+    color: #bf03ed; /* Purple brand color */
+    margin-top: 10px;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.icons {
+    display: flex;
+    gap: 15px; /* Icons madhe space denyasathi */
+    margin-bottom: 10px;
+}
+
+.icons a {
+    color: white; /* Icons cha color white */
+    font-size: 1.2rem; /* Icons chi size */
+    transition: color 0.3s ease;
+}
+
+.icons a:hover {
+    color: #bf03ed; /* Hover kelya var purple color */
 }
 
 /* ================= FLEXBOX RESPONSIVENESS ================= */
 /* Auto stack logo + nav when container too narrow */
 .site-navbar > * {
-    flex: 1 1 auto; /* allow items to shrink/grow */
-    min-width: 150px; /* minimum width for wrapping */
+  flex: 1 1 auto; /* allow items to shrink/grow */
+  min-width: 150px; /* minimum width for wrapping */
 }
 
 /* Nav links auto wrap */
 .nav-links {
-    justify-content: flex-end;
+  justify-content: flex-end;
 }
 
 /* Brand & logo always shrink nicely */
-.logo-container, .brand-name {
-    justify-content: flex-start;
-    flex-shrink: 1;
+.logo-container,
+.brand-name {
+  justify-content: flex-start;
+  flex-shrink: 1;
 }
+
