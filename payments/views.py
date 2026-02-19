@@ -6,6 +6,7 @@ import random
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, FileResponse, HttpResponseNotFound
+from django.views.decorators.cache import never_cache
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import F, Q
@@ -113,6 +114,7 @@ def buy_product(request, pk):
 # ======================
 # 2. PAYMENT SUCCESS HANDLER
 # ======================
+@never_cache
 def payment_success(request, pk):
     if request.method != "POST":
         return HttpResponseForbidden()
@@ -231,7 +233,7 @@ def send_otp(request):
             email = json.loads(request.body).get('email')
             otp = str(random.randint(100000, 999999))
             cache.set(f"otp_{email}", otp, timeout=300)
-            send_mail(f"OTP: {otp}", f"Your OTP is {otp}", settings.EMAIL_HOST_USER, [email], html_message=render_to_string('emails/otp_email.html', {'otp': otp}))
+            send_mail(f"DEVOPSVAULTX - VERIFICATION CODE : {otp}", f"Your OTP is {otp}", settings.EMAIL_HOST_USER, [email], html_message=render_to_string('emails/otp_email.html', {'otp': otp}))
             return JsonResponse({"status": "success"})
         except Exception as e: return JsonResponse({"status": "error", "message": str(e)}, status=500)
     return HttpResponseForbidden()
