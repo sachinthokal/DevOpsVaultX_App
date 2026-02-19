@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function submitPaymentData(p_id, o_id, s_id) {
     Swal.fire({
-      title: "Finalizing Access...",
-      html: `<div class="spinner-border text-primary" role="status"></div><p style="margin-top:15px;">Setting up your private vault...</p>`,
+      title: "FINALIZING ACCESS...",
+      html: `<div class="spinner-border text-primary" role="status"></div><p style="margin-top:15px;">SETTING UP YOUR PRIVATE VAULT...</p>`,
       background: '#1e293b',
       color: '#ffffff',
       allowOutsideClick: false,

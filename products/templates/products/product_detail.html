@@ -3,11 +3,152 @@
 
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --vx-bg: #06080f;
+        --vx-accent: #38bdf8;
+        --vx-card-bg: rgba(15, 23, 42, 0.4);
+        --vx-border: rgba(255, 255, 255, 0.08);
+        --vx-text-dim: #94a3b8;
+        --vx-success: #10b981;
+    }
+
+    .product-detail-wrapper {
+        padding: 60px 20px;
+        background-color: var(--vx-bg);
+        min-height: 100vh;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #fff;
+    }
+
+    .container { max-width: 1100px; margin: 0 auto; }
+
+    /* --- BACK LINK --- */
+    .products-back-link {
+        display: inline-flex; align-items: center; gap: 8px;
+        color: var(--vx-text-dim); text-decoration: none;
+        font-size: 13px; font-weight: 700; margin-bottom: 30px;
+        transition: 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .products-back-link:hover { color: var(--vx-accent); transform: translateX(-5px); }
+
+    /* --- LAYOUT GRID --- */
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.1fr;
+        gap: 60px;
+        align-items: start;
+    }
+
+    /* --- IMAGE CARD --- */
+    .image-card {
+        background: var(--vx-card-bg);
+        border: 1px solid var(--vx-border);
+        border-radius: 24px;
+        overflow: hidden;
+        position: relative;
+        backdrop-filter: blur(10px);
+    }
+
+    .detail-badge {
+        position: absolute; top: 20px; left: 20px;
+        background: rgba(56, 189, 248, 0.15);
+        color: var(--vx-accent);
+        font-size: 10px; font-weight: 800;
+        padding: 6px 14px; border-radius: 8px;
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        z-index: 2;
+    }
+
+    .product-image-preview {
+        aspect-ratio: 1/1;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, #0f172a 0%, #020408 100%);
+    }
+
+    .product-image-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* No Preview Placeholder */
+    .no-image-box { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .no-image-box i { color: #1e293b; font-size: 55px; opacity: 0.5; }
+    .no-image-box p { color: #334155; font-size: 11px; font-weight: 800; letter-spacing: 1px; }
+
+    /* --- CONTENT SIDE --- */
+    .detail-title { 
+        font-size: 42px; font-weight: 800; line-height: 1.1; 
+        margin-bottom: 20px; letter-spacing: -1.5px; 
+    }
+    
+    .detail-meta { display: flex; align-items: center; gap: 24px; margin-bottom: 35px; }
+    
+    .price-container { 
+        font-size: 32px; font-weight: 800; color: #fff; 
+        display: flex; align-items: center; gap: 8px; 
+    }
+    .price-container .free-text { color: var(--vx-success); }
+
+    .stock-status { 
+        font-size: 13px; color: var(--vx-text-dim); font-weight: 600; 
+        display: flex; align-items: center; gap: 8px;
+        padding: 6px 12px; background: rgba(16, 185, 129, 0.1); border-radius: 8px;
+    }
+    .stock-status i { color: var(--vx-success); }
+
+    /* --- HIGHLIGHTS SECTION --- */
+    .detail-info-card { 
+        margin-bottom: 35px; 
+        background: rgba(255, 255, 255, 0.03);
+        padding: 20px; border-radius: 18px;
+        border: 1px solid var(--vx-border);
+    }
+    .detail-info-card h3 {
+        font-size: 13px; text-transform: uppercase; letter-spacing: 1px;
+        color: var(--vx-accent); margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+    }
+    .description-text { color: var(--vx-text-dim); line-height: 1.7; font-size: 15px; }
+
+    /* --- FEATURES LIST --- */
+    .features-list { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 40px; }
+    .f-item {
+        background: rgba(255,255,255,0.02); padding: 12px 16px; border-radius: 12px;
+        font-size: 13px; font-weight: 600; color: #cbd5e1; display: flex; align-items: center; gap: 12px;
+        border: 1px solid var(--vx-border);
+    }
+    .f-item i { color: var(--vx-accent); font-size: 14px; }
+
+    /* --- CLEAN BUTTON UI FIX --- */
+    .cta-section { width: 100%; }
+
+    .buy-btn-large {
+        display: flex; align-items: center; justify-content: center; gap: 12px;
+        background: linear-gradient(135deg, var(--vx-accent) 0%, #0ea5e9 100%);
+        color: #000; text-decoration: none; padding: 20px; border-radius: 18px;
+        font-weight: 800; font-size: 17px;
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        border: none;
+        box-shadow: 0 10px 25px rgba(56, 189, 248, 0.2);
+    }
+
+    .buy-btn-large:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(56, 189, 248, 0.4);
+        filter: brightness(1.1);
+    }
+
+    .buy-btn-large:active { transform: translateY(-2px); }
+
+    @media (max-width: 850px) { 
+        .detail-grid { grid-template-columns: 1fr; gap: 40px; } 
+        .detail-title { font-size: 32px; }
+    }
+</style>
 
 <div class="product-detail-wrapper">
     <div class="container">
         <a href="{% url 'products:list' %}" class="products-back-link">
-            <i class="fas fa-arrow-left"></i> Back to Resources
+            <i class="fas fa-arrow-left"></i> Return to Vault
         </a>
 
         <div class="detail-grid">
@@ -16,11 +157,16 @@
                     <div class="detail-badge">{{ product.category|upper }}</div>
                     <div class="product-image-preview">
                         {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.title }}">
+                            <img src="{{ product.image.url }}" alt="{{ product.title }}" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="no-image-box" style="display: none;">
+                                <i class="fas fa-image"></i>
+                                <p>NO PREVIEW</p>
+                            </div>
                         {% else %}
                             <div class="no-image-box">
-                                <i class="fas fa-file-code fa-4x" style="color: #475569;"></i>
-                                <p style="margin-top: 15px; color: #94a3b8;">Preview Not Available</p>
+                                <i class="fas fa-image"></i>
+                                <p>NO PREVIEW</p>
                             </div>
                         {% endif %}
                     </div>
@@ -33,37 +179,42 @@
                 <div class="detail-meta">
                     <div class="price-container">
                         {% if product.price == 0 %}
-                            <span style="color: #10b981;">FREE</span>
+                            <span class="free-text">FREE</span>
                         {% else %}
-                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                            <i class="fa-solid fa-indian-rupee-sign" style="font-size: 22px; color: var(--vx-accent);"></i>
                             <span>{{ product.price }}</span>
                         {% endif %}
                     </div>
                     <span class="stock-status">
-                        <i class="fas fa-check-circle"></i> Instant Delivery
+                        <i class="fas fa-circle-check"></i> Instant Delivery
                     </span>
                 </div>
 
                 <div class="detail-info-card">
-                    <h3><i class="fas fa-info-circle"></i> Description</h3>
+                    <h3><i class="fas fa-bolt"></i> Key Highlights</h3>
                     <div class="description-text">
                         {% if product.description %}
                             {{ product.description|linebreaks }}
                         {% else %}
-                            <p>No detailed description provided for this resource.</p>
+                            <p>Premium digital asset curated for professional workflows. Get immediate access to all files after purchase.</p>
                         {% endif %}
                     </div>
                 </div>
 
                 <div class="features-list">
-                    <div class="f-item"><i class="fas fa-bolt"></i> Lifetime Access</div>
-                    <div class="f-item"><i class="fas fa-sync"></i> Free Updates</div>
-                    <div class="f-item"><i class="fas fa-shield-alt"></i> Secure Content</div>
+                    <div class="f-item"><i class="fas fa-cloud-arrow-down"></i> Direct Download</div>
+                    <div class="f-item"><i class="fas fa-infinity"></i> Five Times Download</div>
+                    <div class="f-item"><i class="fas fa-lock"></i> Secure Payment</div>
+                    <div class="f-item"><i class="fas fa-file-shield"></i> Verified Asset</div>
                 </div>
 
                 <div class="cta-section">
                     <a href="{% url 'products:buy_now' product.pk %}" class="buy-btn-large">
-                        Buy Now & Download <i class="fas fa-shopping-cart"></i>
+                        {% if product.price == 0 %}
+                            DOWNLOAD FREE<i class="fas fa-download"></i>
+                        {% else %}
+                           DOWNLOAD<i class="fas fa-download"></i>
+                        {% endif %}
                     </a>
                 </div>
             </div>

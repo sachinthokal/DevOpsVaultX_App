@@ -32,7 +32,11 @@
 
     <div style="display: flex; gap: 6px; flex-wrap: wrap">
       <span class="status-badge">
-        {% if payment.download_used >= payment.download_limit %}🔒 Locked{% else %}✨ Active{% endif %}
+        {% if not payment.file_exists or payment.download_used >= payment.download_limit %}
+            <span style="color: #ef4444;">🔒 Locked</span>
+        {% else %}
+            <span style="color: #10b981;">✨ Active</span>
+        {% endif %}
       </span>
       {% if payment.purchase_count > 1 %}
       <span class="status-badge" style="background: rgba(46, 213, 115, 0.1); color: #2ed573;">x{{ payment.purchase_count }}</span>
@@ -78,5 +82,11 @@
   </div>
   {% endfor %}
 </div>
+<script>
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+        location.href = "{% url 'products:list' %}"; 
+    };
+</script>
 
 {% endblock %}
