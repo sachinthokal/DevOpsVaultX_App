@@ -1,69 +1,151 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block content %}
+{% extends "base.html" %} {% load static %} {% block content %}
 <section class="contact-section">
-    <div class="contact-container">
+  <div class="glow-bg-elements">
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+  </div>
 
-        <!-- Contact Form -->
-        <div class="contact-form">
-            <h2>LET’S TALK</h2>
-            <p class="subtitle">Questions, feedback, or collaboration? Drop a message.</p>
-
-            {% if messages %}
-            {% for message in messages %}
-            <div class="alert {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-            {% endif %}
-
-            <form method="post">
-                {% csrf_token %}
-
-                <div class="field">
-                    <input type="text" name="name" required placeholder=" " autocomplete="name" id="id_name">
-                    <label for="id_name">Your Name</label>
-                </div>
-
-                <div class="field">
-                    <input type="email" name="email" required placeholder=" " autocomplete="email" id="id_email">
-                    <label for="id_email">Email Address</label>
-                </div>
-
-                <div class="field">
-                    <textarea name="message" required placeholder=" " autocomplete="off" id="id_message"></textarea>
-                    <label for="id_message">Your Message</label>
-                </div>
-
-                <button type="submit">Send Message 🚀</button>
-            </form>
-
+  <div class="contact-card-v2">
+    <div class="card-grid">
+      <div class="side-info">
+        <div class="terminal-header">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="terminal-title">CONNECT_US</span>
         </div>
 
-        <!-- Contact Info -->
-        <div class="contact-info">
-            <h3>CONTACT INFO</h3>
-            <div class="contact-body">
-                <p>📧 <a href="mailto:support@devopsvaultx.com">support@devopsvaultx.com</a>
-                </p>
-                <p>💬 WhatsApp Support Available</p>
-                <p>🌍 Built for DevOps Engineers</p>
-                <p>📞 +91 8804 17 1399</p>
-                <p>🕒 Mon-Fri, 9 AM - 6 PM</p>
-                <p>💻 <a href="https://www.devopsvaultx.com" target="_blank">www.devopsvaultx.com</a></p>
+        <div class="info-content">
+          <h3>DevOps<span style="color: #ef4444">VaultX</span> Team</h3>
+          <p class="desc">
+            Establish a secure tunnel to our support team for queries or
+            collaborations.
+          </p>
+
+          <div class="contact-list">
+            <div class="item">
+              <span class="icon-box">📧</span>
+              <div class="item-text">
+                <small>SUPPORT_EMAIL</small>
+                <a href="mailto:support@devopsvaultx.com"
+                  >support@devopsvaultx.com</a
+                >
+              </div>
             </div>
 
-            <ul class="no-bullets icon-list">
-                <li><a href="mailto:devopsvaultx_support@devopsvaultx.com"><img
-                            src="https://img.icons8.com/3d-fluency/94/gmail.png" alt="Gmail" /></a></li>
-                <li><a href="https://www.instagram.com/devopsvaultx" target="_blank"><img
-                            src="https://img.icons8.com/3d-fluency/94/instagram-logo.png" alt="Instagram" /></a></li>
-                <li><a href="https://wa.me/8804171399" target="_blank"><img
-                            src="https://img.icons8.com/3d-fluency/94/whatsapp.png" alt="WhatsApp" /></a></li>
-            </ul>
+            <div class="item">
+              <span class="icon-box">💬</span>
+              <div class="item-text">
+                <small>LIVE_PROTOCOL</small>
+                <p>WhatsApp Support Available</p>
+              </div>
+            </div>
 
-            <a href="mailto:devopsvaultx_support@devopsvaultx.com" class="support-btn">Get Support</a>
+            <div class="item">
+              <span class="icon-box">📞</span>
+              <div class="item-text">
+                <small>SECURE_LINE</small>
+                <p>+91 8804 17 1399</p>
+              </div>
+            </div>
+
+            <div class="item">
+              <span class="icon-box">🕒</span>
+              <div class="item-text">
+                <small>UPTIME_STATUS</small>
+                <p>Mon-Fri, 9 AM - 6 PM</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="social-nav">
+            <a href="#" class="social-btn"
+              ><img
+                src="https://img.icons8.com/3d-fluency/94/gmail.png"
+                alt="Gmail"
+            /></a>
+            <a href="#" class="social-btn"
+              ><img
+                src="https://img.icons8.com/3d-fluency/94/instagram-logo.png"
+                alt="Instagram"
+            /></a>
+            <a href="#" class="social-btn"
+              ><img
+                src="https://img.icons8.com/3d-fluency/94/whatsapp.png"
+                alt="WhatsApp"
+            /></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-form">
+        <div class="form-title">
+          <h2>LET’S TALK</h2>
+          <p>Questions, feedback, or collaboration? Drop a message.</p>
         </div>
 
+        {% if messages %}
+        <div class="messages-wrapper">
+          {% for message in messages %}
+          <div class="cyber-alert {{ message.tags }}">
+            <span class="alert-indicator"></span>
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <div class="form-container">
+        <form method="post" id="devopsContactForm" class="high-tech-form">
+          {% csrf_token %}
+          <div class="input-container">
+            <input type="text" name="name" id="name" required placeholder=" " autocomplete="name"/>
+            <label for="name">Full Name</label>
+          </div>
+
+          <div class="input-container">
+            <input type="email" name="email" id="email" required placeholder=" " autocomplete="email"/>
+            <label for="email">Email Address</label>
+          </div>
+
+          <div class="input-container">
+            <textarea name="message" id="message" required placeholder=" " autocomplete="off"></textarea>
+            <label for="message">Message</label>
+          </div>
+
+          <button type="submit" class="neon-btn" id="submitBtn">
+            <span class="btn-text">Send Message 🚀</span>
+            <span class="btn-shimmer"></span>
+          </button>
+        </form>
+      </div>
     </div>
+  </div>
 </section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      {% if messages %}
+          {% for message in messages %}
+              Swal.fire({
+                  title: "{% if message.tags == 'success' %}Message Sent Successfully{% else %}System Alert{% endif %}",
+                  icon: "{{ message.tags }}",
+                  confirmButtonColor: '#8b5cf6',
+                  background: '#0f172a',
+                  color: '#ffffff',
+                  timer: 5000,
+                  timerProgressBar: true
+              });
+          {% endfor %}
+      {% endif %}
+
+      const form = document.getElementById('devopsContactForm');
+      form.addEventListener('submit', function() {
+          const btn = document.getElementById('submitBtn');
+          btn.innerHTML = "Sending... 📡";
+          btn.style.opacity = "0.7";
+          btn.style.pointerEvents = "none";
+      });
+  });
+</script>
 {% endblock %}
