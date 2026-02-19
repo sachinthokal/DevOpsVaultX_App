@@ -1,197 +1,154 @@
-/* ================= Hero Section ================= */
-.home-section {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    padding: 80px 5%;
-    background-color: #22314f; /* dark navy hero */
-    color: #fff;
-    border-radius: 0; /* match screenshot */
-}
+/* ================= THEME SYNC & RESPONSIVE GRID ================= */
+    :root {
+        --v-blue: #3b82f6;
+        --v-orange: #ff6b00;
+        --v-glass: rgba(30, 27, 75, 0.4);
+        --v-dark: #020617;
+        background-color: var(--v-dark);
+    }
 
-.home-hero-image {
-    max-width: 600px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    flex: 1 1 50%;
-}
-
-.home-text {
-    flex: 1 1 45%;
-    padding: 20px;
-}
-
-.home-text h1 {
-    font-size: 2.8rem;
-    margin-bottom: 20px;
-    line-height: 1.2;
-    text-transform: uppercase;
-}
-
-.home-text p {
-    font-size: 1.1rem;
-    margin-bottom: 30px;
-    color: #d0d0d0;
-}
-
-.home-btn-primary {
-    background: #ff6b00; /* orange button */
-    color: #fff;
-    padding: 12px 30px;
-    border-radius: 6px;
-    font-weight: 600;
-    display: inline-block;
-}
-
-.home-btn-primary:hover {
-    background: #ff8b33;
-    transform: translateY(-2px);
-}
-
-/* ================= Featured Products ================= */
-.home-featured {
-    max-width: 1200px;
-    margin: 60px auto;
-    padding: 0 5%;
-}
-
-.home-section-title {
-    font-size: 1.8rem;
-    margin-bottom: 40px;
-    text-align: center;
-    position: relative;
-    color: #212529;
-    text-transform: uppercase;
-}
-
-.home-section-title::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 4px;
-    background: #ff6b00; /* orange underline */
-    margin: 8px auto 0;
-    border-radius: 2px;
-}
-
-/* ================= Product Grid ================= */
-.home-products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-}
-
-/* ================= Product Card ================= */
-.home-product-card {
-    background-color: #f8f9fa; /* light card */
-    border-radius: 8px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-}
-
-.home-product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 35px rgba(0,0,0,0.2);
-}
-
-.home-card-img-container {
-    position: relative;
-    height: 180px;
-    background: #e1e8f0; /* subtle light background */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.home-card-thumbnail {
-    max-height: 100%;
-    object-fit: contain;
-}
-
-.home-no-image-text {
-    color: #999;
-    font-weight: 500;
-}
-
-.home-card-body {
-    padding: 20px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.home-product-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: #212529;
-    text-transform: capitalize;
-}
-
-.home-product-desc {
-    flex: 1;
-    font-size: 0.95rem;
-    color: #555;
-    margin-bottom: 20px;
-}
-
-.home-price-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.home-price-tag {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #22314f; /* match hero/nav color */
-}
-
-/* Gradient Button */
-.home-btn-secondary {
-    background: linear-gradient(90deg, #6a00ff, #e600ff); /* purple-pink gradient */
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    text-align: center;
-}
-
-.home-btn-secondary:hover {
-    background: linear-gradient(90deg, #8c33ff, #ff33e6);
-    transform: translateY(-2px);
-}
-
-/* ================= Badge ================= */
-.home-badge-new {
-    background-color: #ff3d00;
-    color: #fff;
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 4px 10px;
-    text-align: center;
-    text-transform: uppercase;
-}
-
-/* ================= Responsive ================= */
-@media screen and (max-width: 768px) {
+    /* Hero Section Sync */
     .home-section {
-        flex-direction: column-reverse;
-        text-align: center;
-        padding: 60px 5%;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 80px 5%;
+        background: radial-gradient(circle at center, #1e1b4b 0%, var(--v-dark) 100%);
+        color: #fff;
     }
 
     .home-hero-image {
-        max-width: 100%;
-        margin-bottom: 30px;
+        max-width: 500px;
+        border-radius: 12px;
+        box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
+        flex: 1 1 400px;
     }
 
-    .home-text h1 {
-        font-size: 2.2rem;
+    .home-text {
+        flex: 1 1 500px;
+        padding: 20px;
     }
+
+    .home-text h1 { font-size: 2.8rem; font-weight: 800; margin-bottom: 20px; }
+    .home-text p { font-size: 1.1rem; color: #94a3b8; margin-bottom: 30px; }
+
+    .home-btn-primary {
+        background: var(--v-orange);
+        color: white;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    /* Grid Fix: Desktop var 5 items */
+    .home-products-grid {
+    display: grid;
+    /* auto-fit mule items center la rahtat jar te kami astil tar */
+    grid-template-columns: repeat(auto-fit, minmax(240px, 280px)); 
+    gap: 25px;
+    max-width: 1450px;
+    margin: 40px auto;
+    padding: 0 20px;
+    /* Cards center la anyasathi main logic */
+    justify-content: center; 
 }
+
+    /* Card Styling */
+    .home-product-card {
+        background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), var(--v-glass));
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 12px;
+        transition: transform 0.3s ease, border-color 0.3s;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .home-product-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--v-blue);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    /* Image & Placeholder Fix */
+    .home-card-img-container {
+        height: 150px;
+        background: #0b1120;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        position: relative;
+    }
+
+    .home-card-thumbnail {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .home-no-image-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--v-blue);
+        text-align: center;
+        width: 100%;
+    }
+
+    .home-no-image-placeholder i {
+        font-size: 2.5rem;
+        filter: drop-shadow(0 0 10px var(--v-blue));
+    }
+
+    /* Typography */
+    .home-product-title { color: white; font-size: 1rem; margin: 12px 0 8px; font-weight: 700; line-height: 1.2; }
+    .home-product-desc { color: #94a3b8; font-size: 0.8rem; margin-bottom: 15px; flex-grow: 1; }
+
+    .home-price-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .home-price-tag { color: var(--v-blue); font-weight: 800; font-size: 1.1rem; }
+
+    .home-btn-secondary {
+        background: linear-gradient(90deg, #6a00ff, #e600ff);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    .home-badge-new {
+        position: absolute; top: 10px; right: 10px;
+        background: var(--v-orange); color: white;
+        font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 4px;
+        z-index: 5;
+    }
+
+    .home-section-title {
+        text-align: center; color: white; font-size: 2rem; margin-top: 60px; text-transform: uppercase; letter-spacing: 2px;
+    }
+
+    /* Mobile/Tablet Responsiveness */
+    @media (max-width: 1250px) { .home-products-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 800px) { .home-products-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { 
+        .home-products-grid { grid-template-columns: 1fr; }
+        .home-text h1 { font-size: 2rem; }
+    }
