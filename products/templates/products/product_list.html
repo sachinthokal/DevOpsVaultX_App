@@ -3,84 +3,68 @@
 
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'products/css/product_list.css' %}">
+<script src="{% static 'products/js/product_list.js' %}"></script>
 
-<div class="products-wrapper">
-    <header class="products-hero">
-        <div class="container">
-            <span class="top-tag">Premium Resources</span>
-            <h1>DevOps<span>VaultX</span></h1>
-            <p>Stop searching, start automating. Your ultimate vault for industry-ready DevOps resources.</p>
-        </div>
-    </header>
 
-    <nav class="filter-sticky">
-        <div class="filter-container">
-            <button class="filter-btn active" data-filter="all">All Items</button>
-            <button class="filter-btn" data-filter="notes"><i class="fas fa-file-lines"></i> Notes</button>
-            <button class="filter-btn" data-filter="courses"><i class="fa-solid fa-book"></i> Courses</button>
-            <button class="filter-btn" data-filter="templates"><i class="fas fa-layer-group"></i> Templates</button>
-            <button class="filter-btn" data-filter="tools"><i class="fas fa-screwdriver-wrench"></i> Tools</button>
-        </div>
-    </nav>
+<div class="nav-container">
+    <div class="brand-title">PRODUCT VAULT<span>X</span></div>
+    <div class="segment-wrapper">
+        <button class="segment-btn active" data-filter="all">Explore All</button>
+        <button class="segment-btn" data-filter="notes">Notes</button>
+        <button class="segment-btn" data-filter="courses">Courses</button>
+        <button class="segment-btn" data-filter="templates">Templates</button>
+        <button class="segment-btn" data-filter="tools">Tools</button>
+    </div>
+</div>
 
-    <main class="main-container">
-        <div class="products-grid" id="product-grid">
-            {% if products %}
+<div class="content-wrapper">
+    <div class="asset-grid" id="grid">
+        {% if products %}
             {% for product in products %}
-            <div class="p-card" data-category="{{ product.category|lower }}">
-                <div class="p-image-box">
-                    {% if product.is_new %}
-                    <span class="new-pill">NEW</span>
-                    {% endif %}
+            <div class="asset-card" data-category="{{ product.category|lower }}" data-price="{{ product.price }}">
+                
+                {% if forloop.counter <= 6 %}
+                    <div class="new-tag">NEW</div>
+                {% endif %}
 
+                <div class="card-preview-area">
                     {% if product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.title }}">
+                        <img src="{{ product.image.url }}" alt="" onerror="this.parentElement.innerHTML='<div class=\'no-preview-placeholder\'><i class=\'fas fa-image\'></i><span>NO PREVIEW</span></div>';">
                     {% else %}
-                    <div class="p-placeholder">
-                        <span class="placeholder-text">No preview</span>
-                    </div>
+                        <div class="no-preview-placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>NO PREVIEW</span>
+                        </div>
                     {% endif %}
                 </div>
 
-                <div class="p-content">
-                    <span class="p-cat">{{ product.category|upper }}</span>
-                    <h3 class="p-title">{{ product.title }}</h3>
-                    <p class="p-desc">{{ product.description|truncatechars:75 }}</p>
-
-                    <div class="p-footer">
-                        <div class="p-price">
+                <div class="card-info">
+                    <span class="card-cat">{{ product.category }}</span>
+                    <h3 class="card-name">{{ product.title|truncatechars:38 }}</h3>
+                    
+                    <div class="card-meta">
+                        <div class="price-wrap">
                             {% if product.price == 0 %}
-                            <div class="free-container">
-                                <span class="free-spike">FREE</span>
-                                <span class="free-glow"></span>
-                            </div>
+                                <span class="tag-free">FREE</span>
                             {% else %}
-                            <i class="fa-solid fa-indian-rupee-sign"></i>
-                            <span class="amt"> {{ product.price }}</span>
+                                <span class="tag-price">₹{{ product.price }}</span>
                             {% endif %}
                         </div>
-                        <a href="{% url 'products:detail' product.pk %}" class="p-btn">
-                            View <i class="fas fa-arrow-right"></i>
+                        <a href="{% url 'products:detail' product.pk %}" class="btn-action">
+                            VIEW <i class="fas fa-chevron-right" style="font-size: 8px;"></i>
                         </a>
                     </div>
                 </div>
             </div>
             {% endfor %}
+        {% endif %}
 
-            <div id="js-no-data" class="empty-msg" style="display:none; grid-column: 1/-1;">
-                <i class="fa-solid fa-file-circle-minus"></i>
-                <h3>No items found in this category!</h3>
-                <p>Try exploring another section.</p>
-            </div>
-
-            {% else %}
-            <div class="empty-msg" style="grid-column: 1/-1;">
-                <i class="fas fa-box-open"></i>
-                <h3>No Resources Available</h3>
-                <p>We are currently updating our vault.</p>
-            </div>
-            {% endif %}
+        <div id="no-data" class="no-data-wrapper">
+            <i class="fas fa-folder-open"></i>
+            <p>No resources found in this category</p>
         </div>
-    </main>
+    </div>
 </div>
+
 {% endblock %}

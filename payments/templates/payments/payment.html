@@ -1,49 +1,103 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% load static %} {% block content %}
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+/>
 
-{% block content %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<div class="checkout-wrapper">
+  <div class="bg-blur-purple"></div>
+  <div class="bg-blur-blue"></div>
 
-<div class="payment-page-wrapper">
-    <a href="{% url 'products:list' %}" class="back-link">
-        <i class="fas fa-arrow-left"></i> Back to Resources
-    </a>
+  <div class="checkout-container">
+    <header class="checkout-header">
+      <a href="{% url 'products:list' %}" class="minimal-back">
+        <i class="fas fa-chevron-left"></i> Return to Dashboard
+      </a>
+      <div class="brand-logo">DevOps<span>VaultX</span></div>
+    </header>
 
-    <div class="payment-container">
-        <div class="payment-card">
-            <span class="resource-badge">PREMIUM DEVOPS RESOURCE</span>
-            <h2>{{ product.title }}</h2>
-            <p style="color: #64748b; font-size: 14px;">Complete your details to get instant access.</p>
-            
-            <div class="price">
-                {% if is_free %}FREE{% else %}<span>₹</span>{{ product.price }}{% endif %}
-            </div>
-
-            <button id="pay-button" class="pay-btn">
-                {% if is_free %}Unlock Vault 🚀{% else %}PAY NOW{% endif %}
-            </button>
-
-            <div class="secure-footer">
-                <i class="fas fa-lock"></i> Verified Secure Transaction • DevOpsVaultX
-            </div>
+    <main class="checkout-grid">
+      <div class="product-info-side">
+        <div class="badge-row">
+          <span class="status-dot"></span>
+          <span class="badge-text">Secure Access</span>
         </div>
-    </div>
+        <h1 class="checkout-title">{{ product.title }}</h1>
+        <p class="checkout-desc">
+          Get instant access to pro-level scripts and documentation. Production
+          ready DevOps scripts instantly.
+        </p>
+
+        <ul class="benefit-list">
+          <li><i class="fas fa-check-circle"></i> Lifetime Asset Access</li>
+          <li><i class="fas fa-check-circle"></i> Verified & Secure Files</li>
+          <li><i class="fas fa-check-circle"></i> Future Updates Included</li>
+          <li><i class="fas fa-check-circle"></i> Instant Digital Delivery</li>
+        </ul>
+      </div>
+
+      <div class="payment-action-side">
+        <div class="payment-box">
+          <div class="price-display">
+            <label>Total Investment</label>
+            {% if is_free %}
+            <div class="amount-wrap free-mode">FREE ACCESS</div>
+            {% else %}
+            <div class="amount-wrap">
+              <span class="ccy">₹</span>
+              <span class="val">{{ product.price }}</span>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="action-area">
+            <button id="pay-button" class="nexus-btn">
+              {% if is_free %}
+              <span>INITIALIZE UNLOCK</span> <i class="fas fa-bolt"></i>
+              {% else %}
+              <span>COMPLETE PAYMENT</span> <i class="fas fa-shield-halved"></i>
+              {% endif %}
+            </button>
+          </div>
+
+          <footer class="box-footer">
+            <div class="security-tag">
+              <i class="fas fa-lock"></i> AES-256 Encrypted
+            </div>
+            <div class="provider-logos">
+              <i class="fab fa-cc-visa"></i>
+              <i class="fab fa-cc-mastercard"></i>
+              <i class="fab fa-google-pay"></i>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </main>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script id="payment-data" type="application/json">
-    {
-        "csrfToken": "{{ csrf_token }}",
-        "isFree": {{ is_free|yesno:"true,false" }},
-        "razorpayOrderId": "{{ razorpay_order_id|default:'' }}",
-        "razorpayKeyId": "{{ razorpay_key_id }}",
-        "amount": "{{ amount }}",
-        "productTitle": "{{ product.title }}",
-        "successUrl": "{% url 'payments:payment_success' product.id %}"
-    }
+  {
+      "csrfToken": "{{ csrf_token }}",
+      "isFree": {{ is_free|yesno:"true,false" }},
+      "razorpayOrderId": "{{ razorpay_order_id|default:'' }}",
+      "razorpayKeyId": "{{ razorpay_key_id }}",
+      "amount": "{{ amount }}",
+      "productTitle": "{{ product.title }}",
+      "successUrl": "{% url 'payments:payment_success' product.id %}"
+  }
 </script>
 
 <script src="{% static 'payments/js/payment.js' %}"></script>
+<script>
+    // Browser history lock kara
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+        // Jar user ne back dabal tar tyala Product List page var pathva
+        location.href = "{% url 'products:list' %}"; 
+    };
+</script>
 {% endblock %}
