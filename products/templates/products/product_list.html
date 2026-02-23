@@ -30,7 +30,7 @@
 
                 <div class="card-preview-area">
                     {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="" onerror="this.parentElement.innerHTML='<div class=\'no-preview-placeholder\'><i class=\'fas fa-image\'></i><span>NO PREVIEW</span></div>';">
+                        <img src="{{ product.image.url }}"  alt="" onerror="this.parentElement.innerHTML='<div class=\'no-preview-placeholder\'><i class=\'fas fa-image\'></i><span>NO PREVIEW</span></div>';" loading="lazy">
                     {% else %}
                         <div class="no-preview-placeholder">
                             <i class="fas fa-image"></i>
