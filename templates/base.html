@@ -2,52 +2,57 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Basic Meta -->
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <!-- Mobile Responsive (VERY IMPORTANT for SEO) -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- SEO Title -->
     <title>DevOpsVaultX | DevOps Tools, Scripts & Learning Resources</title>
 
-    <!-- SEO Description -->
     <meta
       name="description"
       content="DevOpsVaultX provides DevOps tools, scripts, monitoring dashboards, and learning resources for DevOps engineers."
     />
 
-    <!-- SEO Keywords (optional but helps Lighthouse) -->
     <meta
       name="keywords"
       content="DevOps, DevOps tools, monitoring, CI/CD, Docker, Kubernetes, DevOpsVaultX"
     />
 
-    <!-- Author -->
     <meta name="author" content="DevOpsVaultX" />
 
-    <!-- Favicon -->
     <link
       rel="icon"
       type="image/png"
-      href="{% static 'images/favicon.png' %}"
+      sizes="32x32"
+      href="{% static 'images/favicon-32x32.png' %}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="{% static 'images/favicon-16x16.png' %}"
     />
 
-    <!-- Google Font (performance optimized) -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{% static 'images/apple-touch-icon.png' %}"
+    />
+
+    <link rel="manifest" href="{% static 'images/site.webmanifest' %}" />
+
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
       rel="stylesheet"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Project Global CSS -->
     <link rel="stylesheet" href="{% static 'css/global.css' %}" />
     <link rel="stylesheet" href="{% static 'pages/css/abouts.css' %}" />
     <link rel="stylesheet" href="{% static 'pages/css/contact.css' %}" />
@@ -71,11 +76,12 @@
       <a href="/" aria-label="DevOpsVaultX Home">
         <div class="logo-container">
           <img
-            src="{% static 'images/favicon.png' %}"
+            src="{% static 'images/favicon-32x32.png' %}"
             alt="DevOpsVaultX Logo - DevOps Tools Platform"
             class="nav-logo"
             width="32"
             height="32"
+            loading="lazy"
           />
           <span class="brand-name"
             >DevOps<span style="color: orangered">VaultX</span></span
@@ -92,13 +98,13 @@
 
         <a
           href="{% url 'products:list' %}"
-          class="{% if request.path|slice:':10' == '/products/' %}active{% endif %}"
+          class="{% if '/products/' in request.path %}active{% endif %}"
           >PRODUCTS</a
         >
 
         <a
           href="{% url 'insights:home' %}"
-          class="{% if request.path == '/insights/' %}active{% endif %}"
+          class="{% if '/insights/' in request.path %}active{% endif %}"
           >INSIGHTS</a
         >
 
@@ -132,16 +138,24 @@
 
         <div class="footer-center">
           <p class="tagline">Secure. Automate. Scale.</p>
-          <p class="copyright"> &copy; DevOpsVaultX 2026</p>
+          <p class="copyright">&copy; DevOpsVaultX 2026</p>
         </div>
 
         <div class="footer-social">
           <div class="icons">
             <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
-            <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
-            <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Twitter"
+              ><i class="fab fa-x-twitter"></i
+            ></a>
+            <a href="#" aria-label="WhatsApp"
+              ><i class="fab fa-whatsapp"></i
+            ></a>
+            <a href="#" aria-label="LinkedIn"
+              ><i class="fab fa-linkedin"></i
+            ></a>
+            <a href="#" aria-label="Instagram"
+              ><i class="fab fa-instagram"></i
+            ></a>
           </div>
         </div>
       </div>
