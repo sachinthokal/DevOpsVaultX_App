@@ -1,9 +1,9 @@
 services:
-
   # =========================
   # Django Web Service
   # =========================
   devopsvaultx_web:
+    # Production madhe build: . kadhun taka, fakt image pull kara
     image: sachinthokal/devopsvaultx:1.0.0
     container_name: devopsvaultx_app
     restart: always
@@ -18,11 +18,10 @@ services:
       - devopsvaultx_network
     command: >
       sh -c "
-      python manage.py makemigrations &&
-      python manage.py migrate &&
+      python manage.py migrate --noinput &&
       python manage.py collectstatic --noinput &&
       python create_admin.py &&
-      gunicorn devopsvaultx.wsgi:application --bind 0.0.0.0:8000
+      gunicorn devopsvaultx.wsgi:application --bind 0.0.0.0:8000 --workers 3
       "
 
   # =========================
