@@ -3,7 +3,6 @@ services:
   # Django Web Service
   # =========================
   devopsvaultx_web:
-    # Production madhe build: . kadhun taka, fakt image pull kara
     image: sachinthokal/devopsvaultx:1.0.0
     container_name: devopsvaultx_app
     restart: always
@@ -18,9 +17,9 @@ services:
       - devopsvaultx_network
     command: >
       sh -c "
+      sleep 5 &&
       python manage.py migrate --noinput &&
       python manage.py collectstatic --noinput &&
-      python create_admin.py &&
       gunicorn devopsvaultx.wsgi:application --bind 0.0.0.0:8000 --workers 3
       "
 
@@ -39,19 +38,21 @@ services:
       - devopsvaultx_network
 
   # =========================
-  # Nginx Reverse Proxy
+  # Nginx Proxy Manager (SSL & Reverse Proxy)
   # =========================
-  devopsvaultx_nginx:
-    image: nginx:latest
-    container_name: devopsvaultx_nginx_server
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: devopsvaultx_npm
     restart: always
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'    # HTTP
+      - '81:81'    # NPM Dashboard Login
+      - '443:443'  # HTTPS (SSL)
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - static_volume:/app/staticfiles
-      - media_volume:/app/media
+      - ./npm/data:/data
+      - ./npm/letsencrypt:/etc/letsencrypt
+      - static_volume:/app/staticfiles  # Static files NPM madhun serve karnyathi
+      - media_volume:/app/media         # Media files NPM madhun serve karnyathi
     depends_on:
       - devopsvaultx_web
     networks:
