@@ -4,8 +4,7 @@ services:
   # Django Web Service
   # =========================
   devopsvaultx_web:
-    build: .
-    image: devopsvaultx_app:v1.0.0
+    image: sachinthokal/devopsvaultx:1.0.0
     container_name: devopsvaultx_app
     restart: always
     env_file:
