@@ -38,21 +38,20 @@ services:
       - devopsvaultx_network
 
   # =========================
-  # Nginx Proxy Manager (SSL & Reverse Proxy)
+  # NGINX Reverse Proxy
   # =========================
-  nginx-proxy-manager:
-    image: 'jc21/nginx-proxy-manager:latest'
-    container_name: devopsvaultx_npm
+  devopsvaultx_nginx:
+    image: nginx:latest
+    container_name: devopsvaultx_nginx
     restart: always
     ports:
-      - '80:80'    # HTTP
-      - '81:81'    # NPM Dashboard Login
-      - '443:443'  # HTTPS (SSL)
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./npm/data:/data
-      - ./npm/letsencrypt:/etc/letsencrypt
-      - static_volume:/app/staticfiles  # Static files NPM madhun serve karnyathi
-      - media_volume:/app/media         # Media files NPM madhun serve karnyathi
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - /etc/letsencrypt:/etc/letsencrypt   # SSL certs (host varun mount)
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
     depends_on:
       - devopsvaultx_web
     networks:
