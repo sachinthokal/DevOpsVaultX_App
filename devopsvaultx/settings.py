@@ -163,7 +163,7 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ==================================================
-# Static & Media
+# Static & Media (Final Corrected Version)
 # ==================================================
 
 STATIC_URL = "/static/"
@@ -176,8 +176,9 @@ STATICFILES_DIRS = [
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Django 5.2/Python 3.14 compatible storage config
 if DEBUG:
-    # Local: Sadha storage vapra jyamule "manifest_strict" che errors yenar nahit
+    # Local Development
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -187,19 +188,18 @@ if DEBUG:
         },
     }
 else:
-    # Production: Manifest storage vapra (Hashed filenames sathi)
+    # Production (Docker/Server)
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
         },
         "staticfiles": {
             "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
-            "OPTIONS": {
-                "manifest_strict": False,  # Jar file missing asel tar site crash hou naye mhanun
-            },
+            # 'manifest_strict' kadhun takla aahe TypeError thambvanya sathi.
+            # ManifestStaticFilesStorage by default files hash karel.
         },
     }
-
+    
 # ==================================================
 # Razorpay
 # ==================================================
