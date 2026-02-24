@@ -13,13 +13,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
 
-# IMPORTANT: default=True so local never breaks
-DEBUG = config('DEBUG', default=True, cast=bool)
+# ==================================================
+# BASIC
+# ==================================================
+DEBUG = config("DEBUG", default=True, cast=bool)
 
 ALLOWED_HOSTS = config(
-    'ALLOWED_HOSTS',
-    default='127.0.0.1,localhost'
-).split(',')
+    "ALLOWED_HOSTS",
+    default="127.0.0.1,localhost"
+).split(",")
+
+# ==================================================
+# CSRF
+# ==================================================
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="https://devopsvaultx.com,https://www.devopsvaultx.com"
+).split(",")
 
 # ==================================================
 # CORS
@@ -33,6 +43,31 @@ CORS_ALLOWED_ORIGINS = [
     "https://devopsvaultx.com",
     "https://www.devopsvaultx.com",
 ]
+
+# ==================================================
+# SECURITY
+# ==================================================
+if not DEBUG:
+
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "DENY"
+
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+else:
+
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
 
 # ==================================================
 # Applications
@@ -220,27 +255,3 @@ LOGGING = {
         },
     },
 }
-
-# ==================================================
-# Security (AUTO: Local vs Production)
-# ==================================================
-if not DEBUG:
-    # -------- Production --------
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = "DENY"
-
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-else:
-    # -------- Local --------
-    SECURE_SSL_REDIRECT = False
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
