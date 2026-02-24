@@ -176,21 +176,29 @@ STATICFILES_DIRS = [
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Django 5+ Storage Configuration
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-        "OPTIONS": {
-            "location": MEDIA_ROOT,
+if DEBUG:
+    # Local: Sadha storage vapra jyamule "manifest_strict" che errors yenar nahit
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
         },
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
-        "OPTIONS": {
-            "manifest_strict": False,  # <--- He production sathi must aahe
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
-    },
-}
+    }
+else:
+    # Production: Manifest storage vapra (Hashed filenames sathi)
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+            "OPTIONS": {
+                "manifest_strict": False,  # Jar file missing asel tar site crash hou naye mhanun
+            },
+        },
+    }
 
 # ==================================================
 # Razorpay
