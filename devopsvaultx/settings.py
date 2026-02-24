@@ -186,6 +186,9 @@ STORAGES = {
     },
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+        "OPTIONS": {
+            "manifest_strict": False,  # <--- He production sathi must aahe
+        },
     },
 }
 
