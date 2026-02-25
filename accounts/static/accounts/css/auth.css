@@ -1,0 +1,184 @@
+/* ================= AUTHENTICATION COMPONENTS ================= */
+
+/* --- Navbar Auth Section --- */
+.auth-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: 10px;
+}
+
+/* Profile Pill Style */
+.profile-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8f9fa;
+    padding: 4px 12px;
+    border-radius: 50px;
+    border: 1px solid orangered;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+    transition: 0.3s ease;
+}
+
+.profile-nav:hover {
+    background: #fff2ed;
+    box-shadow: 0 2px 8px rgba(255, 69, 0, 0.1);
+}
+
+.avatar {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(45deg, #ff4500, #ff8c00);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.profile-nav span {
+    color: #333;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* --- Professional Dropdown Menu --- */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 45px;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    min-width: 180px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    z-index: 2000;
+    overflow: hidden;
+    padding: 5px 0;
+}
+
+.dropdown-menu a {
+    padding: 12px 18px !important;
+    color: #444 !important;
+    font-size: 14px !important;
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    transition: 0.2s;
+    background: transparent !important;
+    border-bottom: none !important;
+    font-weight: 500 !important;
+}
+
+.dropdown-menu a:hover {
+    background: #fff5f0 !important;
+    color: orangered !important;
+}
+
+/* Join Button Creative Style */
+.join-btn-creative {
+    background: orangered;
+    color: white !important;
+    padding: 6px 18px;
+    border-radius: 6px;
+    font-weight: 600 !important;
+    transition: 0.3s;
+}
+
+.join-btn-creative:hover {
+    background: #e63e00;
+    box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3);
+}
+
+/* --- Auth Modals --- */
+.auth-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.modal-card {
+    background: #ffffff;
+    border-top: 5px solid orangered;
+    width: 95%;
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 30px;
+    border-radius: 15px;
+    position: relative;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: fadeInModal 0.3s ease-out;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-card h2 { color: #222; margin-bottom: 20px; font-size: 24px; }
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.auth-form input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+.auth-form input:focus {
+    border-color: orangered;
+    outline: none;
+    box-shadow: 0 0 5px rgba(255, 69, 0, 0.2);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(45deg, #ff4500, #ff8c00);
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.auth-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
+}
+
+.close-btn {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #bbb;
+    transition: 0.3s;
+}
+
+.close-btn:hover { color: orangered; }

@@ -1,0 +1,30 @@
+<div id="loginModal" class="auth-modal" style="display: none;">
+    <div class="modal-card">
+        <span class="close-btn" onclick="closeModal('loginModal')" aria-label="Close">&times;</span>
+        <h2>Secure Login</h2>
+        <p>Access your DevOps resources</p>
+        
+        <form class="auth-form" method="POST" action="{% url 'accounts:login' %}">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Username" autocomplete="username" required>
+            <input type="password" name="password" placeholder="Password" autocomplete="current-password" required>
+            <button type="submit" class="auth-btn">Authorize Access</button>
+        </form>
+    </div>
+</div>
+
+<div id="registerModal" class="auth-modal" style="display: none;">
+    <div class="modal-card">
+        <span class="close-btn" onclick="closeModal('registerModal')" aria-label="Close">&times;</span>
+        <h2>Join Community</h2>
+        <p>Start your DevOps journey today</p>
+        
+        <form class="auth-form" method="POST" action="{% url 'accounts:register' %}">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Pick a username" autocomplete="username" required>
+            <input type="email" name="email" placeholder="Email Address" autocomplete="email" required>
+            <input type="password" name="password" placeholder="Create strong password" autocomplete="new-password" required>
+            <button type="submit" class="auth-btn">Initialize Account</button>
+        </form>
+    </div>
+</div>

@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     'corsheaders',
 
     # Custom apps
+    'accounts',
     'products',
     'pages',
     'payments',
