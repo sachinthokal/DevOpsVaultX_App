@@ -1,4 +1,4 @@
-/* ================= AUTHENTICATION COMPONENTS ================= */
+/* ================= AUTHENTICATION COMPONENTS (FINAL SYNCED - BOTTOM RIGHT TOAST) ================= */
 
 /* --- Navbar Auth Section --- */
 .auth-section {
@@ -41,80 +41,7 @@
     font-size: 12px;
 }
 
-.profile-nav span {
-    color: #333;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-/* --- Professional Dropdown Menu --- */
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 45px;
-    right: 0;
-    background: #ffffff;
-    border: 1px solid #ddd;
-    min-width: 180px;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    z-index: 2000;
-    overflow: hidden;
-    padding: 5px 0;
-}
-
-.dropdown-menu a {
-    padding: 12px 18px !important;
-    color: #444 !important;
-    font-size: 14px !important;
-    display: flex !important;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    transition: 0.2s;
-    background: transparent !important;
-    border-bottom: none !important;
-    font-weight: 500 !important;
-}
-
-.dropdown-menu a:hover {
-    background: #fff5f0 !important;
-    color: orangered !important;
-}
-
-/* Join Button Creative Style */
-.join-btn-creative {
-    background: orangered;
-    color: white !important;
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-weight: 600 !important;
-    transition: 0.3s;
-}
-
-.join-btn-creative:hover {
-    background: #e63e00;
-    box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3);
-}
-
-/* Login Button Creative Style */
-.login-btn-creative {
-    background: rgb(0, 64, 239);
-    color: white !important;
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-weight: 600 !important;
-    transition: 0.3s;
-}
-
-.login-btn-creative:hover {
-    background: #023af1;
-    box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3);
-}
-
-
-
-/* --- Auth Modals --- */
+/* --- Auth Modals (HEIGHT & ALIGNMENT FIXED) --- */
 .auth-modal {
     display: none;
     position: fixed;
@@ -122,15 +49,19 @@
     z-index: 9999;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(5px);
+    align-items: center; 
+    justify-content: center;
+    padding: 20px;
 }
 
 .modal-card {
     background: #ffffff;
     border-top: 5px solid orangered;
-    width: 95%;
-    max-width: 400px;
-    margin: 80px auto;
-    padding: 30px;
+    width: 100%;
+    max-width: 380px; 
+    height: auto !important; 
+    min-height: auto !important;
+    padding: 25px; 
     border-radius: 15px;
     position: relative;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
@@ -138,64 +69,141 @@
     animation: fadeInModal 0.3s ease-out;
 }
 
-@keyframes fadeInModal {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
+#profileModal .modal-card {
+    border-top: 5px solid #0040ef; 
 }
-
-.modal-card h2 { color: #222; margin-bottom: 20px; font-size: 24px; }
 
 .auth-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
+}
+
+.auth-form .name-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
 }
 
 .auth-form input {
     width: 100%;
     box-sizing: border-box;
-    padding: 14px;
+    padding: 12px; 
     border: 1px solid #ddd;
     border-radius: 8px;
-    font-size: 15px;
-    transition: 0.3s;
-}
-
-.auth-form input:focus {
-    border-color: orangered;
-    outline: none;
-    box-shadow: 0 0 5px rgba(255, 69, 0, 0.2);
+    font-size: 14px;
 }
 
 .auth-btn {
     width: 100%;
-    padding: 14px;
+    padding: 12px;
     background: linear-gradient(45deg, #ff4500, #ff8c00);
     border: none;
     color: white;
     font-weight: bold;
-    font-size: 16px;
     border-radius: 8px;
     cursor: pointer;
-    transition: 0.3s;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+    gap: 10px;
 }
 
-.auth-btn:hover {
-    filter: brightness(1.1);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
+.auth-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    filter: grayscale(0.5);
 }
 
 .close-btn {
     position: absolute;
     right: 15px;
     top: 10px;
-    font-size: 28px;
+    font-size: 24px;
     cursor: pointer;
     color: #bbb;
-    transition: 0.3s;
 }
 
-.close-btn:hover { color: orangered; }
+/* --- Loading Spinner --- */
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- Optimized Responsive Toast (BOTTOM RIGHT FIXED) --- */
+.toast-container {
+    position: fixed;
+    bottom: 20px; /* Top kadhun Bottom kela */
+    right: 20px;
+    z-index: 10005;
+    display: flex;
+    flex-direction: column-reverse; /* Navin alerts varti stack hotil */
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast-alert {
+    background: #28a745; 
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    font-size: 14px;
+    min-width: 250px;
+    pointer-events: auto;
+    animation: slideInRight 0.4s ease-out;
+}
+
+/* Mobile Responsiveness for Toast */
+@media (max-width: 576px) {
+    .toast-container {
+        right: 20px;
+        left: 20px; 
+        bottom: 20px;
+        align-items: center;
+    }
+    
+    .toast-alert {
+        width: 100%;
+        max-width: 320px;
+        justify-content: center;
+        animation: slideInBottom 0.4s ease-out;
+    }
+}
+
+/* --- Animations --- */
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInBottom {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOutToast {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.9); }
+}

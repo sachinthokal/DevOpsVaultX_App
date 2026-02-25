@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>DevOpsVaultX | DevOps Tools, Scripts & Learning Resources</title>
-  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -52,14 +52,19 @@
         <div class="profile-nav" onclick="toggleDrop(event)">
           <div class="avatar">{{ user.username|slice:":1"|upper }}</div>
           <span>{{ user.username|upper }}</span>
-          <div id="dropMenu" class="dropdown-menu">
-            <a href="#"><i class="fas fa-user-circle"></i> Profile</a>
-            <a href="{% url 'accounts:logout' %}" style="color: #ff4d4d"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          <div id="dropMenu" class="dropdown-content">
+            <a href="javascript:void(0)" onclick="openModal('profileModal')">
+              <i class="fas fa-user-edit"></i> Profile
+            </a>
+
+            <a href="{% url 'accounts:logout' %}">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
           </div>
         </div>
         {% else %}
         <a href="javascript:void(0)" onclick="openModal('loginModal')" class="login-btn-creative">LOGIN</a>
-        <a href="javascript:void(0)" onclick="openModal('registerModal')" class="join-btn-creative">JOIN</a>
+        <a href="javascript:void(0)" onclick="openModal('registerModal')" class="join-btn-creative">JOIN US</a>
         {% endif %}
       </div>
     </nav>
@@ -90,6 +95,16 @@
 
   {% include 'accounts/modals.html' %}
   <script src="{% static 'js/global.js' %}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if messages %}
+            {% for message in messages %}
+                showToast("{{ message }}");
+            {% endfor %}
+        {% endif %}
+    });
+</script>
+
 </body>
 
 </html>

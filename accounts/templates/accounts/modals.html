@@ -1,26 +1,63 @@
-<div id="loginModal" class="auth-modal" style="display: none;">
+{% load static %}
+<script src="{% static 'accounts/js/verify_email.js' %}"></script>
+
+<div id="loginModal" class="auth-modal" style="display: none">
     <div class="modal-card">
-        <span class="close-btn" onclick="closeModal('loginModal')" aria-label="Close">&times;</span>
-        <h2>SECURE LOGIN</h2>        
-        <form class="auth-form" method="POST" action="{% url 'accounts:login' %}">
+        <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
+        <h2>SECURE LOGIN</h2>
+        <form class="auth-form" method="POST" action="{% url 'accounts:login' %}" onsubmit="return handleFormLoading(this)">
             {% csrf_token %}
-            <input type="text" name="username" placeholder="Username" autocomplete="username" required>
-            <input type="password" name="password" placeholder="Password" autocomplete="current-password" required>
+            <input type="text" name="username" placeholder="Username" autocomplete="username" required />
+            <input type="password" name="password" placeholder="Password" autocomplete="current-password" required />
             <button type="submit" class="auth-btn">Authorize Access</button>
         </form>
     </div>
 </div>
 
-<div id="registerModal" class="auth-modal" style="display: none;">
+<div id="registerModal" class="auth-modal" style="display: none">
     <div class="modal-card">
-        <span class="close-btn" onclick="closeModal('registerModal')" aria-label="Close">&times;</span>
-        <h2>JOIN COMMUNITY</h2>        
-        <form class="auth-form" method="POST" action="{% url 'accounts:register' %}">
+        <span class="close-btn" onclick="closeModal('registerModal')">&times;</span>
+
+        <div id="registrationStep">
+            <h2>JOIN COMMUNITY</h2>
+            <form class="auth-form" id="regForm" onsubmit="return handleFormLoading(this)">
+                {% csrf_token %}
+                <div class="name-row">
+                    <input type="text" id="reg_fn" placeholder="First Name" autocomplete="given-name" required />
+                    <input type="text" id="reg_ln" placeholder="Last Name" autocomplete="family-name" required />
+                </div>
+                <input type="text" id="reg_un" placeholder="Username" autocomplete="username" required />
+                <input type="email" id="reg_email" placeholder="Email Address" autocomplete="email" required />
+                <input type="password" id="reg_pass" placeholder="Password" autocomplete="new-password" required />
+                <button type="button" class="auth-btn" onclick="sendOTP()">Initialize Account</button>
+            </form>
+        </div>
+
+        <div id="otpStep" style="display: none">
+            <h2>VERIFY EMAIL</h2>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">Enter the code sent to your email.</p>
+            <div class="auth-form">
+                <input type="text" id="otp_code" placeholder="Enter OTP" maxlength="6" autocomplete="one-time-code" style="text-align: center; font-size: 20px; letter-spacing: 5px" />
+                <button type="button" class="auth-btn" onclick="verifyOTP()">Verify & Register</button>
+                <p style="font-size: 0.8rem">Didn't get it? <a href="javascript:void(0)" onclick="sendOTP()" style="color: orangered">Resend</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="profileModal" class="auth-modal" style="display: none">
+    <div class="modal-card">
+        <span class="close-btn" onclick="closeModal('profileModal')">&times;</span>
+        <h2>USER SETTINGS</h2>
+        <form class="auth-form" method="POST" action="{% url 'accounts:update_profile' %}" onsubmit="return handleFormLoading(this)">
             {% csrf_token %}
-            <input type="text" name="username" placeholder="Pick a username" autocomplete="username" required>
-            <input type="email" name="email" placeholder="Email Address" autocomplete="email" required>
-            <input type="password" name="password" placeholder="Create strong password" autocomplete="new-password" required>
-            <button type="submit" class="auth-btn">Initialize Account</button>
+            <div class="name-row">
+                <input type="text" name="first_name" value="{{ user.first_name }}" autocomplete="given-name" placeholder="First Name" />
+                <input type="text" name="last_name" value="{{ user.last_name }}" autocomplete="family-name" placeholder="Last Name" />
+            </div>
+            <input type="text" name="username" value="{{ user.username }}" autocomplete="username" required />
+            <input type="email" name="email" value="{{ user.email }}" autocomplete="email" required />
+            <button type="submit" class="auth-btn" style="background: #2563eb">Save Changes</button>
         </form>
     </div>
 </div>
