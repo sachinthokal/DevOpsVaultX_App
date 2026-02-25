@@ -1,9 +1,7 @@
 <div id="loginModal" class="auth-modal" style="display: none;">
     <div class="modal-card">
         <span class="close-btn" onclick="closeModal('loginModal')" aria-label="Close">&times;</span>
-        <h2>Secure Login</h2>
-        <p>Access your DevOps resources</p>
-        
+        <h2>SECURE LOGIN</h2>        
         <form class="auth-form" method="POST" action="{% url 'accounts:login' %}">
             {% csrf_token %}
             <input type="text" name="username" placeholder="Username" autocomplete="username" required>
@@ -16,9 +14,7 @@
 <div id="registerModal" class="auth-modal" style="display: none;">
     <div class="modal-card">
         <span class="close-btn" onclick="closeModal('registerModal')" aria-label="Close">&times;</span>
-        <h2>Join Community</h2>
-        <p>Start your DevOps journey today</p>
-        
+        <h2>JOIN COMMUNITY</h2>        
         <form class="auth-form" method="POST" action="{% url 'accounts:register' %}">
             {% csrf_token %}
             <input type="text" name="username" placeholder="Pick a username" autocomplete="username" required>

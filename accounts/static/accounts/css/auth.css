@@ -86,7 +86,7 @@
 .join-btn-creative {
     background: orangered;
     color: white !important;
-    padding: 6px 18px;
+    padding: 5px 10px;
     border-radius: 6px;
     font-weight: 600 !important;
     transition: 0.3s;
@@ -96,6 +96,23 @@
     background: #e63e00;
     box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3);
 }
+
+/* Login Button Creative Style */
+.login-btn-creative {
+    background: rgb(0, 64, 239);
+    color: white !important;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-weight: 600 !important;
+    transition: 0.3s;
+}
+
+.login-btn-creative:hover {
+    background: #023af1;
+    box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3);
+}
+
+
 
 /* --- Auth Modals --- */
 .auth-modal {
