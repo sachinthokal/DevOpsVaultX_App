@@ -48,7 +48,7 @@
 <div id="profileModal" class="auth-modal" style="display: none">
     <div class="modal-card">
         <span class="close-btn" onclick="closeModal('profileModal')">&times;</span>
-        <h2>USER SETTINGS</h2>
+        <h2>USER PROFILE</h2>
         <form class="auth-form" method="POST" action="{% url 'accounts:update_profile' %}" onsubmit="return handleFormLoading(this)">
             {% csrf_token %}
             <div class="name-row">

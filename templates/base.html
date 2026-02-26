@@ -50,8 +50,8 @@
       <div class="auth-section">
         {% if user.is_authenticated %}
         <div class="profile-nav" onclick="toggleDrop(event)">
-          <div class="avatar">{{ user.username|slice:":1"|upper }}</div>
-          <span>{{ user.username|upper }}</span>
+          <div class="avatar">{{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}</div>
+          <span>{{ user.first_name|upper }} {{ user.last_name|upper }}</span>
           <div id="dropMenu" class="dropdown-content">
             <a href="javascript:void(0)" onclick="openModal('profileModal')">
               <i class="fas fa-user-edit"></i> Profile
