@@ -26,7 +26,7 @@ function showHistory(
             <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">VAULT SUMMARY</div>
         </div>
         <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); padding: 5px 10px; border-radius: 6px; color: #38bdf8; font-size: 9px; font-weight: 800;">
-            ID: ${orderId.substring(0, 8)}
+            ID: ${orderId.substring(0, 10)}
         </div>
     </div>
 
@@ -57,7 +57,7 @@ function showHistory(
                 <span style="color: #fff;">${lastDownload}</span>
             </div>
             <div style="display: flex; justify-content: space-between; color: #94a3b8;">
-                <span>CYCLES:</span>
+                <span>RENEWED:</span>
                 <span style="color: #38bdf8; font-weight: bold;">x${count}</span>
             </div>
             <div style="display: flex; justify-content: space-between; color: #94a3b8;">

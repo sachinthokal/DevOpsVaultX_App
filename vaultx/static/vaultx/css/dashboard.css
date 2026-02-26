@@ -75,8 +75,8 @@
     color: #000;
   }
 
-  .status-badge {
-    font-size: 9px;
+  .status-badge-vaultx {
+    font-size: 10px;
     text-transform: uppercase;
     color: var(--accent);
     font-weight: 800;
