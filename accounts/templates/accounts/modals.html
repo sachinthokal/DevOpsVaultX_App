@@ -7,6 +7,9 @@
         <h2>SECURE LOGIN</h2>
         <form class="auth-form" method="POST" action="{% url 'accounts:login' %}" onsubmit="return handleFormLoading(this)">
             {% csrf_token %}
+            
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            
             <input type="text" name="username" placeholder="Username" autocomplete="username" required />
             <input type="password" name="password" placeholder="Password" autocomplete="current-password" required />
             <button type="submit" class="auth-btn">Authorize Access</button>

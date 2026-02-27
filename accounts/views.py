@@ -10,17 +10,33 @@ from django.http import JsonResponse
 from django.conf import settings
 
 # --- LOGIN & LOGOUT ---
-
 def login_view(request):
     if request.method == 'POST':
         u = request.POST.get('username')
         p = request.POST.get('password')
+        
+        # 1. 'next' parameter gya jo modal form madhe add kela hota
+        next_url = request.POST.get('next') 
+        
         user = authenticate(username=u, password=p)
+        
         if user:
             login(request, user)
             messages.success(request, f"Welcome back, {user.first_name if user.first_name else u}!")
+            
+            # 2. Redirect logic with Trigger Cleaning
+            if next_url:
+                # Jar URL madhe '?login_trigger=true' asel tar te kadhun taka
+                # Jyamule page reload jhalya nantar popup parat yenar nahi
+                clean_url = next_url.split('?')[0]
+                return redirect(clean_url)
+            
+            return redirect(request.META.get('HTTP_REFERER', 'home'))
+            
         else:
             messages.error(request, "Invalid username or password.")
+            
+    # POST nasel kinva login fail jhala tar parat maagchya page var pathva
     return redirect(request.META.get('HTTP_REFERER', 'home'))
 
 def logout_view(request):

@@ -147,7 +147,7 @@
 /* --- Optimized Responsive Toast (BOTTOM RIGHT FIXED) --- */
 .toast-container {
     position: fixed;
-    bottom: 20px; /* Top kadhun Bottom kela */
+    bottom: 20px;
     right: 20px;
     z-index: 10005;
     display: flex;
@@ -157,34 +157,67 @@
 }
 
 .toast-alert {
+    /* Default Background (Info/Success) */
     background: #28a745; 
     color: white;
     padding: 12px 20px;
     border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     gap: 12px;
     font-weight: 500;
     font-size: 14px;
-    min-width: 250px;
+    min-width: 280px;
     pointer-events: auto;
-    animation: slideInRight 0.4s ease-out;
+    border-left: 5px solid rgba(0,0,0,0.2); /* Thoda extra look sathi */
+    animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Mobile Responsiveness for Toast */
+/* --- Dynamic Colors Based on Type --- */
+
+/* Success - Green */
+.toast-alert.success { background: #10b981 !important; }
+
+/* Warning - Orange/Yellow */
+.toast-alert.warning { background: #f59e0b !important; }
+
+/* Error - Red */
+.toast-alert.error { background: #ef4444 !important; }
+
+/* Info - Blue */
+.toast-alert.info { background: #3b82f6 !important; }
+
+
+/* --- Animations --- */
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInBottom {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeOutToast {
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(0.9); opacity: 0; }
+}
+
+/* Mobile Responsiveness */
 @media (max-width: 576px) {
     .toast-container {
-        right: 20px;
-        left: 20px; 
+        right: 15px;
+        left: 15px; 
         bottom: 20px;
         align-items: center;
     }
     
     .toast-alert {
         width: 100%;
-        max-width: 320px;
-        justify-content: center;
+        max-width: 100%;
+        justify-content: flex-start;
         animation: slideInBottom 0.4s ease-out;
     }
 }

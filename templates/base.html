@@ -162,14 +162,15 @@
 
     <script src="{% static 'js/global.js' %}"></script>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-          {% if messages %}
-              {% for message in messages %}
-                  showToast("{{ message }}");
-              {% endfor %}
-          {% endif %}
-      });
-    </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if messages %}
+            {% for message in messages %}
+                // message.tags mule 'warning', 'error', ki 'success' he showToast la samjel
+                showToast("{{ message }}", "{{ message.tags }}");
+            {% endfor %}
+        {% endif %}
+    });
+  </script>
   </body>
 </html>

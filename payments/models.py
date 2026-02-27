@@ -8,7 +8,6 @@ class Payment(models.Model):
         ("FAILED", "FAILED"),
         ("SUCCESS", "SUCCESS"),
     )
-
     # Core Relations
     # ForeignKey to User added to fix the 'unexpected keyword argument user' error
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="payments")

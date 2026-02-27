@@ -40,7 +40,7 @@
       </span>
       {% if payment.purchase_count > 1 %}
       <span class="status-badge-vaultx" style="background: rgba(191, 3, 237, 0.1); 
-                 color: #bf03ed;">x{{ payment.purchase_count }}</span>
+                   color: #bf03ed;">x{{ payment.purchase_count }}</span>
       {% endif %}
     </div>
 
@@ -78,16 +78,23 @@
 
   {% empty %}
   <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px">
-    <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">VAULT EMPTY</h2>
-    <a href="/" style="background: var(--accent); color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800;">Explore Store</a>
+    {% if not request.user.is_authenticated %}
+      <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">PLEASE LOG IN</h2>
+      <p style="color: #94a3b8; margin-bottom: 25px;">Log in to check your purchased assets.</p>
+      <a href="{% url 'login' %}" style="background: #bf03ed; color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800;">Login Now</a>
+    {% else %}
+      <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">VAULT EMPTY</h2>
+      <p style="color: #94a3b8; margin-bottom: 25px;">You haven't purchased anything yet.</p>
+      <a href="/" style="background: var(--accent); color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800;">Explore Store</a>
+    {% endif %}
   </div>
   {% endfor %}
 </div>
+
 <script>
     history.pushState(null, null, location.href);
     window.onpopstate = function () {
         location.href = "{% url 'products:list' %}"; 
     };
 </script>
-
 {% endblock %}

@@ -13,9 +13,8 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
-// 2. Show Alert Popup (Toast)
-function showToast(msg) {
+// showToast settings
+function showToast(msg, type = 'info') {
     let container = document.getElementById('toast-container');
     if (!container) {
         container = document.createElement('div');
@@ -24,16 +23,25 @@ function showToast(msg) {
         document.body.appendChild(container);
     }
     
+    let icon = "fa-info-circle";
+    if (type.includes("success")) icon = "fa-check-circle";
+    if (type.includes("warning")) icon = "fa-exclamation-triangle";
+    if (type.includes("error")) icon = "fa-times-circle";
+
     const toast = document.createElement('div');
-    toast.className = 'toast-alert';
-    toast.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
+    toast.className = `toast-alert ${type}`;
+    toast.innerHTML = `<i class="fas ${icon}"></i> ${msg}`;
     
     container.appendChild(toast);
+
+    // --- TIME ---
+    // 5000 means 5 seconds.
+    const displayTime = 6000; 
 
     setTimeout(() => {
         toast.style.animation = "fadeOutToast 0.5s forwards";
         setTimeout(() => toast.remove(), 500);
-    }, 3500);
+    }, displayTime); 
 }
 
 // 3. Toggle Loading Spinner on Buttons
