@@ -51,7 +51,7 @@
                             <span class="home-price-tag">
                                 {% if product.price == 0 %}FREE{% else %}₹ {{ product.price }}{% endif %}
                             </span>
-                            <a href="{% url 'products:detail' product.pk %}" class="home-btn-secondary">VIEW DETAILS</a>
+                            <a href="{% url 'products:details' product.pk %}" class="home-btn-secondary">VIEW DETAILS</a>
                         </div>
                     </div>
                 </article>

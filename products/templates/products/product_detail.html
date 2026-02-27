@@ -2,222 +2,177 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
     :root {
-        --vx-bg: #06080f;
-        --vx-accent: #38bdf8;
-        --vx-card-bg: rgba(15, 23, 42, 0.4);
-        --vx-border: rgba(255, 255, 255, 0.08);
-        --vx-text-dim: #94a3b8;
-        --vx-success: #10b981;
+        --v-blue: #3b82f6;
+        --v-orange: #ff6b00;
+        --v-dark: #020617;
+        --v-border: rgba(255, 255, 255, 0.08);
+        --v-panel: rgba(15, 23, 42, 0.6);
     }
 
-    .product-detail-wrapper {
-        padding: 60px 20px;
-        background-color: var(--vx-bg);
-        min-height: 100vh;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        color: #fff;
+    body {
+        background: var(--v-dark);
+        color: #f8fafc;
+        font-family: 'Outfit', sans-serif;
+        overflow-x: hidden;
     }
 
-    .container { max-width: 1100px; margin: 0 auto; }
-
-    /* --- BACK LINK --- */
-    .products-back-link {
-        display: inline-flex; align-items: center; gap: 8px;
-        color: var(--vx-text-dim); text-decoration: none;
-        font-size: 13px; font-weight: 700; margin-bottom: 30px;
-        transition: 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
-    }
-    .products-back-link:hover { color: var(--vx-accent); transform: translateX(-5px); }
-
-    /* --- LAYOUT GRID --- */
-    .detail-grid {
+    .viewport-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
         display: grid;
-        grid-template-columns: 1fr 1.1fr;
-        gap: 60px;
-        align-items: start;
+        grid-template-columns: 400px 1fr;
+        gap: 40px;
+        height: 78vh; 
+        align-items: stretch;
     }
 
-    /* --- IMAGE CARD --- */
-    .image-card {
-        background: var(--vx-card-bg);
-        border: 1px solid var(--vx-border);
+    /* --- Left Side: Floating Animation --- */
+    .observation-deck {
+        background: var(--v-panel);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--v-border);
         border-radius: 24px;
-        overflow: hidden;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         position: relative;
-        backdrop-filter: blur(10px);
     }
 
-    .detail-badge {
-        position: absolute; top: 20px; left: 20px;
-        background: rgba(56, 189, 248, 0.15);
-        color: var(--vx-accent);
-        font-size: 10px; font-weight: 800;
-        padding: 6px 14px; border-radius: 8px;
-        border: 1px solid rgba(56, 189, 248, 0.2);
-        z-index: 2;
+    .btn-back {
+        font-family: 'JetBrains Mono'; font-size: 11px; color: var(--v-blue);
+        text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 8px;
     }
 
-    .product-image-preview {
-        aspect-ratio: 1/1;
+    .img-wrap {
+        flex-grow: 1;
         display: flex; align-items: center; justify-content: center;
-        background: linear-gradient(135deg, #0f172a 0%, #020408 100%);
     }
 
-    .product-image-preview img { width: 100%; height: 100%; object-fit: cover; }
-
-    /* No Preview Placeholder */
-    .no-image-box { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-    .no-image-box i { color: #1e293b; font-size: 55px; opacity: 0.5; }
-    .no-image-box p { color: #334155; font-size: 11px; font-weight: 800; letter-spacing: 1px; }
-
-    /* --- CONTENT SIDE --- */
-    .detail-title { 
-        font-size: 42px; font-weight: 800; line-height: 1.1; 
-        margin-bottom: 20px; letter-spacing: -1.5px; 
+    /* Floating Image Animation */
+    .liquid-img {
+        max-width: 100%; max-height: 320px;
+        filter: drop-shadow(0 10px 30px rgba(59, 130, 246, 0.2));
+        transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    
-    .detail-meta { display: flex; align-items: center; gap: 24px; margin-bottom: 35px; }
-    
-    .price-container { 
-        font-size: 32px; font-weight: 800; color: #fff; 
-        display: flex; align-items: center; gap: 8px; 
-    }
-    .price-container .free-text { color: var(--vx-success); }
-
-    .stock-status { 
-        font-size: 13px; color: var(--vx-text-dim); font-weight: 600; 
-        display: flex; align-items: center; gap: 8px;
-        padding: 6px 12px; background: rgba(16, 185, 129, 0.1); border-radius: 8px;
-    }
-    .stock-status i { color: var(--vx-success); }
-
-    /* --- HIGHLIGHTS SECTION --- */
-    .detail-info-card { 
-        margin-bottom: 35px; 
-        background: rgba(255, 255, 255, 0.03);
-        padding: 20px; border-radius: 18px;
-        border: 1px solid var(--vx-border);
-    }
-    .detail-info-card h3 {
-        font-size: 13px; text-transform: uppercase; letter-spacing: 1px;
-        color: var(--vx-accent); margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
-    }
-    .description-text { color: var(--vx-text-dim); line-height: 1.7; font-size: 15px; }
-
-    /* --- FEATURES LIST --- */
-    .features-list { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 40px; }
-    .f-item {
-        background: rgba(255,255,255,0.02); padding: 12px 16px; border-radius: 12px;
-        font-size: 13px; font-weight: 600; color: #cbd5e1; display: flex; align-items: center; gap: 12px;
-        border: 1px solid var(--vx-border);
-    }
-    .f-item i { color: var(--vx-accent); font-size: 14px; }
-
-    /* --- CLEAN BUTTON UI FIX --- */
-    .cta-section { width: 100%; }
-
-    .buy-btn-large {
-        display: flex; align-items: center; justify-content: center; gap: 12px;
-        background: linear-gradient(135deg, var(--vx-accent) 0%, #0ea5e9 100%);
-        color: #000; text-decoration: none; padding: 20px; border-radius: 18px;
-        font-weight: 800; font-size: 17px;
-        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-        border: none;
-        box-shadow: 0 10px 25px rgba(56, 189, 248, 0.2);
+    .observation-deck:hover .liquid-img { 
+        transform: translateY(-15px) scale(1.05);
+        filter: drop-shadow(0 20px 50px rgba(59, 130, 246, 0.4));
     }
 
-    .buy-btn-large:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px rgba(56, 189, 248, 0.4);
-        filter: brightness(1.1);
+    /* --- Right Side: Scrollable Panel --- */
+    .data-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        overflow: hidden;
     }
 
-    .buy-btn-large:active { transform: translateY(-2px); }
+    .internal-scroll-box {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--v-border);
+        border-radius: 24px;
+        padding: 40px;
+        overflow-y: auto; 
+        flex-grow: 1;
+    }
 
-    @media (max-width: 850px) { 
-        .detail-grid { grid-template-columns: 1fr; gap: 40px; } 
-        .detail-title { font-size: 32px; }
+    /* Smooth Scrollbar */
+    .internal-scroll-box::-webkit-scrollbar { width: 4px; }
+    .internal-scroll-box::-webkit-scrollbar-thumb { background: var(--v-blue); border-radius: 10px; }
+
+    .cat-tag {
+        font-family: 'JetBrains Mono'; font-size: 11px; color: var(--v-blue);
+        border-left: 2px solid var(--v-blue); padding-left: 10px; margin-bottom: 15px; display: block;
+    }
+
+    .title-text {
+        font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 25px;
+        background: linear-gradient(to right, #fff, #64748b);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .scroll-content p {
+        color: #94a3b8; font-size: 1.1rem; line-height: 1.8;
+    }
+
+    /* --- Bottom: Action Console --- */
+    .console-action {
+        background: #0f172a;
+        border: 1px solid var(--v-border);
+        padding: 22px 40px;
+        border-radius: 24px;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .price-wrap .label { font-size: 10px; color: #475569; font-weight: 800; display: block; letter-spacing: 1px; }
+    .price-wrap .val { font-family: 'JetBrains Mono'; font-size: 2rem; font-weight: 700; color: #fff; }
+
+    .unlock-btn {
+        background: var(--v-orange); color: #fff;
+        padding: 16px 36px; border-radius: 14px;
+        text-decoration: none; font-weight: 800;
+        transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 20px rgba(255, 107, 0, 0.2);
+    }
+    .unlock-btn:hover { 
+        background: #ff7c1a; 
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(255, 107, 0, 0.4);
+    }
+
+    @media (max-width: 950px) {
+        .viewport-container { grid-template-columns: 1fr; height: auto; }
+        .observation-deck { height: 350px; }
+        .internal-scroll-box { min-height: 300px; }
     }
 </style>
 
-<div class="product-detail-wrapper">
-    <div class="container">
-        <a href="{% url 'products:list' %}" class="products-back-link">
-            <i class="fas fa-arrow-left"></i> Return to Vault
+<div class="viewport-container">
+    <div class="observation-deck">
+        <a href="{% url 'products:list' %}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> BACK_TO_LIST
         </a>
+        <div class="img-wrap">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" class="liquid-img" alt="Product">
+            {% else %}
+                <i class="fas fa-cube fa-6x" style="opacity: 0.1;"></i>
+            {% endif %}
+        </div>
+    </div>
 
-        <div class="detail-grid">
-            <div class="detail-left">
-                <div class="image-card">
-                    <div class="detail-badge">{{ product.category|upper }}</div>
-                    <div class="product-image-preview">
-                        {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.title }}" 
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" loading="lazy">
-                            <div class="no-image-box" style="display: none;">
-                                <i class="fas fa-image"></i>
-                                <p>NO PREVIEW</p>
-                            </div>
-                        {% else %}
-                            <div class="no-image-box">
-                                <i class="fas fa-image"></i>
-                                <p>NO PREVIEW</p>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
+    <div class="data-panel">
+        <div class="internal-scroll-box">
+            <span class="cat-tag">{{ product.category|upper }}</span>
+            <h1 class="title-text">{{ product.title }}</h1>
+            
+            <div class="scroll-content">
+                <p>
+                    {% if product.description %}
+                        {{ product.description|linebreaks }}
+                    {% else %}
+                        No detailed description available for this module.
+                    {% endif %}
+                </p>
+                <div style="height: 20px;"></div>
             </div>
+        </div>
 
-            <div class="detail-right">
-                <h1 class="detail-title">{{ product.title }}</h1>
-                
-                <div class="detail-meta">
-                    <div class="price-container">
-                        {% if product.price == 0 %}
-                            <span class="free-text">FREE</span>
-                        {% else %}
-                            <i class="fa-solid fa-indian-rupee-sign" style="font-size: 22px; color: var(--vx-accent);"></i>
-                            <span>{{ product.price }}</span>
-                        {% endif %}
-                    </div>
-                    <span class="stock-status">
-                        <i class="fas fa-circle-check"></i> Instant Delivery
-                    </span>
-                </div>
-
-                <div class="detail-info-card">
-                    <h3><i class="fas fa-bolt"></i> Key Highlights</h3>
-                    <div class="description-text">
-                        {% if product.description %}
-                            {{ product.description|linebreaks }}
-                        {% else %}
-                            <p>Premium digital asset curated for professional workflows. Get immediate access to all files after purchase.</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="features-list">
-                    <div class="f-item"><i class="fas fa-cloud-arrow-down"></i> Direct Download</div>
-                    <div class="f-item"><i class="fas fa-infinity"></i> Five Times Download</div>
-                    <div class="f-item"><i class="fas fa-lock"></i> Secure Payment</div>
-                    <div class="f-item"><i class="fas fa-file-shield"></i> Verified Asset</div>
-                </div>
-
-                <div class="cta-section">
-                    <a href="{% url 'products:buy_now' product.pk %}" class="buy-btn-large">
-                        {% if product.price == 0 %}
-                            DOWNLOAD FREE<i class="fas fa-download"></i>
-                        {% else %}
-                           DOWNLOAD<i class="fas fa-download"></i>
-                        {% endif %}
-                    </a>
-                </div>
+        <div class="console-action">
+            <div class="price-wrap">
+                <span class="label">ACCESS_FEE</span>
+                <span class="val">{% if product.price == 0 %}FREE{% else %}₹{{ product.price }}{% endif %}</span>
             </div>
+            
+            <a href="{% url 'products:buy_now' product.pk %}" class="unlock-btn">
+                {% if product.price == 0 %}DOWNLOAD <i class="fas fa-download"></i>{% else %}UNLOCK ASSET <i class="fas fa-unlock"></i>{% endif %}
+            </a>
         </div>
     </div>
 </div>

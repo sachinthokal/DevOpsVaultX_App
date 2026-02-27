@@ -187,7 +187,7 @@ def download_file(request, pk):
         response = FileResponse(open(product.file.path, "rb"), as_attachment=True)
         response["Content-Disposition"] = f'attachment; filename="{os.path.basename(product.file.path)}"'
         return response
-    return redirect('products:detail', pk=pk)
+    return redirect('products:details', pk=pk)
 
 # ======================
 # 4. RETRY & FAILURE
