@@ -1,4 +1,9 @@
-/* All JavaScript Logic (showHistory, removeItem, handleDownload) remains exactly as provided */
+// Prevent Back Button Loop
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+  location.href = "{% url 'products:list' %}";
+};
+
 function showHistory(
   orderId,
   purchaseDate,
@@ -8,89 +13,79 @@ function showHistory(
   userName,
   userEmail,
 ) {
-  const usagePercent = (used / 5) * 100;
+  const receiptUrl = `/vaultx/receipt/${orderId}/`;
+
   Swal.fire({
     customClass: { popup: "vault-gradient-popup" },
     color: "#ffffff",
-    width: "480px",
-    padding: "2rem",
+    width: "400px",
     showConfirmButton: false,
+    background: "#050811",
     html: `
-<div class="vault-modal-container" style="text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; color: #fff; max-width: 400px; margin: 0 auto;">
-    
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
-        <div style="border-left: 4px solid #38bdf8; padding-left: 15px;">
-            <div style="color: #38bdf8; font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px;">
-                <i class="fas fa-shield-alt"></i> Access Verified
-            </div>
-            <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">VAULT SUMMARY</div>
-        </div>
-        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); padding: 5px 10px; border-radius: 6px; color: #38bdf8; font-size: 9px; font-weight: 800;">
-            ID: ${orderId.substring(0, 10)}
-        </div>
-    </div>
-
-    <div style="background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 15px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 35px; height: 35px; background: #38bdf8; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #000; font-weight: 800;">
-                ${userName.charAt(0).toUpperCase()}
-            </div>
-            <div>
-                <div style="font-size: 13px; font-weight: 800; color: #fff;">${userName.toUpperCase()}</div>
-                <div style="font-size: 11px; color: #64748b; font-weight: 600;">${userEmail}</div>
-            </div>
-        </div>
-    </div>
-
-    <div style="background: #000; border-radius: 12px; padding: 18px; border: 1px solid rgba(56, 189, 248, 0.2); margin-bottom: 20px;">
-        <div style="font-size: 10px; color: #38bdf8; font-weight: 800; margin-bottom: 15px; border-bottom: 1px solid rgba(56, 189, 248, 0.1); padding-bottom: 8px;">
-            <i class="fas fa-database"></i> TRANSACTION LOGS
-        </div>
+    <div style="text-align: left; font-family: 'Plus Jakarta Sans', sans-serif; padding: 5px;">
         
-        <div style="display: flex; flex-direction: column; gap: 12px; font-family: 'Courier New', monospace; font-size: 11px;">
-            <div style="display: flex; justify-content: space-between; color: #94a3b8;">
-                <span>PURCHASED:</span>
-                <span style="color: #fff;">${purchaseDate}</span>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+            <div>
+                <h2 style="font-size: 18px; font-weight: 900; color: #fff; margin: 0; letter-spacing: -0.5px;">PURCHASE <span style="color: #bf03ed;">INFO</span></h2>
+                <div style="font-size: 10px; color: #64748b; margin-top: 4px; font-family: monospace;">ID: ${orderId.substring(0, 14).toUpperCase()}</div>
             </div>
-            <div style="display: flex; justify-content: space-between; color: #94a3b8;">
-                <span>LAST SYNC:</span>
-                <span style="color: #fff;">${lastDownload}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; color: #94a3b8;">
-                <span>RENEWED:</span>
-                <span style="color: #38bdf8; font-weight: bold;">x${count}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; color: #94a3b8;">
-                <span>STATUS:</span>
-                <span style="color: #10b981;">AUTHORIZED</span>
+            <div style="background: rgba(191, 3, 237, 0.1); border: 1px solid rgba(191, 3, 237, 0.3); color: #bf03ed; padding: 4px 10px; border-radius: 6px; font-size: 9px; font-weight: 900; letter-spacing: 1px;">
+                VERIFIED
             </div>
         </div>
-    </div>
 
-    <div style="margin-bottom: 25px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; margin-bottom: 10px;">
-            <span style="color: #94a3b8;">STORAGE CAPACITY</span>
-            <span style="color: #fff;">${used} <span style="color: #38bdf8;">/ 5 Units</span></span>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; text-align: center;">
+                <div style="font-size: 9px; color: #64748b; font-weight: 700; text-transform: uppercase;">Payments</div>
+                <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 5px;">${count} <span style="font-size: 10px; color: #bf03ed;">Times</span></div>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; text-align: center;">
+                <div style="font-size: 9px; color: #64748b; font-weight: 700; text-transform: uppercase;">Status</div>
+                <div style="font-size: 13px; font-weight: 800; color: #10b981; margin-top: 8px;">ACTIVE</div>
+            </div>
         </div>
-        <div style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
-            <div style="width: ${(used / 5) * 100}%; background: linear-gradient(90deg, #38bdf8, #818cf8); height: 100%; box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);"></div>
-        </div>
-    </div>
 
-    <button onclick="Swal.close()" style="width: 100%; background: #fff; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;">
-        Return to Vault
-    </button>
-</div>`,
-    showClass: { popup: "animate__animated animate__fadeInUp animate__faster" },
+        <div style="background: rgba(255, 255, 255, 0.02); border-radius: 14px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
+                <span style="font-size: 11px; color: #64748b; font-weight: 600;">OWNER</span>
+                <span style="font-size: 11px; color: #fff; font-weight: 700;">${userName.toUpperCase()}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
+                <span style="font-size: 11px; color: #64748b; font-weight: 600;">BOUGHT ON</span>
+                <span style="font-size: 11px; color: #fff; font-weight: 700;">${purchaseDate}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="font-size: 11px; color: #64748b; font-weight: 600;">LAST USED</span>
+                <span style="font-size: 11px; color: #fff; font-weight: 700;">${lastDownload}</span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+           <a href="${receiptUrl}" 
+            target="_blank"
+            style="flex: 1.2; background: #bf03ed; color: #fff; border: none; padding: 12px; border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; box-shadow: 0 4px 15px rgba(191, 3, 237, 0.3);">
+                <i class="fas fa-eye"></i> VIEW BILL
+            </a>
+            
+            <button onclick="Swal.close()" 
+                    style="flex: 1; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.3s;">
+                CLOSE
+            </button>
+        </div>
+    </div>`,
+    showClass: { popup: "animate__animated animate__zoomIn animate__faster" },
   });
 }
 
 function removeItem(paymentId) {
   Swal.fire({
-    title: "REMOVE?",
+    title: "REMOVE ASSET?",
+    text: "Are you sure you want to delete this from your vault?",
     icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#ff4757",
+    cancelButtonColor: "#64748b",
+    confirmButtonText: "YES, DELETE",
     background: "#161e2e",
     color: "#fff",
   }).then((result) => {
@@ -102,20 +97,40 @@ function removeItem(paymentId) {
         .then((data) => {
           if (data.status === "success") {
             const card = document.getElementById(`card-${paymentId}`);
-            card.classList.add("animate__animated", "animate__zoomOut");
+
+            // 1. Card la delete animation dya
+            card.style.transition = "all 0.5s ease";
+            card.style.transform = "scale(0)";
+            card.style.opacity = "0";
+
+            // 2. Animation nantar card DOM madhun purna kadha
             setTimeout(() => {
-              location.reload();
+              card.remove(); // Ha card purna delete karto
+
+              // 3. Jar vault purna rikama zala asel tar reload kara (Empty state dakhvnyasathi)
+              const remainingCards = document.querySelectorAll(".asset-card");
+              if (remainingCards.length === 0) {
+                location.reload();
+              }
             }, 500);
+          } else {
+            Swal.fire("Error", "Could not remove item.", "error");
           }
+        })
+        .catch(() => {
+          Swal.fire("Error", "Server connection failed.", "error");
         });
     }
   });
 }
 
+// 3. Download Logic
 function handleDownload(productId, paymentId) {
   const btn = document.getElementById(`btn-${paymentId}`);
-  btn.innerHTML = "Wait...";
+  const originalText = btn.innerText;
+  btn.innerText = "WAIT...";
   btn.disabled = true;
+
   fetch(`/products/${productId}/download/`, {
     headers: { "X-Requested-With": "XMLHttpRequest" },
   })
@@ -123,57 +138,34 @@ function handleDownload(productId, paymentId) {
     .then((data) => {
       if (data.status === "success") {
         window.location.href = data.download_url;
-        setTimeout(() => {
-          location.reload();
-        }, 2000);
+        setTimeout(() => location.reload(), 2000);
       } else {
         Swal.fire("Error", data.message, "error");
-        btn.innerText = "Download";
+        btn.innerText = originalText;
         btn.disabled = false;
       }
     })
     .catch(() => {
+      btn.innerText = originalText;
       btn.disabled = false;
-      btn.innerText = "Download";
     });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const messages = document.querySelectorAll('.django-message');
-    messages.forEach(msg => {
-        const type = msg.getAttribute('data-type'); // error, success, etc.
-        const text = msg.getAttribute('data-text');
+// 4. Django Messages Handler
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".django-message").forEach((msg) => {
+    const type = msg.getAttribute("data-type");
+    const text = msg.getAttribute("data-text");
 
-        if (type === 'error') {
-            Swal.fire({
-                title: 'ACCESS DENIED',
-                text: text,
-                icon: 'error',
-                background: '#050811',
-                color: '#fff',
-                iconColor: '#ff4757',
-                showClass: { popup: 'animate__animated animate__shakeX' }, // Error sathi shake effect
-                buttonsStyling: false,
-                customClass: {
-                    confirmButton: 'vault-btn-ack',
-                    popup: 'vault-gradient-popup'
-                },
-                confirmButtonText: 'ACKNOWLEDGE',
-                footer: '<span style="color: #ff4757; font-size: 10px; font-weight: 800; letter-spacing: 2px;">SYSTEM SECURITY ALERT</span>'
-            });
-        } else if (type === 'success') {
-            // Success sathi pan dakhvu shakto
-            Swal.fire({
-                title: 'SUCCESSFUL',
-                text: text,
-                icon: 'success',
-                background: '#050811',
-                color: '#fff',
-                timer: 3000,
-                timerProgressBar: true,
-                showConfirmButton: false,
-                customClass: { popup: 'vault-gradient-popup' }
-            });
-        }
+    Swal.fire({
+      title: type === "error" ? "ACCESS DENIED" : "SUCCESSFUL",
+      text: text,
+      icon: type === "error" ? "error" : "success",
+      background: "#050811",
+      color: "#fff",
+      timer: type === "success" ? 3000 : null,
+      confirmButtonText: "ACKNOWLEDGE",
+      customClass: { popup: "vault-gradient-popup" },
     });
+  });
 });

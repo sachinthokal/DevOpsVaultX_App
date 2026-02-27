@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {# path: vaultx/templates/vaultx/dashboard.html #}
-{% load static %} 
+{% load static %}
 
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -39,8 +39,7 @@
         {% endif %}
       </span>
       {% if payment.purchase_count > 1 %}
-      <span class="status-badge-vaultx" style="background: rgba(191, 3, 237, 0.1); 
-                   color: #bf03ed;">x{{ payment.purchase_count }}</span>
+      <span class="status-badge-vaultx" style="background: rgba(191, 3, 237, 0.1); color: #bf03ed;">x{{ payment.purchase_count }}</span>
       {% endif %}
     </div>
 
@@ -59,7 +58,6 @@
     </div>
 
     <div class="action-area" style="margin-top: auto">
-      
       {% if payment.download_used >= payment.download_limit %}
         <a href="{% url 'products:details' payment.product.id %}" class="btn-download buy-again-btn">Renew Access</a>
       
@@ -72,35 +70,21 @@
       {% else %}
         <button onclick="handleDownload('{{ payment.product.id }}', '{{ payment.id }}')" class="btn-download active-btn" id="btn-{{ payment.id }}">Download</button>
       {% endif %}
-
     </div>
   </div>
 
   {% empty %}
-      <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px">
-        {% if not request.user.is_authenticated %}
-          <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">UNLOCK YOUR VAULT</h2>
-          <p style="color: #94a3b8; margin-bottom: 25px;">Securely sign in to retrieve your purchased products.</p>
-          
-          <a href="javascript:void(0)" 
-             onclick="openModal('loginModal')" 
-             style="background: #bf03ed; color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block;">
-             Login Now
-          </a>
-
-        {% else %}
-          <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">VAULT EMPTY</h2>
-          <p style="color: #94a3b8; margin-bottom: 25px;">You haven't purchased anything yet.</p>
-          <a href="/" style="background: var(--accent); color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block;">
-             Explore Store
-          </a>
-        {% endif %}
-      </div>
-    {% endfor %} </div> <script>
-    history.pushState(null, null, location.href);
-    window.onpopstate = function () {
-        location.href = "{% url 'products:list' %}"; 
-    };
-</script>
-
+    <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px">
+      {% if not request.user.is_authenticated %}
+        <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">UNLOCK YOUR VAULT</h2>
+        <p style="color: #94a3b8; margin-bottom: 25px;">Securely sign in to retrieve your purchased products.</p>
+        <a href="javascript:void(0)" onclick="openModal('loginModal')" style="background: #bf03ed; color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block;">Login Now</a>
+      {% else %}
+        <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">VAULT EMPTY</h2>
+        <p style="color: #94a3b8; margin-bottom: 25px;">You haven't purchased anything yet.</p>
+        <a href="/" style="background: var(--accent); color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block;">Explore Store</a>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>
 {% endblock %}

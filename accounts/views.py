@@ -55,7 +55,7 @@ def update_profile(request):
         user.username = request.POST.get('username')
         user.email = request.POST.get('email')
         user.save()
-        messages.success(request, "Profile updated successfully!")
+        messages.success(request, "Profile updated successfully!",extra_tags='profile_msg')
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 # --- REGISTRATION WITH OTP ---

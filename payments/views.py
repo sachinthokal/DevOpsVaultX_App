@@ -2,7 +2,8 @@ import json
 import razorpay
 import logging
 import os
-import random
+import datetime
+import uuid
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, FileResponse, HttpResponseNotFound
@@ -47,7 +48,7 @@ def buy_product(request, pk):
     if request.user.is_authenticated:
         current_user = request.user  # Ha 'user' field madhe save karaycha aahe
         customer_email = request.user.email
-        customer_name = request.user.username
+        customer_name = request.user.first_name + " " + request.user.last_name if request.user.first_name and request.user.last_name else request.user.username
     else:
         customer_email = request.POST.get('email') or request.session.get('customer_email')
         customer_name = request.POST.get('customer_name') or request.session.get('customer_name')
@@ -65,7 +66,16 @@ def buy_product(request, pk):
 
     # 2. FREE PRODUCT LOGIC (With User Link)
     if product.price == 0:
-        unique_order_id = f"FREE_{product.id}_{session_id[:5]}_{random.randint(1000,9999)}"
+        
+        # Current Date dynamic ghenyasathi (Format: DDMMYYYY)
+        # Example: 28022026
+        date_str = datetime.datetime.now().strftime("%d%m%Y") 
+        
+        # 1. Unique Order ID Format: ORD-FREE-28022026-XXXX
+        unique_order_id = f"ORD-FREE-{date_str}-{uuid.uuid4().hex[:8].upper()}"
+        
+        # 2. Dummy Payment ID Format: PAY-FREE-28022026-XXXXXXXXXX
+        dummy_payment_id = f"PAY-FREE-{date_str}-{uuid.uuid4().hex[:8].upper()}"
         
         Payment.objects.create(
             user=current_user,  # ITHE USER LINK KELA AAHE
@@ -74,6 +84,7 @@ def buy_product(request, pk):
             email=customer_email,
             customer_name=customer_name,
             razorpay_order_id=unique_order_id,
+            razorpay_payment_id=dummy_payment_id,  # Free Dummy ID
             amount=0,
             is_renewal=is_renewal_payment,
             status="SUCCESS", 

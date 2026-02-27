@@ -130,7 +130,7 @@ def contact(request):
             email_msg.send()
             
             logger.info(f"Email sent successfully from {email}")
-            messages.success(request, "✅️ Email Sent !! Expect an email response from our support engineers within 24 hours.")
+            messages.success(request, "✅️ Email Sent !! Expect an email response from our support engineers within 24 hours.",extra_tags='contact_msg')
 
         except Exception as e:
             # Middleware extra data capture karel
