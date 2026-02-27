@@ -77,24 +77,30 @@
   </div>
 
   {% empty %}
-  <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px">
-    {% if not request.user.is_authenticated %}
-      <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">PLEASE LOG IN</h2>
-      <p style="color: #94a3b8; margin-bottom: 25px;">Log in to check your purchased assets.</p>
-      <a href="{% url 'login' %}" style="background: #bf03ed; color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800;">Login Now</a>
-    {% else %}
-      <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">VAULT EMPTY</h2>
-      <p style="color: #94a3b8; margin-bottom: 25px;">You haven't purchased anything yet.</p>
-      <a href="/" style="background: var(--accent); color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800;">Explore Store</a>
-    {% endif %}
-  </div>
-  {% endfor %}
-</div>
+      <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px">
+        {% if not request.user.is_authenticated %}
+          <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">UNLOCK YOUR VAULT</h2>
+          <p style="color: #94a3b8; margin-bottom: 25px;">Securely sign in to retrieve your purchased products.</p>
+          
+          <a href="javascript:void(0)" 
+             onclick="openModal('loginModal')" 
+             style="background: #bf03ed; color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block;">
+             Login Now
+          </a>
 
-<script>
+        {% else %}
+          <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">VAULT EMPTY</h2>
+          <p style="color: #94a3b8; margin-bottom: 25px;">You haven't purchased anything yet.</p>
+          <a href="/" style="background: var(--accent); color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block;">
+             Explore Store
+          </a>
+        {% endif %}
+      </div>
+    {% endfor %} </div> <script>
     history.pushState(null, null, location.href);
     window.onpopstate = function () {
         location.href = "{% url 'products:list' %}"; 
     };
 </script>
+
 {% endblock %}

@@ -67,3 +67,15 @@ function handleFormLoading(formElement) {
     }
     return true; 
 }
+
+// Modal switch logic
+function switchModal(closeId, openId) {
+    closeModal(closeId);
+    setTimeout(() => openModal(openId), 300);
+}
+
+// Login ani Forgot Password toggle
+function toggleForgotSection(show) {
+    document.getElementById('loginFormSection').style.display = show ? 'none' : 'block';
+    document.getElementById('forgotFormSection').style.display = show ? 'block' : 'none';
+}

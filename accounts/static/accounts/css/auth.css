@@ -174,6 +174,36 @@
     animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+.auth-nav-links {
+    margin-top: 20px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+}
+
+.auth-nav-links p {
+    font-size: 13px;
+    color: #94a3b8;
+    margin: 5px 0;
+}
+
+.auth-nav-links a {
+    color: #bf03ed; /* Tumcha brand color */
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.auth-nav-links a:hover {
+    color: #ff007b;
+    text-decoration: underline;
+}
+
+.forgot-link {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
 /* --- Dynamic Colors Based on Type --- */
 
 /* Success - Green */
