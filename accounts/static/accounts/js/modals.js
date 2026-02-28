@@ -1,81 +1,85 @@
 // 1. CSRF Token Helper
 function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === name + "=") {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
     }
-    return cookieValue;
+  }
+  return cookieValue;
 }
 // showToast settings
-function showToast(msg, type = 'info') {
-    let container = document.getElementById('toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        container.className = 'toast-container';
-        document.body.appendChild(container);
-    }
-    
-    let icon = "fa-info-circle";
-    if (type.includes("success")) icon = "fa-check-circle";
-    if (type.includes("warning")) icon = "fa-exclamation-triangle";
-    if (type.includes("error")) icon = "fa-times-circle";
+function showToast(msg, type = "info") {
+  let container = document.getElementById("toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toast-container";
+    container.className = "toast-container";
+    document.body.appendChild(container);
+  }
 
-    const toast = document.createElement('div');
-    toast.className = `toast-alert ${type}`;
-    toast.innerHTML = `<i class="fas ${icon}"></i> ${msg}`;
-    
-    container.appendChild(toast);
+  let icon = "fa-info-circle";
+  if (type.includes("success")) icon = "fa-check-circle";
+  if (type.includes("warning")) icon = "fa-exclamation-triangle";
+  if (type.includes("error")) icon = "fa-times-circle";
 
-    // --- TIME ---
-    // 5000 means 5 seconds.
-    const displayTime = 6000; 
+  const toast = document.createElement("div");
+  toast.className = `toast-alert ${type}`;
+  toast.innerHTML = `<i class="fas ${icon}"></i> ${msg}`;
 
-    setTimeout(() => {
-        toast.style.animation = "fadeOutToast 0.5s forwards";
-        setTimeout(() => toast.remove(), 500);
-    }, displayTime); 
+  container.appendChild(toast);
+
+  // --- TIME ---
+  // 5000 means 5 seconds.
+  const displayTime = 6000;
+
+  setTimeout(() => {
+    toast.style.animation = "fadeOutToast 0.5s forwards";
+    setTimeout(() => toast.remove(), 500);
+  }, displayTime);
 }
 
 // 3. Toggle Loading Spinner on Buttons
 function toggleLoading(btnSelector, isLoading, originalText) {
-    const btn = document.querySelector(btnSelector);
-    if (!btn) return;
+  const btn = document.querySelector(btnSelector);
+  if (!btn) return;
 
-    if (isLoading) {
-        btn.disabled = true;
-        btn.innerHTML = `<span class="spinner"></span> Processing...`;
-    } else {
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-    }
+  if (isLoading) {
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner"></span> Processing...`;
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+  }
 }
 
 // Universal function for all forms (Login, Profile, etc.)
 function handleFormLoading(formElement) {
-    const submitBtn = formElement.querySelector('button[type="submit"]');
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = `<span class="spinner"></span> Processing...`;
-    }
-    return true; 
+  const submitBtn = formElement.querySelector('button[type="submit"]');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span class="spinner"></span> Processing...`;
+  }
+  return true;
 }
 
 // Modal switch logic
 function switchModal(closeId, openId) {
-    closeModal(closeId);
-    setTimeout(() => openModal(openId), 300);
+  closeModal(closeId);
+  setTimeout(() => openModal(openId), 300);
 }
 
 // Login ani Forgot Password toggle
 function toggleForgotSection(show) {
-    document.getElementById('loginFormSection').style.display = show ? 'none' : 'block';
-    document.getElementById('forgotFormSection').style.display = show ? 'block' : 'none';
+  document.getElementById("loginFormSection").style.display = show
+    ? "none"
+    : "block";
+  document.getElementById("forgotFormSection").style.display = show
+    ? "block"
+    : "none";
 }

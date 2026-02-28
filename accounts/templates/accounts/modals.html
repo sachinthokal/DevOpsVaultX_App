@@ -1,36 +1,185 @@
 {% load static %}
-<script src="{% static 'accounts/js/modals.js' %}"></script>
+
+<style>
+:root {
+    --accent: #ff4500;
+    --accent-hover: #e63e00;
+    --bg-modal: #ffffff;
+    --input-bg: #f8fafc;
+    --border-color: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+}
+
+.auth-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(10px);
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.modal-card {
+    background: var(--bg-modal);
+    width: 100%;
+    max-width: 440px;
+    padding: 48px 40px;
+    border-radius: 24px;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-header { margin-bottom: 32px; }
+.modal-header h2 {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+.modal-header p {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Perfect spacing between inputs */
+}
+
+.name-row {
+    display: flex;
+    gap: 12px;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--input-bg);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1);
+}
+
+.auth-btn {
+    margin-top: 8px;
+    padding: 16px;
+    background: var(--accent);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.auth-btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px -5px rgba(255, 69, 0, 0.3);
+}
+
+.auth-btn:active { transform: translateY(0); }
+
+.auth-nav-links {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-color);
+}
+
+.auth-nav-links p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.auth-nav-links a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.close-btn {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 32px;
+    height: 32px;
+    background: var(--input-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 18px;
+    transition: 0.2s;
+}
+
+.close-btn:hover { background: #fee2e2; color: #ef4444; }
+
+/* OTP Area */
+.otp-container {
+    padding: 20px 0;
+}
+.otp-input {
+    text-align: center;
+    letter-spacing: 12px;
+    font-size: 28px !important;
+    font-weight: 800 !important;
+    color: var(--accent);
+    border: 2px solid var(--accent) !important;
+}
+
+@keyframes modalPop {
+    0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+</style>
 
 <div id="loginModal" class="auth-modal" style="display: none">
     <div class="modal-card">
         <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
-        
         <div id="loginFormSection">
-            <h2>SECURE LOGIN</h2>
-            <form class="auth-form" method="POST" action="{% url 'accounts:login' %}" onsubmit="return handleFormLoading(this)">
+            <div class="modal-header">
+                <h2>LOGIN</h2>
+                <p>Please enter your details to continue</p>
+            </div>
+            <form class="auth-form" method="POST" action="{% url 'accounts:login' %}" onsubmit="return handleFormLoading(this);">
                 {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <input type="hidden" name="next" value="{{ request.get_full_path }}" />
                 <input type="text" name="username" placeholder="Username" autocomplete="username" required />
                 <input type="password" name="password" placeholder="Password" autocomplete="current-password" required />
-                <button type="submit" class="auth-btn">Authorize Access</button>
+                <button type="submit" class="auth-btn">Sign In</button>
             </form>
             <div class="auth-nav-links">
-                <p>New user? <a href="javascript:void(0)" onclick="switchModal('loginModal', 'registerModal')">Join Community</a></p>
-                <p><a href="javascript:void(0)" onclick="toggleForgotSection(true)">Forgot Password?</a></p>
+                <p>New here? <a href="javascript:void(0)" onclick="switchModal('loginModal', 'registerModal')">Create Account</a></p>
+                <p><a href="javascript:void(0)" onclick="toggleForgotSection(true)" style="font-weight: 500; font-size: 13px;">Forgot Password?</a></p>
             </div>
-        </div>
-
-        <div id="forgotFormSection" style="display: none;">
-            <h2>RESET ACCESS</h2>
-            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 15px;">Enter your email to receive a reset link.</p>
-            <form class="auth-form" method="POST" action="{% url 'accounts:password_reset' %}">
-                {% csrf_token %}
-                <input type="email" name="email" placeholder="Registered Email" autocomplete="email" required />
-                <button type="submit" class="auth-btn" style="background: #6366f1;">Send Reset Link</button>
-                <p style="margin-top: 15px;">
-                    <a href="javascript:void(0)" onclick="toggleForgotSection(false)" style="color: #bf03ed; font-size: 13px;">Back to Login</a>
-                </p>
-            </form>
         </div>
     </div>
 </div>
@@ -38,41 +187,107 @@
 <div id="registerModal" class="auth-modal" style="display: none">
     <div class="modal-card">
         <span class="close-btn" onclick="closeModal('registerModal')">&times;</span>
-
         <div id="registrationStep">
-            <h2>JOIN COMMUNITY</h2>
-            <form class="auth-form" id="regForm" onsubmit="return handleFormLoading(this)">
+            <div class="modal-header">
+                <h2>Create Account</h2>
+                <p>Join our secure DevOps community</p>
+            </div>
+            <form class="auth-form" id="regForm" onsubmit="return false;">
                 {% csrf_token %}
-                <div class="name-row">
-                    <input type="text" id="reg_fn" placeholder="First Name" autocomplete="given-name" required />
-                    <input type="text" id="reg_ln" placeholder="Last Name" autocomplete="family-name" required />
+                <div id="reg_details" class="auth-form">
+                    <div class="name-row">
+                        <input type="text" id="reg_fn" placeholder="First Name" autocomplete="given-name" required />
+                        <input type="text" id="reg_ln" placeholder="Last Name" autocomplete="family-name" required />
+                    </div>
+                    <input type="text" id="reg_un" placeholder="Username" autocomplete="username" required />
+                    <input type="email" id="reg_email" placeholder="Email Address" autocomplete="email" required />
+                    <input type="password" id="reg_pass" placeholder="Password" autocomplete="new-password" required />
+                    <button type="button" id="initBtn" class="auth-btn" onclick="sendOTP()">Get Started</button>
                 </div>
-                <input type="text" id="reg_un" placeholder="Username" autocomplete="username" required />
-                <input type="email" id="reg_email" placeholder="Email Address" autocomplete="email" required />
-                <input type="password" id="reg_pass" placeholder="Password" autocomplete="new-password" required />
-                <button type="button" class="auth-btn" onclick="sendOTP()">Initialize Account</button>
-                
-                <div class="auth-nav-links">
-                    <p>Already have an account? <a href="javascript:void(0)" onclick="switchModal('registerModal', 'loginModal')">Login Here</a></p>
+
+                <div id="otp_details" style="display: none;" class="otp-container">
+                    <div class="modal-header" style="margin-bottom: 20px;">
+                        <h3 style="color: var(--text-primary); margin: 0;">Verify Email</h3>
+                        <p style="font-size: 13px;">Enter the 6-digit code sent to your inbox</p>
+                    </div>
+                    <input type="text" id="reg_otp" placeholder="000000" class="otp-input" maxlength="6" autocomplete="one-time-code" />
+                    <button type="button" class="auth-btn" style="background: #10b981; width: 100%; margin-top: 20px;" onclick="verifyOTP()">Verify Account</button>
+                    <p class="auth-nav-links" style="border: none; margin-top: 15px;">
+                        Didn't receive it? <a href="javascript:void(0)" onclick="sendOTP()">Resend Code</a>
+                    </p>
                 </div>
             </form>
+            <div class="auth-nav-links">
+                <p>Already have an account? <a href="javascript:void(0)" onclick="switchModal('registerModal', 'loginModal')">Log In</a></p>
+            </div>
         </div>
     </div>
 </div>
 
-<div id="profileModal" class="auth-modal" style="display: none">
-    <div class="modal-card">
-        <span class="close-btn" onclick="closeModal('profileModal')">&times;</span>
-        <h2>USER PROFILE</h2>
-        <form class="auth-form" method="POST" action="{% url 'accounts:update_profile' %}" onsubmit="return handleFormLoading(this)">
-            {% csrf_token %}
-            <div class="name-row">
-                <input type="text" name="first_name" value="{{ user.first_name }}" autocomplete="given-name" placeholder="First Name" />
-                <input type="text" name="last_name" value="{{ user.last_name }}" autocomplete="family-name" placeholder="Last Name" />
-            </div>
-            <input type="text" name="username" value="{{ user.username }}" autocomplete="username" required />
-            <input type="email" name="email" value="{{ user.email }}" autocomplete="email" required />
-            <button type="submit" class="auth-btn" style="background: #2563eb">Save Changes</button>
-        </form>
-    </div>
-</div>
+<script src="{% static 'accounts/js/modals.js' %}"></script>
+<script>
+    // Tumche sendOTP ani verifyOTP functions ithe asu dya (unchanged)
+    function sendOTP() {
+        const email = document.getElementById("reg_email").value;
+        const username = document.getElementById("reg_un").value;
+        const initBtn = document.getElementById("initBtn");
+        const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+        if (!email || !username) {
+            Swal.fire("Required", "All fields are mandatory.", "warning");
+            return;
+        }
+
+        initBtn.innerHTML = "Sending...";
+        initBtn.disabled = true;
+
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("username", username);
+        formData.append("csrfmiddlewaretoken", csrfToken);
+
+        fetch("{% url 'accounts:send_otp' %}", {
+            method: "POST",
+            headers: { "X-CSRFToken": csrfToken },
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                document.getElementById("reg_details").style.display = "none";
+                document.getElementById("otp_details").style.display = "block";
+            } else {
+                Swal.fire("Error", data.message, "error");
+                initBtn.innerHTML = "Get Started";
+                initBtn.disabled = false;
+            }
+        });
+    }
+
+    function verifyOTP() {
+        const otp = document.getElementById("reg_otp").value;
+        const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+        const formData = new FormData();
+        formData.append("first_name", document.getElementById("reg_fn").value);
+        formData.append("last_name", document.getElementById("reg_ln").value);
+        formData.append("username", document.getElementById("reg_un").value);
+        formData.append("email", document.getElementById("reg_email").value);
+        formData.append("password", document.getElementById("reg_pass").value);
+        formData.append("otp", otp);
+        formData.append("csrfmiddlewaretoken", csrfToken);
+
+        fetch("{% url 'accounts:register' %}", {
+            method: "POST",
+            headers: { "X-CSRFToken": csrfToken },
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                window.location.reload();
+            } else {
+                Swal.fire("Error", data.message, "error");
+            }
+        });
+    }
+</script>

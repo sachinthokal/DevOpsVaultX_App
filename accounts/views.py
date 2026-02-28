@@ -22,7 +22,7 @@ def login_view(request):
         
         if user:
             login(request, user)
-            messages.success(request, f"Welcome back, {user.first_name if user.first_name else u}!")
+            messages.success(request, f"Welcome back, {user.first_name + ' ' + user.last_name if user.first_name else u} !! 🤗✨")
             
             # 2. Redirect logic with Trigger Cleaning
             if next_url:
@@ -44,7 +44,10 @@ def logout_view(request):
     messages.info(request, "Successfully logged out.")
     return redirect('home')
 
+
+#---------------------------------------
 # --- PROFILE UPDATE ---
+#---------------------------------------
 
 @login_required
 def update_profile(request):
@@ -58,12 +61,25 @@ def update_profile(request):
         messages.success(request, "Profile updated successfully!",extra_tags='profile_msg')
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-# --- REGISTRATION WITH OTP ---
+#---------------------------------------
+# --- OTP SEND & VERIFY ---
+#---------------------------------------
+import json, random
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.contrib.auth import login
 
 def send_otp(request):
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)
+            # 1. Data Handle (JSON kiva FormData)
+            if request.content_type == 'application/json':
+                data = json.loads(request.body)
+            else:
+                data = request.POST
+
             email = data.get('email')
             username = data.get('username')
 
@@ -72,15 +88,24 @@ def send_otp(request):
             
             if User.objects.filter(username=username).exists():
                 return JsonResponse({'status': 'error', 'message': 'Username already taken'}, status=400)
+            
+            if User.objects.filter(email=email).exists():
+                return JsonResponse({'status': 'error', 'message': 'Email already registered'}, status=400)
 
             otp = str(random.randint(100000, 999999))
             
-            # Session storage
-            request.session['registration_data'] = data
+            # 2. Session madhe Explicitly data save kara (Keys fix rahtat yane)
+            request.session['registration_data'] = {
+                'username': username,
+                'email': email,
+                'password': data.get('password'),
+                'first_name': data.get('first_name', ''),
+                'last_name': data.get('last_name', '')
+            }
             request.session['email_otp'] = otp
-            request.session.set_expiry(300) 
+            request.session.set_expiry(300) # 5 minutes
 
-            # Send Mail
+            # 3. Send Mail
             subject = "Verify your DevOpsVaultX Account"
             message = f"Hi {username},\n\nYour OTP for registration is: {otp}\nValid for 5 minutes."
             
@@ -88,37 +113,43 @@ def send_otp(request):
             
             return JsonResponse({'status': 'success', 'message': 'OTP sent to your email.'})
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': 'Check SMTP settings.'}, status=500)
+            return JsonResponse({'status': 'error', 'message': f'Server Error: {str(e)}'}, status=500)
+            
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 def verify_otp_and_register(request):
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)
-            user_otp = data.get('otp')
+            user_otp = request.POST.get('otp')
             stored_otp = request.session.get('email_otp')
             reg_data = request.session.get('registration_data')
 
             if not stored_otp or user_otp != stored_otp:
                 return JsonResponse({'status': 'error', 'message': 'Invalid or expired OTP'}, status=400)
 
-            # User Creation
+            if not reg_data:
+                return JsonResponse({'status': 'error', 'message': 'Registration session expired.'}, status=400)
+
+            # --- USER CREATION ---
+            # session madhun direct keys vapra jya aapan send_otp madhe set kelya hotya
             user = User.objects.create_user(
                 username=reg_data['username'],
                 email=reg_data['email'],
                 password=reg_data['password'],
-                first_name=reg_data.get('first_name', ''),
+                first_name=reg_data.get('first_name', ''), 
                 last_name=reg_data.get('last_name', '')
             )
-            user.save()
             
             login(request, user)
-            
-            del request.session['email_otp']
-            del request.session['registration_data']
-            
+
+            # Cleanup
+            request.session.pop('email_otp', None)
+            request.session.pop('registration_data', None)
+
             return JsonResponse({'status': 'success'})
-            
+
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+            print(f"ERROR: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': f"DB Error: {str(e)}"}, status=500)
+            
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
