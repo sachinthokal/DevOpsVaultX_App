@@ -45,29 +45,34 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # ==================================================
-# SECURITY
+# SECURITY CONFIGURATION
 # ==================================================
 if not DEBUG:
-
+    # Basic Security Headers
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = "DENY"
 
-    SECURE_SSL_REDIRECT = True
+    # SSL & Cookies Logic
+    # Redirect to HTTPS only if NOT on localhost/127.0.0.1
+    SECURE_SSL_REDIRECT = DEBUG
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+    # HSTS Settings (Strict Transport Security)
+    # FIX: Set HSTS to 0 on localhost to avoid "Bad request version" / HTTPS errors
+    SECURE_HSTS_SECONDS = 0 if DEBUG else 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+    SECURE_HSTS_PRELOAD = not DEBUG
 
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 else:
-
+    # Development / Debug Mode Settings
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
+    SECURE_HSTS_SECONDS = 0
 
 # ==================================================
 # Applications
@@ -102,6 +107,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -148,10 +154,20 @@ DATABASES = {
 # Password validation
 # ==================================================
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    # १. UserAttributeSimilarityValidator काढला आहे (आता नाव किंवा ईमेल पासवर्डमध्ये वापरता येईल)
+    
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 6,  # तुला हवे असल्यास ६ सुद्धा करू शकतोस
+        }
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
 # ==================================================

@@ -32,9 +32,53 @@
     />
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      .global-toast-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 11000;
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 12px;
+        pointer-events: none;
+      }
+      .toast-alert {
+        pointer-events: auto;
+        min-width: 280px;
+        max-width: 380px;
+        padding: 16px 20px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        font-size: 14px;
+        border-left: 6px solid #ccc;
+        animation: toastIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      }
+      .toast-alert.success { border-left-color: #10b981; color: #064e3b; }
+      .toast-alert.error { border-left-color: #ef4444; color: #7f1d1d; }
+      .toast-alert.warning { border-left-color: #f59e0b; color: #78350f; }
+      .toast-alert.info { border-left-color: #3b82f6; color: #1e3a8a; }
+      
+      @keyframes toastIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes toastOut {
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    </style>
   </head>
 
   <body>
+    <div id="toast-container" class="global-toast-container"></div>
+
     <header class="site-navbar">
       <a href="/" aria-label="DevOpsVaultX Home">
         <div class="logo-container">
@@ -52,36 +96,12 @@
       </a>
 
       <nav class="nav-links" aria-label="Main Navigation">
-        <a
-          href="{% url 'home' %}"
-          class="{% if request.path == '/' %}active{% endif %}"
-          >HOME</a
-        >
-        <a
-          href="{% url 'products:list' %}"
-          class="{% if '/products/' in request.path %}active{% endif %}"
-          >PRODUCTS</a
-        >
-        <a
-          href="{% url 'insights:home' %}"
-          class="{% if '/insights/' in request.path %}active{% endif %}"
-          >INSIGHTS</a
-        >
-        <a
-          href="{% url 'vaultx:index' %}"
-          class="{% if 'vaultx' in request.path %}active{% endif %}"
-          >VAULTX</a
-        >
-        <a
-          href="{% url 'about' %}"
-          class="{% if request.path == '/about/' %}active{% endif %}"
-          >ABOUT</a
-        >
-        <a
-          href="{% url 'contact' %}"
-          class="{% if request.path == '/contact/' %}active{% endif %}"
-          >CONTACT</a
-        >
+        <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">HOME</a>
+        <a href="{% url 'products:list' %}" class="{% if '/products/' in request.path %}active{% endif %}">PRODUCTS</a>
+        <a href="{% url 'insights:home' %}" class="{% if '/insights/' in request.path %}active{% endif %}">INSIGHTS</a>
+        <a href="{% url 'vaultx:index' %}" class="{% if 'vaultx' in request.path %}active{% endif %}">VAULTX</a>
+        <a href="{% url 'about' %}" class="{% if request.path == '/about/' %}active{% endif %}">ABOUT</a>
+        <a href="{% url 'contact' %}" class="{% if request.path == '/contact/' %}active{% endif %}">CONTACT</a>
 
         <div class="auth-section">
           {% if user.is_authenticated %}
@@ -94,25 +114,14 @@
               <a href="javascript:void(0)" onclick="openModal('profileModal')">
                 <i class="fas fa-user-edit"></i> Profile
               </a>
-
               <a href="{% url 'accounts:logout' %}">
                 <i class="fas fa-sign-out-alt"></i> Logout
               </a>
             </div>
           </div>
           {% else %}
-          <a
-            href="javascript:void(0)"
-            onclick="openModal('loginModal')"
-            class="login-btn-creative"
-            >LOGIN</a
-          >
-          <a
-            href="javascript:void(0)"
-            onclick="openModal('registerModal')"
-            class="join-btn-creative"
-            >JOIN US</a
-          >
+          <a href="javascript:void(0)" onclick="openModal('loginModal')" class="login-btn-creative">LOGIN</a>
+          <a href="javascript:void(0)" onclick="openModal('registerModal')" class="join-btn-creative">JOIN US</a>
           {% endif %}
         </div>
       </nav>
@@ -132,41 +141,53 @@
         <div class="footer-social">
           <div class="icons">
             <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
-            <a href="#" aria-label="Twitter"
-              ><i class="fab fa-x-twitter"></i
-            ></a>
-            <a href="#" aria-label="LinkedIn"
-              ><i class="fab fa-linkedin"></i
-            ></a>
-            <a href="#" aria-label="Instagram"
-              ><i class="fab fa-instagram"></i
-            ></a>
-            <a href="#" aria-label="WhatsApp"
-              ><i class="fab fa-whatsapp"></i
-            ></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
           </div>
         </div>
       </div>
     </footer>
 
-    {% include 'accounts/modals.html' %} {% include 'accounts/modals.html' %}
+    {% include 'accounts/modals.html' %}
 
     <script>
-      // Django variable JS file sathi global banva
       window.AUTH_STATUS = {{ user.is_authenticated|yesno:"true,false" }};
+      
+      // --- GLOBAL TOAST FUNCTION ---
+      function showToast(msg, type = "info") {
+        const container = document.getElementById("toast-container");
+        if(!container) return;
+
+        let icon = "fa-info-circle";
+        if (type.includes("success")) icon = "fa-check-circle";
+        if (type.includes("error")) icon = "fa-times-circle";
+        if (type.includes("warning")) icon = "fa-exclamation-triangle";
+
+        const toast = document.createElement("div");
+        toast.className = `toast-alert ${type}`;
+        toast.innerHTML = `<i class="fas ${icon}"></i> <span>${msg}</span>`;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.animation = "toastOut 0.5s forwards";
+          setTimeout(() => toast.remove(), 500);
+        }, 6000);
+      }
     </script>
 
     <script src="{% static 'js/global.js' %}"></script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        {% if messages %}
-            {% for message in messages %}
-                // message.tags mule 'warning', 'error', ki 'success' he showToast la samjel
-                showToast("{{ message }}", "{{ message.tags }}");
-            {% endfor %}
-        {% endif %}
-    });
-  </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          {% if messages %}
+              {% for message in messages %}
+                  showToast("{{ message }}", "{{ message.tags }}");
+              {% endfor %}
+          {% endif %}
+      });
+    </script>
   </body>
 </html>

@@ -35,7 +35,7 @@ body {
   background: rgba(255, 255, 255, 0.03);
   padding: 5px;
   border-radius: 14px;
-  display: flex;
+  display: inline;
   border: 1px solid var(--vx-border);
   max-width: 100%;
   overflow-x: auto; /* Mobile Scroll */

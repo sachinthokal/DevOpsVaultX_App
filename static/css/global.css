@@ -10,6 +10,8 @@ body {
   box-sizing: border-box;
   overflow-x: hidden;
   background-color: #fbfbfb;
+  background: linear-gradient(135deg, #0f172a 60%, #4c1d95 100%);
+
 }
 
 *, *::before, *::after {
@@ -156,7 +158,7 @@ a {
     cursor: pointer;
     padding: 2px 16px;
     border-radius: 50px;
-    background: rgba(255, 255, 255, 0.08);
+    background: linear-gradient(135deg, #00d2ff 0%, #92fe9d 100%);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 0, 0, 0.1);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -172,8 +174,24 @@ a {
 }
 
 .avatar {
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, #ff4500 0%, #ff8c00 100%); /* Orange Gradient */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    border: 2px solid #fff;
+    box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3);
+    flex-shrink: 0;
+}
+
+/* .avatar {
+    width: 34px;
+    height: 34px;
     padding: 13px;
     background: linear-gradient(135deg, #00d2ff 0%, #92fe9d 100%);
     color: #000;
@@ -182,11 +200,11 @@ a {
     align-items: center;
     justify-content: center;
     font-weight: 800;
-    font-size: 12px;
+    font-size: 15px;
     border: 2px solid #fff;
     box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
     flex-shrink: 0;
-}
+} */
 
 .profile-nav span {
     font-weight: 600;
