@@ -1,7 +1,6 @@
 /* ===== FINAL REFINED UI - NO OVERLAP STICKY ===== */
     .insights-wrapper-new {
         padding: 40px 20px;
-        background: #020617;
         min-height: 100vh;
     }
 
@@ -25,7 +24,7 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
 
-    .fixed-card { height: 550px; }
+    .fixed-card { height: 500px; }
 
     .insights-card-new h2 {
         color: white;
@@ -114,7 +113,7 @@
     }
 
     /* Offers Grid */
-    .full-width { grid-column: span 4; margin-top: 40px; }
+    .full-width { grid-column: span 4; margin-top: 40px; min-height: 200px; }
     .offers-grid-new {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -140,7 +139,52 @@
         font-weight: 800;
     }
 
-    @media (max-width: 1200px) {
-        .insights-grid-new { grid-template-columns: 1fr 1fr; }
-        .side-banner-new { display: none; }
+   /* ===== UPDATED MOBILE RESPONSIVE (SHOWING BANNERS) ===== */
+
+/* Tablet & Mobile Layout */
+@media (max-width: 1024px) {
+    .insights-grid-new {
+        grid-template-columns: 1fr; /* Mobile var ekach column */
+        gap: 20px;
+        padding: 10px;
     }
+
+    .side-banner-new {
+        display: flex; /* Hide n karta parat dakhva */
+        height: 300px; /* Mobile var height thodi kami keli jyamule screen bharun janar nahi */
+        width: 100%;
+    }
+
+    /* Order set keli: Banners Card chya var ani khali disnyasathi */
+    .side-banner-new:first-child { order: 1; } /* Pahila banner top la */
+    .insights-card-new:nth-child(2) { order: 2; }
+    .insights-card-new:nth-child(3) { order: 3; }
+    .side-banner-new:last-child { order: 4; } /* Dusra banner bottom la */
+
+    .fixed-card {
+        height: 450px; 
+    }
+
+    .full-width {
+        grid-column: span 1;
+        order: 5; /* Offers sarvat shevti */
+    }
+
+    .offers-grid-new {
+        grid-template-columns: 1fr;
+    }
+
+    .insights-wrapper-new {
+        padding: 20px 10px;
+    }
+}
+
+/* Extra small screens sathi adjustment */
+@media (max-width: 480px) {
+    .side-banner-new {
+        height: 200px; /* Agdi lahan mobile sathi banner height azun kami */
+    }
+    .insights-title {
+        font-size: 13px;
+    }
+}

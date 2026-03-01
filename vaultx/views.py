@@ -1,70 +1,111 @@
 import os
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from django.db.models import Count, Q, F
-from payments.models import Payment
+from payments.models import Payment # Tumcha model path check kara
+from django.db.models import Count, F, Q  # Q import kela aahe
 
-# ==========================================
-# VaultX Dashboard View (With File Check Fix)
-# ==========================================
 def vaultx_home(request):
-    session_id = request.session.session_key
-    session_email = request.session.get('customer_email')
-    user_email = request.user.email if request.user.is_authenticated else session_email
+    if not request.user.is_authenticated:
+        return render(request, "vaultx/dashboard.html", {"payments": [], "is_logged_in": False})
 
-    # 1. Fetch all successful payments for the user
-    payments_qs = Payment.objects.filter(
-        Q(session_id=session_id) | Q(email=user_email),
-        status="SUCCESS",
-        is_deleted_by_user=False
-    ).select_related('product').order_by('-id')
+    # 1. Purna History: Count sathi sagle यशस्वी payments ghya (Deleted pan dakhva count madhe)
+    all_successful_payments = Payment.objects.filter(
+        Q(user=request.user) | Q(email=request.user.email),
+        Q(status="SUCCESS") | Q(status="COMPLETED") | Q(amount=0)
+    )
 
-    # 2. Count how many times each product has been purchased (Renewal History)
-    purchase_counts = payments_qs.values('product_id').annotate(total=Count('id'))
+    # Product wise count kadha
+    purchase_counts = all_successful_payments.values('product_id').annotate(total=Count('id'))
     counts_dict = {item['product_id']: item['total'] for item in purchase_counts}
 
-    final_items = {}
-    unique_p_ids = payments_qs.values_list('product_id', flat=True).distinct()
+    # 2. Display Logic: Fakt te payments dakhva je user ne delete nahi kele
+    display_qs = all_successful_payments.filter(is_deleted_by_user=False).select_related('product')
 
-    for p_id in unique_p_ids:
-        # Search for an active payment (where downloads are remaining)
-        active_p = payments_qs.filter(
-            product_id=p_id, 
+    final_items = {}
+    
+    # Pratyek product sathi ek best record nivda
+    for p_id, total_count in counts_dict.items():
+        # Jar user ne sagale records delete kele astil tar to product dakhvu naka
+        active_display = display_qs.filter(product_id=p_id).order_by('-id')
+        
+        if not active_display.exists():
+            continue
+
+        # Try to find an active one (not fully used)
+        display_payment = active_display.filter(
             download_used__lt=F('download_limit'),
             is_active=True
         ).first()
 
-        # If no active payment exists, take the latest expired payment
-        display_payment = active_p if active_p else payments_qs.filter(product_id=p_id).first()
-        
-        if display_payment:
-            # --- CRITICAL FIX: File Existence Check ---
-            # Check if file path exists in DB and file exists on Disk
-            product = display_payment.product
-            if product.file and os.path.exists(product.file.path):
-                display_payment.file_exists = True
-            else:
-                display_payment.file_exists = False
-            # ------------------------------------------
+        # Jar active nasel tar latest available record ghya
+        if not display_payment:
+            display_payment = active_display.first()
 
-            # Add purchase_count data
-            display_payment.purchase_count = counts_dict.get(p_id, 1)
+        if display_payment:
+            product = display_payment.product
+            # File existence check
+            display_payment.file_exists = bool(product.file and os.path.exists(product.file.path))
+            # FIX: Purna history cha count dakhva
+            display_payment.purchase_count = total_count
             final_items[p_id] = display_payment
 
     context = {
         "payments": list(final_items.values()),
-        "customer_name": request.user.username if request.user.is_authenticated else "Premium Member",
+        "is_logged_in": True,
+        "customer_name": request.user.username,
     }
     return render(request, "vaultx/dashboard.html", context)
 
 
 # ==========================================
-# Delete Item from Vault
+# Delete Item (Security Fixed)
 # ==========================================
 def delete_vault_item(request, payment_id):
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        payment = get_object_or_404(Payment, id=payment_id)
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' and request.user.is_authenticated:
+        # Security: Fakt swatahchech payment delete karta yetil
+        payment = get_object_or_404(Payment, id=payment_id, email=request.user.email)
         payment.is_deleted_by_user = True
         payment.save()
         return JsonResponse({"status": "success"})
-    return JsonResponse({"status": "error"}, status=400)
+    
+    return JsonResponse({"status": "error", "message": "Unauthorized"}, status=400)
+
+# ==========================================
+# Receipt Download Fix
+# ==========================================
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from payments.models import Payment  
+
+@login_required
+def generate_receipt_pdf(request, order_id):
+    # Payment fetch kara
+    payment = get_object_or_404(Payment, razorpay_order_id=order_id)
+    
+    # Dynamic Product Details ghy (Jar Payment model madhe product FK asel tar)
+    product = payment.product 
+    
+    # Jar features list madhe pahije astil tar tyala split kara (समजा database madhe comma-separated aahet)
+    # Nasel tar ek default list set kara
+    features = [
+        "Lifetime Full Access to " + product.title,
+        "Premium Documentation & PDF Guides",
+        "Source Code & Project Assets",
+        "24/7 Priority Support Access",
+        "Future Updates Included"
+    ]
+
+    context = {
+        'order_id': payment.razorpay_order_id,
+        'payment_id': payment.razorpay_payment_id,
+        'product_id': payment.product_id,
+        'user_fullname': payment.customer_name or payment.user.get_full_name() or payment.user.username,
+        'user_email': payment.email or payment.user.email,
+        'purchase_date': payment.created_at.strftime("%d %b %Y"),
+        'amount': "{:.2f}".format(payment.amount / 100),
+        'product_title': product.title, # Dynamic Title
+        'product_features': features,    # Dynamic Features List
+    }
+    
+    return render(request, 'vaultx/receipt_print.html', context)
+

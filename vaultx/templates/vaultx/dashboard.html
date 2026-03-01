@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {# path: vaultx/templates/vaultx/dashboard.html #}
-{% load static %} 
+{% load static %}
 
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -31,7 +31,7 @@
     </div>
 
     <div style="display: flex; gap: 6px; flex-wrap: wrap">
-      <span class="status-badge">
+      <span class="status-badge-vaultx">
         {% if not payment.file_exists or payment.download_used >= payment.download_limit %}
             <span style="color: #ef4444;">🔒 Locked</span>
         {% else %}
@@ -39,7 +39,7 @@
         {% endif %}
       </span>
       {% if payment.purchase_count > 1 %}
-      <span class="status-badge" style="background: rgba(46, 213, 115, 0.1); color: #2ed573;">x{{ payment.purchase_count }}</span>
+      <span class="status-badge-vaultx" style="background: rgba(191, 3, 237, 0.1); color: #bf03ed;">x{{ payment.purchase_count }}</span>
       {% endif %}
     </div>
 
@@ -58,9 +58,8 @@
     </div>
 
     <div class="action-area" style="margin-top: auto">
-      
       {% if payment.download_used >= payment.download_limit %}
-        <a href="{% url 'products:detail' payment.product.id %}" class="btn-download buy-again-btn">Renew Access</a>
+        <a href="{% url 'products:details' payment.product.id %}" class="btn-download buy-again-btn">Renew Access</a>
       
       {% elif not payment.file_exists %}
         <button class="btn-download" style="background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.2); cursor: not-allowed; width: 100%;" disabled>
@@ -71,22 +70,21 @@
       {% else %}
         <button onclick="handleDownload('{{ payment.product.id }}', '{{ payment.id }}')" class="btn-download active-btn" id="btn-{{ payment.id }}">Download</button>
       {% endif %}
-
     </div>
   </div>
 
   {% empty %}
-  <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px">
-    <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">VAULT EMPTY</h2>
-    <a href="/" style="background: var(--accent); color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800;">Explore Store</a>
-  </div>
+    <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px">
+      {% if not request.user.is_authenticated %}
+        <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">UNLOCK YOUR VAULT</h2>
+        <p style="color: #94a3b8; margin-bottom: 25px;">Securely sign in to retrieve your purchased products.</p>
+        <a href="javascript:void(0)" onclick="openModal('loginModal')" style="background: #bf03ed; color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block;">Login Now</a>
+      {% else %}
+        <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">VAULT EMPTY</h2>
+        <p style="color: #94a3b8; margin-bottom: 25px;">You haven't purchased anything yet.</p>
+        <a href="/" style="background: var(--accent); color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block;">Explore Store</a>
+      {% endif %}
+    </div>
   {% endfor %}
 </div>
-<script>
-    history.pushState(null, null, location.href);
-    window.onpopstate = function () {
-        location.href = "{% url 'products:list' %}"; 
-    };
-</script>
-
 {% endblock %}

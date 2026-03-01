@@ -7,7 +7,6 @@
 }
 
 .brutalist-about {
-    background-color: var(--dark-void);
     color: #fff;
     min-height: 100vh;
     padding: 100px 20px 60px; /* Top padding thoda vadhvla nav sathi */

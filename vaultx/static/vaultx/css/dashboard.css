@@ -11,11 +11,9 @@
   }
 
   body {
-    background: var(--bg);
     color: white;
     font-family: "Inter", sans-serif;
     margin: 0;
-    background-image: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg) 80%);
   }
 
   /* Compact Grid for 50+ items */
@@ -75,8 +73,8 @@
     color: #000;
   }
 
-  .status-badge {
-    font-size: 9px;
+  .status-badge-vaultx {
+    font-size: 10px;
     text-transform: uppercase;
     color: var(--accent);
     font-weight: 800;

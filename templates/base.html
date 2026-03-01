@@ -4,45 +4,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
     <title>DevOpsVaultX | DevOps Tools, Scripts & Learning Resources</title>
-
-    <meta
-      name="description"
-      content="DevOpsVaultX provides DevOps tools, scripts, monitoring dashboards, and learning resources for DevOps engineers."
-    />
-
-    <meta
-      name="keywords"
-      content="DevOps, DevOps tools, monitoring, CI/CD, Docker, Kubernetes, DevOpsVaultX"
-    />
-
-    <meta name="author" content="DevOpsVaultX" />
-
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="{% static 'images/favicon-32x32.png' %}"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="{% static 'images/favicon-16x16.png' %}"
-    />
-
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="{% static 'images/apple-touch-icon.png' %}"
-    />
-
-    <link rel="manifest" href="{% static 'images/site.webmanifest' %}" />
-
-    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" />
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -51,14 +15,11 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}" />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="stylesheet" href="{% static 'css/global.css' %}" />
+    <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}" />
     <link rel="stylesheet" href="{% static 'pages/css/abouts.css' %}" />
     <link rel="stylesheet" href="{% static 'pages/css/contact.css' %}" />
-    <link rel="stylesheet" href="{% static 'products/css/productview.css' %}" />
-    <link rel="stylesheet" href="{% static 'products/css/download.css' %}" />
-    <link rel="stylesheet" href="{% static 'products/css/toast.css' %}" />
     <link rel="stylesheet" href="{% static 'payments/css/payments.css' %}" />
     <link rel="stylesheet" href="{% static 'db_monitor/css/db_size.css' %}" />
     <link
@@ -69,19 +30,64 @@
       rel="stylesheet"
       href="{% static 'insights/css/insights_detail.css' %}"
     />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      .global-toast-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 11000;
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 12px;
+        pointer-events: none;
+      }
+      .toast-alert {
+        pointer-events: auto;
+        min-width: 280px;
+        max-width: 380px;
+        padding: 16px 20px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        font-size: 14px;
+        border-left: 6px solid #ccc;
+        animation: toastIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      }
+      .toast-alert.success { border-left-color: #10b981; color: #064e3b; }
+      .toast-alert.error { border-left-color: #ef4444; color: #7f1d1d; }
+      .toast-alert.warning { border-left-color: #f59e0b; color: #78350f; }
+      .toast-alert.info { border-left-color: #3b82f6; color: #1e3a8a; }
+      
+      @keyframes toastIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes toastOut {
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    </style>
   </head>
 
   <body>
+    <div id="toast-container" class="global-toast-container"></div>
+
     <header class="site-navbar">
       <a href="/" aria-label="DevOpsVaultX Home">
         <div class="logo-container">
           <img
             src="{% static 'images/favicon-32x32.png' %}"
-            alt="DevOpsVaultX Logo - DevOps Tools Platform"
+            alt="DevOpsVaultX Logo"
             class="nav-logo"
             width="32"
             height="32"
-            loading="lazy"
           />
           <span class="brand-name"
             >DevOps<span style="color: orangered">VaultX</span></span
@@ -90,41 +96,34 @@
       </a>
 
       <nav class="nav-links" aria-label="Main Navigation">
-        <a
-          href="{% url 'home' %}"
-          class="{% if request.path == '/' %}active{% endif %}"
-          >HOME</a
-        >
+        <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">HOME</a>
+        <a href="{% url 'products:list' %}" class="{% if '/products/' in request.path %}active{% endif %}">PRODUCTS</a>
+        <a href="{% url 'insights:home' %}" class="{% if '/insights/' in request.path %}active{% endif %}">INSIGHTS</a>
+        <a href="{% url 'vaultx:index' %}" class="{% if 'vaultx' in request.path %}active{% endif %}">VAULTX</a>
+        <a href="{% url 'about' %}" class="{% if request.path == '/about/' %}active{% endif %}">ABOUT</a>
+        <a href="{% url 'contact' %}" class="{% if request.path == '/contact/' %}active{% endif %}">CONTACT</a>
 
-        <a
-          href="{% url 'products:list' %}"
-          class="{% if '/products/' in request.path %}active{% endif %}"
-          >PRODUCTS</a
-        >
-
-        <a
-          href="{% url 'insights:home' %}"
-          class="{% if '/insights/' in request.path %}active{% endif %}"
-          >INSIGHTS</a
-        >
-
-        <a
-          href="{% url 'vaultx:index' %}"
-          class="{% if 'vaultx' in request.path %}active{% endif %}"
-          >VAULTX</a
-        >
-
-        <a
-          href="{% url 'about' %}"
-          class="{% if request.path == '/about/' %}active{% endif %}"
-          >ABOUT</a
-        >
-
-        <a
-          href="{% url 'contact' %}"
-          class="{% if request.path == '/contact/' %}active{% endif %}"
-          >CONTACT</a
-        >
+        <div class="auth-section">
+          {% if user.is_authenticated %}
+          <div class="profile-nav" onclick="toggleDrop(event)">
+            <div class="avatar">
+              {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
+            </div>
+            <span>{{ user.first_name|upper }} {{ user.last_name|upper }}</span>
+            <div id="dropMenu" class="dropdown-content">
+              <a href="javascript:void(0)" onclick="openModal('profileModal')">
+                <i class="fas fa-user-edit"></i> Profile
+              </a>
+              <a href="{% url 'accounts:logout' %}">
+                <i class="fas fa-sign-out-alt"></i> Logout
+              </a>
+            </div>
+          </div>
+          {% else %}
+          <a href="javascript:void(0)" onclick="openModal('loginModal')" class="login-btn-creative">LOGIN</a>
+          <a href="javascript:void(0)" onclick="openModal('registerModal')" class="join-btn-creative">JOIN US</a>
+          {% endif %}
+        </div>
       </nav>
     </header>
 
@@ -135,30 +134,60 @@
         <div class="footer-brand">
           <h2>DevOps<span>VaultX</span></h2>
         </div>
-
         <div class="footer-center">
           <p class="tagline">Secure. Automate. Scale.</p>
           <p class="copyright">&copy; DevOpsVaultX 2026</p>
         </div>
-
         <div class="footer-social">
           <div class="icons">
             <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
-            <a href="#" aria-label="Twitter"
-              ><i class="fab fa-x-twitter"></i
-            ></a>
-            <a href="#" aria-label="WhatsApp"
-              ><i class="fab fa-whatsapp"></i
-            ></a>
-            <a href="#" aria-label="LinkedIn"
-              ><i class="fab fa-linkedin"></i
-            ></a>
-            <a href="#" aria-label="Instagram"
-              ><i class="fab fa-instagram"></i
-            ></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
           </div>
         </div>
       </div>
     </footer>
+
+    {% include 'accounts/modals.html' %}
+
+    <script>
+      window.AUTH_STATUS = {{ user.is_authenticated|yesno:"true,false" }};
+      
+      // --- GLOBAL TOAST FUNCTION ---
+      function showToast(msg, type = "info") {
+        const container = document.getElementById("toast-container");
+        if(!container) return;
+
+        let icon = "fa-info-circle";
+        if (type.includes("success")) icon = "fa-check-circle";
+        if (type.includes("error")) icon = "fa-times-circle";
+        if (type.includes("warning")) icon = "fa-exclamation-triangle";
+
+        const toast = document.createElement("div");
+        toast.className = `toast-alert ${type}`;
+        toast.innerHTML = `<i class="fas ${icon}"></i> <span>${msg}</span>`;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.animation = "toastOut 0.5s forwards";
+          setTimeout(() => toast.remove(), 500);
+        }, 6000);
+      }
+    </script>
+
+    <script src="{% static 'js/global.js' %}"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          {% if messages %}
+              {% for message in messages %}
+                  showToast("{{ message }}", "{{ message.tags }}");
+              {% endfor %}
+          {% endif %}
+      });
+    </script>
   </body>
 </html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice_{{ order_id }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --accent: #bf03ed;
+        --accent-soft: rgba(191, 3, 237, 0.04);
+        --text-dark: #0f172a;
+        --text-slate: #64748b;
+        --border: #f1f5f9;
+        --success: #10b981;
+      }
+
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background-color: #f4f7fa;
+        margin: 0;
+        padding: 20px;
+        color: var(--text-dark);
+        -webkit-print-color-adjust: exact;
+      }
+
+      .no-print {
+        max-width: 750px;
+        margin: 0 auto 15px;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .btn-download {
+        background: var(--text-dark);
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 10px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .invoice-wrapper {
+        max-width: 750px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .watermark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-45deg);
+        font-size: 70px;
+        font-weight: 900;
+        color: rgba(191, 3, 237, 0.03);
+        white-space: nowrap;
+        pointer-events: none;
+        z-index: 0;
+        letter-spacing: 8px;
+      }
+
+      .main-content {
+        padding: 40px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .top-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+
+      .brand-logo {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -1px;
+      }
+      .brand-logo span {
+        color: var(--accent);
+      }
+
+      .paid-badge {
+        background: #ecfdf5;
+        color: var(--success);
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 800;
+        border: 1px solid #d1fae5;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .purchase-info-card {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        background: var(--accent-soft);
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(191, 3, 237, 0.1);
+      }
+
+      .p-label {
+        font-size: 9px;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--text-slate);
+        margin-bottom: 3px;
+      }
+
+      .p-val {
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .status-active {
+        color: var(--success);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+      }
+      th {
+        text-align: left;
+        font-size: 10px;
+        color: var(--text-slate);
+        text-transform: uppercase;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f8fafc;
+      }
+      td {
+        padding: 20px 0;
+        border-bottom: 1px solid #f8fafc;
+      }
+
+      .product-title {
+        font-size: 17px;
+        font-weight: 800;
+        margin-bottom: 6px;
+      }
+      .feature-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        list-style: none;
+        padding: 0;
+      }
+      .feature-item {
+        font-size: 10px;
+        background: #ffffff;
+        border: 1px solid black;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-weight: 600;
+        color: red;
+      }
+
+      .price-display {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--accent);
+        text-align: right;
+      }
+
+      .total-box {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #1e293b;
+        padding: 25px;
+        border-radius: 18px;
+        color: white;
+      }
+
+      .total-val {
+        font-size: 30px;
+        font-weight: 800;
+      }
+
+      .qr-section {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      .qr-code {
+        background: white;
+        padding: 5px;
+        border-radius: 8px;
+        width: 65px;
+        height: 65px;
+      }
+
+      .secure-tag {
+        color: #10b981;
+        font-size: 9px;
+        font-weight: 800;
+        margin-bottom: 2px;
+      }
+
+      .invoice-footer {
+        padding: 25px 40px;
+        text-align: center;
+        font-size: 10px;
+        color: var(--text-slate);
+        border-top: 1px solid #f1f5f9;
+      }
+
+      @media print {
+        body { background: white; padding: 0; }
+        .no-print { display: none; }
+        .invoice-wrapper { 
+          box-shadow: none; 
+          border: 1px solid #eee; 
+          width: 100%; 
+          border-radius: 0;
+        }
+        @page { 
+          size: auto;   
+          margin: 10mm; 
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="no-print">
+      <button class="btn-download" onclick="window.print()">DOWNLOAD PDF</button>
+    </div>
+
+    <div class="invoice-wrapper">
+      <div class="watermark">DEVOPSVAULTX</div>
+
+      <div class="main-content">
+        <div class="top-flex">
+          <div class="brand-logo">DEVOPS<span>VAULTX</span></div>
+          <div class="paid-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            </svg>
+            PAYMENT SUCCESS
+          </div>
+        </div>
+
+        <div class="purchase-info-card">
+          <div style="grid-column: span 4; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 10px; font-weight: 800; color: var(--accent)">PURCHASE SUMMARY</span>
+            <span style="font-size: 9px; background: #ffffff; padding: 2px 6px; border-radius: 4px; font-weight: 700; border: 1px solid #e2e8f0;">ID: #{{ order_id |upper }}</span>
+          </div>
+          <div class="purchase-item">
+            <div class="p-label">PRODUCT ID</div>
+            <div class="p-val">{{ product_id}}</div>
+          </div>
+          <div class="purchase-item">
+            <div class="p-label">STATUS</div>
+            <div class="p-val status-active">ACTIVE</div>
+          </div>
+          <div class="purchase-item">
+            <div class="p-label">OWNER</div>
+            <div class="p-val">{{ user_fullname|upper }}</div>
+          </div>
+          <div class="purchase-item">
+            <div class="p-label">BOUGHT ON</div>
+            <div class="p-val">{{ purchase_date |upper }}</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
+          <div>
+            <div class="p-label">CUSTOMER DETAILS</div>
+            <div style="font-size: 16px; font-weight: 800">{{ user_fullname }}</div>
+            <div style="font-size: 13px; color: var(--text-slate)">{{ user_email }}</div>
+          </div>
+          <div style="text-align: right">
+            <div class="p-label">DATE OF ISSUE</div>
+            <div class="p-val">{{ purchase_date |upper }}</div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th width="75%">PRODUCT DESCRIPTION</th>
+              <th width="25%" style="text-align: right">PRICE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="product-title">{{ product_title |upper }}</div>
+                <div class="feature-list">
+                  {% for feature in product_features %}
+                  <span class="feature-item">{{ feature }}</span>
+                  {% empty %}
+                  <span class="feature-item">Full Access</span>
+                  <span class="feature-item">Lifetime Updates</span>
+                  {% endfor %}
+                </div>
+              </td>
+              <td class="price-display">₹ {{ amount }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="total-box">
+          <div>
+            <div style="font-size: 10px; font-weight: 700; color: #94a3b8">TOTAL PAID</div>
+            <div class="total-val">₹ {{ amount }}</div>
+          </div>
+          <div class="qr-section">
+            <div style="text-align: right">
+              <div class="secure-tag">VERIFIED RECEIPT</div>
+              <div style="font-size: 11px; font-weight: 700">SCAN TO VERIFY</div>
+              <div style="font-family: monospace; font-size: 9px; color: #94a3b8">{{ order_id }}</div>
+            </div>
+            <img class="qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://devopsvaultx.com/vaultx/receipt/{{ order_id }}" alt="Scan to Verify" />
+          </div>
+        </div>
+      </div>
+
+      <div class="invoice-footer">
+        Visit us at: <a href="https://devopsvaultx.com" style="color: var(--accent); text-decoration: none; font-weight: 700">www.devopsvaultx.com</a>
+        <br />
+        DevOpsVaultX - Empowering DevOps Engineers. <br />
+        This is a computer generated invoice and does not require a signature.
+      </div>
+    </div>
+  </body>
+</html>

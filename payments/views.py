@@ -2,7 +2,8 @@ import json
 import razorpay
 import logging
 import os
-import random
+import datetime
+import uuid
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, FileResponse, HttpResponseNotFound
@@ -26,6 +27,12 @@ client = razorpay.Client(
 # ======================
 # 1. BUY PRODUCT (Fixed: Random ID & Credit Reset)
 # ======================
+import random
+from django.urls import reverse
+from django.shortcuts import get_object_or_404, redirect, render
+from .models import Payment
+from products.models import Product
+
 def buy_product(request, pk):
     product = get_object_or_404(Product, pk=pk, is_active=True)
     
@@ -33,54 +40,64 @@ def buy_product(request, pk):
         request.session.create()
     session_id = request.session.session_key
 
-    # १. नाव/ईमेल मिळवण्याचा प्रयत्न (POST > Session)
-    customer_email = request.POST.get('email') or request.session.get('customer_email')
-    customer_name = request.POST.get('customer_name') or request.session.get('customer_name')
+    # 1. User details fix kara
+    customer_email = None
+    customer_name = None
+    current_user = None
 
-    # २. जर अजूनही नाव मिळालं नसेल (Buy Again केस), तर DB मधून मागील रेकॉर्ड शोधा
-    if not customer_name or not customer_email:
-        last_payment = Payment.objects.filter(session_id=session_id).exclude(customer_name__isnull=True).exclude(customer_name="").order_by('-created_at').first()
-        if last_payment:
-            customer_name = customer_name or last_payment.customer_name
-            customer_email = customer_email or last_payment.email
+    if request.user.is_authenticated:
+        current_user = request.user  # Ha 'user' field madhe save karaycha aahe
+        customer_email = request.user.email
+        customer_name = request.user.first_name + " " + request.user.last_name if request.user.first_name and request.user.last_name else request.user.username
+    else:
+        customer_email = request.POST.get('email') or request.session.get('customer_email')
+        customer_name = request.POST.get('customer_name') or request.session.get('customer_name')
 
-    # ३. भविष्यासाठी सेशन अपडेट करा
+    # Session data update kara
     request.session['customer_email'] = customer_email
     request.session['customer_name'] = customer_name
 
-    # रिन्यूअल तपासणी: या ईमेलवर आधी यशस्वी पेमेंट झाले आहे का?
+    # Renewal check
     is_renewal_payment = Payment.objects.filter(
         email=customer_email, 
         product=product, 
         status="SUCCESS"
     ).exists()
 
-    # ४. FREE PRODUCT LOGIC
+    # 2. FREE PRODUCT LOGIC (With User Link)
     if product.price == 0:
-        # random.randint(1000, 9999) वापरलाय जेणेकरून ID unique राहील
-        unique_order_id = f"FREE_{product.id}_{session_id[:5]}_{random.randint(1000,9999)}"
+        
+        # Current Date dynamic ghenyasathi (Format: DDMMYYYY)
+        # Example: 28022026
+        date_str = datetime.datetime.now().strftime("%d%m%Y") 
+        
+        # 1. Unique Order ID Format: ORD-FREE-28022026-XXXX
+        unique_order_id = f"ORD-FREE-{date_str}-{uuid.uuid4().hex[:8].upper()}"
+        
+        # 2. Dummy Payment ID Format: PAY-FREE-28022026-XXXXXXXXXX
+        dummy_payment_id = f"PAY-FREE-{date_str}-{uuid.uuid4().hex[:8].upper()}"
         
         Payment.objects.create(
+            user=current_user,  # ITHE USER LINK KELA AAHE
             product=product, 
             session_id=session_id,
             email=customer_email,
             customer_name=customer_name,
             razorpay_order_id=unique_order_id,
+            razorpay_payment_id=dummy_payment_id,  # Free Dummy ID
             amount=0,
-            is_renewal=is_renewal_payment, # इथे रिन्यूअल मार्क करा
+            is_renewal=is_renewal_payment,
             status="SUCCESS", 
             paid=True, 
             download_limit=5, 
-            download_used=0, # नवीन खरेदीसाठी क्रेडिट्स रिसेट
-            is_active=True    # नवीन खरेदी असल्यामुळे ऍक्टिव्ह असणे गरजेचे आहे
+            download_used=0,
+            is_active=True
         )
         request.session[f"paid_{pk}"] = True
-        # payment_result वर रिडायरेक्ट करा जेणेकरून UI आणि टोस्ट दिसेल
         return redirect(reverse("payments:payment_result", args=[pk]))
 
-    # ५. PAID PRODUCT LOGIC
+    # 3. PAID PRODUCT LOGIC (With User Link)
     amount = int(product.price * 100)
-    # Razorpay order create
     razorpay_order = client.order.create({
         "amount": amount, 
         "currency": "INR", 
@@ -88,18 +105,18 @@ def buy_product(request, pk):
         "payment_capture": 1
     })
 
-    # पेमेंट रेकॉर्ड तयार करा (Customer डेटासह)
     Payment.objects.create(
+        user=current_user,  # ITHE USER LINK KELA AAHE
         product=product, 
         session_id=session_id, 
         email=customer_email, 
         customer_name=customer_name,
         razorpay_order_id=razorpay_order["id"], 
         amount=amount,
-        is_renewal=is_renewal_payment, # इथे रिन्यूअल मार्क करा
+        is_renewal=is_renewal_payment,
         status="INIT", 
         download_limit=5, 
-        download_used=0 # सुरुवातीला ० ठेवा
+        download_used=0
     )
 
     return render(request, "payments/payment.html", {
@@ -107,7 +124,6 @@ def buy_product(request, pk):
         "amount": amount, 
         "razorpay_key_id": settings.RAZORPAY_KEY_ID,
         "razorpay_order_id": razorpay_order["id"], 
-        "is_free": False,
         "customer_email": customer_email, 
         "customer_name": customer_name,
     })
@@ -187,7 +203,7 @@ def download_file(request, pk):
         response = FileResponse(open(product.file.path, "rb"), as_attachment=True)
         response["Content-Disposition"] = f'attachment; filename="{os.path.basename(product.file.path)}"'
         return response
-    return redirect('products:detail', pk=pk)
+    return redirect('products:details', pk=pk)
 
 # ======================
 # 4. RETRY & FAILURE
