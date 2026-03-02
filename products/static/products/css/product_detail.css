@@ -109,6 +109,8 @@ body {
   transition: all 0.3s ease;
   text-transform: uppercase;
   word-spacing: 5px;
+  padding: 2px;
+  font-family:'Times New Roman', Times, serif;
 }
 
 /* --- Right Side Panel --- */
