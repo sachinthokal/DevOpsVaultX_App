@@ -2,7 +2,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}" />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
@@ -40,8 +40,8 @@
         </form>
         <div class="link-section">
             <p><a href="{% url 'accounts:password_reset' %}">Forgot Password?</a></p>
-            <p>New here? <a href="javascript:void(0)" onclick="switchModal('loginModal', 'registerModal')">Create
-                    Account</a></p>
+            <p>New here? <button href="javascript:void(0)" onclick="switchModal('loginModal', 'registerModal')">Create
+                    Account</button></p>
         </div>
     </div>
 </div>
@@ -117,15 +117,15 @@
                 <span id="timer_text" style="font-size: 14px; color: #94a3b8;">
                     Resend code in <span id="timer_count" style="color: #ff4500; font-weight: bold;">60</span>s
                 </span>
-                <a href="javascript:void(0)" id="resend_link" onclick="sendOTP(true)"
+                <button href="javascript:void(0)" id="resend_link" onclick="sendOTP(true)"
                     style="display: none; color: #ff4500; font-weight: 600; text-decoration: none; font-size: 14px;">
                     RESEND OTP
-                </a>
+            </button>
             </div>
         </div>
 
         <div class="link-section">
-            <p>Member? <a href="javascript:void(0)" onclick="switchModal('registerModal', 'loginModal')">Log In</a></p>
+            <p>Member? <button href="javascript:void(0)" onclick="switchModal('registerModal', 'loginModal')">Log In</button></p>
         </div>
     </div>
 </div>

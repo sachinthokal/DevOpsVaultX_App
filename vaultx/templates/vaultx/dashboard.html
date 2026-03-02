@@ -78,7 +78,7 @@
       {% if not request.user.is_authenticated %}
         <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">UNLOCK YOUR VAULT</h2>
         <p style="color: #94a3b8; margin-bottom: 25px;">Securely sign in to retrieve your purchased products.</p>
-        <a href="javascript:void(0)" onclick="openModal('loginModal')" style="background: #bf03ed; color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block;">Login Now</a>
+        <button href="javascript:void(0)" onclick="openModal('loginModal')" style="background: #bf03ed; color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block;">Login Now</button>
       {% else %}
         <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">VAULT EMPTY</h2>
         <p style="color: #94a3b8; margin-bottom: 25px;">You haven't purchased anything yet.</p>
