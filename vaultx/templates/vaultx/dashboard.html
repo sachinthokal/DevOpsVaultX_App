@@ -19,13 +19,21 @@
   <div class="asset-card" id="card-{{ payment.id }}">
     
     <div class="top-actions">
-      <button class="action-circle btn-history" 
-              onclick="showHistory('{{ payment.razorpay_order_id }}', '{{ payment.created_at|date:'d M Y' }}', '{{ payment.updated_at|date:'d M Y' }}', '{{ payment.download_used }}', '{{ payment.purchase_count|default:1 }}','{{ request.user.get_full_name|default:request.user.username|default:'New User' }}', '{{ request.user.email|default:'Not Linked' }}')" 
+      <button class="action-circle btn-history history-trigger" 
+              data-order-id="{{ payment.razorpay_order_id }}" 
+              data-purchase-date="{{ payment.created_at|date:'d M Y' }}" 
+              data-last-download="{{ payment.updated_at|date:'d M Y' }}" 
+              data-used="{{ payment.download_used }}" 
+              data-count="{{ payment.purchase_count|default:1 }}"
+              data-user="{{ request.user.get_full_name|default:request.user.username|default:'New User' }}" 
+              data-email="{{ request.user.email|default:'Not Linked' }}"
               title="History">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
       </button>
       
-      <button class="action-circle btn-delete" onclick="removeItem('{{ payment.id }}')" title="Remove">
+      <button class="action-circle btn-delete remove-trigger" 
+              data-payment-id="{{ payment.id }}" 
+              title="Remove">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
     </div>
@@ -68,7 +76,10 @@
         <p style="font-size: 10px; color: #ff4757; text-align: center; margin-top: 5px; font-weight: 800; letter-spacing: 0.5px;">FILE REMOVED FROM DATABASE</p>
       
       {% else %}
-        <button onclick="handleDownload('{{ payment.product.id }}', '{{ payment.id }}')" class="btn-download active-btn" id="btn-{{ payment.id }}">Download</button>
+        <button class="btn-download active-btn download-trigger" 
+                id="btn-{{ payment.id }}"
+                data-product-id="{{ payment.product.id }}" 
+                data-payment-id="{{ payment.id }}">Download</button>
       {% endif %}
     </div>
   </div>
@@ -77,11 +88,9 @@
     <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px">
       {% if not request.user.is_authenticated %}
         <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">UNLOCK YOUR VAULT</h2>
-        <p style="color: #94a3b8; margin-bottom: 25px;">Securely sign in to retrieve your purchased products.</p>
-        <a href="javascript:void(0)" onclick="openModal('loginModal')" style="background: #bf03ed; color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block;">Login Now</a>
+        <button class="login-modal-trigger" style="background: #bf03ed; color: white; padding: 15px 40px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer;">Login Now</button>
       {% else %}
         <h2 style="color: #64748b; font-size: 1.8rem; font-weight: 800">VAULT EMPTY</h2>
-        <p style="color: #94a3b8; margin-bottom: 25px;">You haven't purchased anything yet.</p>
         <a href="/" style="background: var(--accent); color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block;">Explore Store</a>
       {% endif %}
     </div>

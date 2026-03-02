@@ -44,6 +44,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://www.devopsvaultx.com",
 ]
 
+
 # ==================================================
 # SECURITY CONFIGURATION
 # ==================================================

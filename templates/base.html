@@ -6,34 +6,34 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>DevOpsVaultX | DevOps Tools, Scripts & Learning Resources</title>
+    <meta name="description" content="Explore DevOpsVaultX for expert DevOps tools, automation scripts, and comprehensive learning resources. Master CI/CD, cloud infrastructure, and modern practices.">
     <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="{% static 'css/global.css' %}" />
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}" />
     <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}" />
-    <link rel="stylesheet" href="{% static 'pages/css/abouts.css' %}" />
-    <link rel="stylesheet" href="{% static 'pages/css/contact.css' %}" />
-    <link rel="stylesheet" href="{% static 'payments/css/payments.css' %}" />
-    <link rel="stylesheet" href="{% static 'db_monitor/css/db_size.css' %}" />
-    <link
-      rel="stylesheet"
-      href="{% static 'insights/css/insights_home.css' %}"
-    />
-    <link
-      rel="stylesheet"
-      href="{% static 'insights/css/insights_detail.css' %}"
-    />
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{% static 'pages/css/abouts.css' %}" media="print" onload="this.media='all'"/>
+    <link rel="stylesheet" href="{% static 'pages/css/contact.css' %}" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="{% static 'payments/css/payments.css' %}" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="{% static 'db_monitor/css/db_size.css' %}" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="{% static 'insights/css/insights_home.css' %}" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="{% static 'insights/css/insights_detail.css' %}" media="print" onload="this.media='all'" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 
     <style>
+      /* Font Display Swap (Fixes Font-display Lighthouse error) */
+      @font-face {
+        font-family: 'Poppins';
+        font-display: swap;
+      }
+
       .global-toast-container {
         position: fixed;
         bottom: 24px;
@@ -90,7 +90,7 @@
             height="32"
           />
           <span class="brand-name"
-            >DevOps<span style="color: orangered">VaultX</span></span
+            >DevOps<span style="color: #E63E00">VaultX</span></span
           >
         </div>
       </a>
@@ -120,8 +120,8 @@
             </div>
           </div>
           {% else %}
-          <a href="javascript:void(0)" onclick="openModal('loginModal')" class="login-btn-creative">LOGIN</a>
-          <a href="javascript:void(0)" onclick="openModal('registerModal')" class="join-btn-creative">JOIN US</a>
+          <button href="javascript:void(0)" onclick="openModal('loginModal')" class="login-btn-creative">LOGIN</button>
+          <button href="javascript:void(0)" onclick="openModal('registerModal')" class="join-btn-creative">JOIN US</button>
           {% endif %}
         </div>
       </nav>

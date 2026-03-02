@@ -24,8 +24,8 @@ document.addEventListener("DOMContentLoaded", function () {
             razorpay_order_id: o_id || "FREE_ORDER",
             razorpay_signature: s_id || "FREE_SIGNATURE",
             csrfmiddlewaretoken: config.csrfToken,
-            customer_name: config.customerName || "{{ user.username }}",
-            email: config.customerEmail || "{{ user.email }}",
+            customer_name: config.customerName, 
+            email: config.customerEmail, 
         };
 
         Object.entries(fields).forEach(([name, value]) => {

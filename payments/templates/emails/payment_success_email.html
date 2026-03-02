@@ -1,43 +1,113 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        .email-card { font-family: 'Arial', sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 30px; text-align: center; }
-        .body { padding: 30px; line-height: 1.6; color: #333; }
-        .product-name { color: #1e3c72; font-weight: bold; font-size: 18px; }
-        .highlight-box { background: #f0f7ff; border-left: 5px solid #2a5298; padding: 15px; margin: 20px 0; border-radius: 4px; }
-        .footer { background: #f9f9f9; padding: 20px; text-align: center; font-size: 12px; color: #777; }
-        .btn { background: #28a745; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 20px; font-weight: bold; }
-        a { color: white !important; } /* Link color fix */
+        body { margin: 0; padding: 0; background-color: #f8fafc; -webkit-font-smoothing: antialiased; }
+        .wrapper { width: 100%; table-layout: fixed; background-color: #f8fafc; padding-bottom: 40px; }
+        .email-card { 
+            max-width: 600px; 
+            margin: 40px auto; 
+            background: #ffffff; 
+            border-radius: 24px; 
+            overflow: hidden; 
+            border: 1px solid #e2e8f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+        }
+        .header { 
+            background: #ffffff; 
+            padding: 40px 40px 20px 40px; 
+            text-align: left; 
+        }
+        .logo-text {
+            font-size: 22px;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -1px;
+        }
+        .logo-dot { color: #6366f1; }
+        
+        .body { padding: 0 40px 40px 40px; }
+        .status-badge {
+            display: inline-block;
+            background: #ecfdf5;
+            color: #059669;
+            padding: 6px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        h2 { color: #0f172a; font-size: 24px; font-weight: 700; margin: 0 0 15px 0; }
+        p { color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0; }
+        
+        .product-card {
+            background: #f1f5f9;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+            border: 1px dashed #cbd5e1;
+        }
+        .label { color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; display: block; }
+        .product-title { color: #0f172a; font-size: 18px; font-weight: 700; }
+        
+        .btn {
+            display: block;
+            background: #0f172a;
+            color: #ffffff !important;
+            text-align: center;
+            padding: 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .info-grid {
+            border-top: 1px solid #f1f5f9;
+            margin-top: 30px;
+            padding-top: 30px;
+            font-size: 14px;
+            color: #64748b;
+        }
+        .footer {
+            text-align: center;
+            padding: 0 40px 40px 40px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .footer a { color: #6366f1; text-decoration: none; }
     </style>
 </head>
 <body>
-    <div class="email-card">
-        <div class="header">
-            <h1 style="color: white; margin: 0;">Payment Successful! 🚀</h1>
-        </div>
-        <div class="body">
-            <p>Hi <strong>{{ customer_name }}</strong>,</p>
+    <div class="wrapper">
+        <div class="email-card">
+            <div class="header">
+                <div class="logo-text">DevOps<span style="color: red;">VaultX</span></div>
+            </div>
             
-            <p>Thank you for choosing <strong>DevOpsVaultX</strong>! Your payment for the following product has been confirmed:</p>
-            <p class="product-name">{{ product_title }}</p>
+            <div class="body">
+                <div class="status-badge">PAYMENT VERIFIED</div>
+                <h2>Your order is confirmed.</h2>
+                <p>Hi {{ customer_name }}, thanks for your purchase! We've added the following resource to your account.</p>
+                
+                <div class="product-card">
+                    <span class="label">Purchased Resource</span>
+                    <div class="product-title">{{ product_title | upper }}</div>
+                </div>
 
-            <div class="highlight-box">
-                <strong>💡 Important Download Information:</strong><br>
-                You can download this file up to <strong>5 times</strong> without any extra charges. Once you reach this limit, you will need to re-purchase the access to continue.
+                <a href="https://devopsvaultx.com/vaultx/" class="btn">Go to Dashboard</a>
+
+                <div class="info-grid">
+                    <strong>Note:</strong> You have 5 download attempts for this resource.<br>We recommend saving it to your local machine or cloud drive.
+                </div>
             </div>
 
-            <p>Click the button below to access your vault and start your download:</p>
-            <div style="text-align: center;">
-                <a href="https://devopsvaultx.com/vault/" class="btn">Go to My Vault</a>
+            <div class="footer">
+                <p>Questions? Visit our <a href="https://devopsvaultx.com/contact/">Support Center</a>.</p>
+                <p>&copy; 2026 DevOpsVaultX. All rights reserved.</p>
             </div>
-
-            <p style="margin-top: 25px;">If you face any issues, feel free to contact our support team at support@devopsvaultx.com.</p>
-        </div>
-        <div class="footer">
-            &copy; 2026 <strong>DevOpsVaultX</strong>. All rights reserved.<br>
-            Empowering DevOps Engineers with Premium Resources.
         </div>
     </div>
 </body>

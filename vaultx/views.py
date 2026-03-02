@@ -1,8 +1,10 @@
 import os
-from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
+from django.shortcuts import redirect, render, get_object_or_404
+from django.http import FileResponse, HttpResponseForbidden, JsonResponse
 from payments.models import Payment # Tumcha model path check kara
-from django.db.models import Count, F, Q  # Q import kela aahe
+from django.db.models import Count, F, Q
+
+from products.models import Product  # Q import kela aahe
 
 def vaultx_home(request):
     if not request.user.is_authenticated:
@@ -109,3 +111,43 @@ def generate_receipt_pdf(request, order_id):
     
     return render(request, 'vaultx/receipt_print.html', context)
 
+# ======================
+# 3. SECURE DOWNLOAD (Credit Logic)
+# ======================
+def download_file(request, product_id, payment_id):
+    # १. फाईल आणि पेमेंट रेकॉर्ड मिळवा
+    product = get_object_or_404(Product, pk=product_id)
+    payment = get_object_or_404(Payment, id=payment_id, email=request.user.email)
+
+    is_forcing = request.GET.get('force_download') == '1'
+
+    # २. AJAX Request: क्रेडिट चेक आणि वजावट
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' and not is_forcing:
+        
+        # क्रेडिट शिल्लक आहे का ते तपासा
+        if payment.download_used >= payment.download_limit:
+            return JsonResponse({"status": "error", "message": "Download limit reached for this purchase."}, status=400)
+
+        if not product.file or not os.path.exists(product.file.path):
+            return JsonResponse({"status": "error", "message": "File not found on server."}, status=404)
+
+        # क्रेडिट कमी करा
+        payment.download_used += 1
+        if payment.download_used >= payment.download_limit:
+            payment.is_active = False
+        payment.save()
+
+        # परतीची URL (ह्याच फंक्शनला पुन्हा कॉल करेल पण force_download=1 सह)
+        download_url = f"/vaultx/download/{product_id}/{payment_id}/?force_download=1"
+        return JsonResponse({"status": "success", "download_url": download_url})
+
+    # ३. प्रत्यक्ष फाईल डाउनलोड (जेव्हा force_download=1 असेल)
+    if is_forcing:
+        try:
+            response = FileResponse(open(product.file.path, "rb"), as_attachment=True)
+            response["Content-Disposition"] = f'attachment; filename="{os.path.basename(product.file.path)}"'
+            return response
+        except Exception as e:
+            return HttpResponseForbidden("File access error")
+
+    return redirect('vaultx:index')

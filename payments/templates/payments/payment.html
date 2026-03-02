@@ -83,6 +83,8 @@
       "razorpayKeyId": "{{ razorpay_key_id }}",
       "amount": "{{ amount }}",
       "productTitle": "{{ product.title }}",
+      "customerName": "{{ request.user.username|default:'Developer' }}",
+      "customerEmail": "{{ request.user.email|default:'' }}",
       "successUrl": "{% url 'payments:payment_success' product.id %}"
   }
 </script>
