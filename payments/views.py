@@ -3,6 +3,7 @@ import razorpay
 import logging
 import os
 import datetime
+import threading
 import uuid
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
@@ -166,44 +167,17 @@ def payment_success(request, pk):
         payment.save()
         return redirect(reverse("payments:payment_result", args=[pk]))
 
+    # EMAIL CALL FIX
     if c_email:
-        send_payment_success_email(c_email, product.title, c_name)
+        # Threading vapra jevane page fast reload hoil
+        threading.Thread(
+            target=send_payment_success_email, 
+            args=(c_email, product.title, c_name)
+        ).start()
 
     request.session[f"paid_{pk}"] = True
     return redirect(reverse("payments:payment_result", args=[pk]))
 
-# ======================
-# 3. SECURE DOWNLOAD (Credit Logic)
-# ======================
-def download_file(request, pk):
-    session_id = request.session.session_key
-    session_email = request.session.get('customer_email')
-    user_email = request.user.email if request.user.is_authenticated else None
-    
-    search_query = Q(session_id=session_id)
-    if session_email: search_query |= Q(email=session_email)
-    if user_email: search_query |= Q(email=user_email)
-
-    is_forcing = request.GET.get('force_download') == '1'
-
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest' and not is_forcing:
-        payment = Payment.objects.filter(search_query, product_id=pk, status="SUCCESS", is_active=True, download_used__lt=F('download_limit')).order_by('-created_at').first()
-        if not payment:
-            return JsonResponse({"status": "error", "message": "Limit Exceeded"}, status=400)
-
-        payment.download_used += 1
-        if payment.download_used >= payment.download_limit: payment.is_active = False
-        payment.save()
-        return JsonResponse({"status": "success", "download_url": f"/products/{pk}/download/?force_download=1"})
-
-    if is_forcing:
-        if not Payment.objects.filter(search_query, product_id=pk, status="SUCCESS").exists():
-            return HttpResponseForbidden()
-        product = get_object_or_404(Product, pk=pk)
-        response = FileResponse(open(product.file.path, "rb"), as_attachment=True)
-        response["Content-Disposition"] = f'attachment; filename="{os.path.basename(product.file.path)}"'
-        return response
-    return redirect('products:details', pk=pk)
 
 # ======================
 # 4. RETRY & FAILURE
@@ -237,6 +211,7 @@ def razorpay_webhook(request):
 def payment_result(request, pk):
     product = get_object_or_404(Product, pk=pk)
     db_paid = Payment.objects.filter(product=product, session_id=request.session.session_key, status="SUCCESS").exists()
+    logger.info("Payment Result: " + ("success" if db_paid else "failed"))
     return render(request, "payments/payment_result.html", {"status": "success" if db_paid else "failed", "product": product, "is_free": product.price == 0})
 
 # ======================
@@ -250,6 +225,7 @@ def send_otp(request):
             otp = str(random.randint(100000, 999999))
             cache.set(f"otp_{email}", otp, timeout=300)
             send_mail(f"DEVOPSVAULTX - VERIFICATION CODE : {otp}", f"Your OTP is {otp}", settings.EMAIL_HOST_USER, [email], html_message=render_to_string('emails/otp_email.html', {'otp': otp}))
+            logger.info(f"OTP SENT TO: {email}")
             return JsonResponse({"status": "success"})
         except Exception as e: return JsonResponse({"status": "error", "message": str(e)}, status=500)
     return HttpResponseForbidden()
@@ -264,6 +240,7 @@ def verify_otp(request):
                 old_p = Payment.objects.filter(session_id=request.session.session_key, status="SUCCESS").first()
                 Payment.objects.filter(session_id=request.session.session_key, status="SUCCESS").update(old_email=old_p.email if old_p else "", email=email, email_updated=True, email_otp_verified=True)
                 request.session['customer_email'] = email
+            logger.info(f"OTP VERIFIED: {email}")
             return JsonResponse({"status": "success"})
         return JsonResponse({"status": "error"}, status=400)
     return HttpResponseForbidden()
@@ -273,8 +250,30 @@ def verify_otp(request):
 # ======================
 def send_payment_success_email(u_email, p_title, c_name):
     try:
-        html = render_to_string('emails/payment_success_email.html', {'product_title': p_title, 'customer_name': c_name or "Developer"})
-        msg = EmailMultiAlternatives(f'Confirmed: {p_title}', strip_tags(html), settings.EMAIL_HOST_USER, [u_email])
-        msg.attach_alternative(html, "text/html")
-        msg.send()
-    except Exception as e: logger.error(e)
+        # 1. Context data prepare kara
+        context = {
+            'product_title': p_title, 
+            'customer_name': c_name or "Developer"
+        }
+        
+        # 2. HTML render kara
+        html_content = render_to_string('emails/payment_success_email.html', context)
+        text_content = strip_tags(html_content) # Plain text fallback sathi
+        
+        # 3. Email Object banva
+        subject = f"Order Confirmed! {p_title} has been added to your vault 🔐"
+        msg = EmailMultiAlternatives(
+            subject=subject,
+            body=text_content,
+            from_email=settings.EMAIL_HOST_USER,
+            to=[u_email]
+        )
+        
+        # 4. HTML version attach kara
+        msg.attach_alternative(html_content, "text/html")
+        
+        # 5. Send (fail_silently=False mule error samajto)
+        msg.send(fail_silently=False)
+        logger.info(f"SUCCESS: Email sent to {u_email} for {p_title}")
+    except Exception as e:
+        logger.error(f"Email Error for {u_email}: {str(e)}")

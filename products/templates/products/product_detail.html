@@ -13,9 +13,7 @@
 
         <div class="img-wrap">
             {% if product.image %}
-                <img src="{% if 'http' in product.image.name %}{{ product.image.name }}{% else %}{{ product.image.url }}{% endif %}" 
-                class="liquid-img" 
-                alt="Product">
+               <img src="{% if ':/' in product.image.name %}{{ product.image.name }}{% else %}{{ product.image.url }}{% endif %}" class="liquid-img" alt="Product">
             {% else %}
                 <i class="fas fa-cube fa-6x" style="opacity: 0.1;"></i>
             {% endif %}
