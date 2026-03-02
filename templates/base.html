@@ -111,12 +111,12 @@
             </div>
             <span>{{ user.first_name|upper }} {{ user.last_name|upper }}</span>
             <div id="dropMenu" class="dropdown-content">
-              <button href="javascript:void(0)" onclick="openModal('profileModal')">
+              <a href="javascript:void(0)" onclick="openModal('profileModal')">
                 <i class="fas fa-user-edit"></i> Profile
-              </button>
-              <button href="{% url 'accounts:logout' %}">
+              </a>
+              <a href="{% url 'accounts:logout' %}">
                 <i class="fas fa-sign-out-alt"></i> Logout
-              </button>
+              </a>
             </div>
           </div>
           {% else %}
