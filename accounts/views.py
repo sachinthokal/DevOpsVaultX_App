@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.mail import EmailMultiAlternatives
+from dashboard.models import SystemLog
 
 # Logger initialization to match your middleware audit logs
 logger = logging.getLogger("request.audit")
@@ -32,6 +33,12 @@ def login_view(request):
             login(request, user)
             full_name = f"{user.first_name} {user.last_name}".strip()
             display_name = full_name if full_name else u
+            # --- STEP 2: LOG ADDED ---
+            SystemLog.objects.create(
+                message=f"Access Granted: User @{u} logged into terminal",
+                log_type="User"
+            )
+            # -------------------------
             messages.success(request, f"Welcome back, {display_name.title()}! 🤗✨")
             
             # Log successful login
@@ -43,6 +50,12 @@ def login_view(request):
             
             return redirect(request.META.get('HTTP_REFERER', 'home'))
         else:
+            # --- STEP 2: FAILED LOG ---
+            SystemLog.objects.create(
+                message=f"Security Alert: Failed login attempt for @{u}",
+                log_type="Error"
+            )
+            # -------------------------
             messages.error(request, "Invalid username or password.")
             # Log failed login attempt
             logger.warning(f"Failed login attempt for username: {u}")
@@ -52,6 +65,12 @@ def login_view(request):
 def logout_view(request):
     """ User logout """
     user_log = request.user.username if request.user.is_authenticated else "Anonymous"
+    # --- STEP 2: LOG ADDED ---
+    SystemLog.objects.create(
+        message=f"Session Terminated: User @{user_log} logged out",
+        log_type="User"
+    )
+    # -------------------------
     logout(request)
     logger.info(f"User logged out: {user_log}")
     messages.info(request, "Successfully logged out. See you soon!")
@@ -83,6 +102,12 @@ def update_profile(request):
                 login(request, user)
                 
             logger.info(f"Profile updated for user: {old_username}")
+            # --- STEP 2: PROFILE LOG ---
+            SystemLog.objects.create(
+                message=f"Profile Updated: Profile modified for @{old_username}",
+                log_type="User"
+            )
+            # ---------------------------
             messages.success(request, "Profile updated successfully!")
         except Exception as e:
             logger.error(f"Profile update failed for {request.user.username}: {str(e)}")
@@ -222,6 +247,12 @@ def verify_otp_and_register(request):
             )
             
             login(request, user)
+            # --- STEP 2: NEW REGISTRATION LOG ---
+            SystemLog.objects.create(
+                message=f"New Profile Initialized: User @{user.username} joined DevOpsVaultX",
+                log_type="User"
+            )
+            # ------------------------------------
             logger.info(f"New user registered and verified: {user.username}")
             messages.success(request, f"Welcome to DevOpsVaultX, {user.username}!")
 

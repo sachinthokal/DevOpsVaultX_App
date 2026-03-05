@@ -18,6 +18,7 @@ from django.utils.html import strip_tags
 from products.models import Product
 from django.core.cache import cache
 from .models import Payment
+from dashboard.models import SystemLog
 
 # Logger and Razorpay Client Setup
 logger = logging.getLogger(__name__)
@@ -161,10 +162,29 @@ def payment_success(request, pk):
         if not payment.customer_name: payment.customer_name = c_name
         if not payment.email: payment.email = c_email
         payment.save()
+
+        # ==========================================
+        # DYNAMIC LOG START: PAYMENT SUCCESS
+        # ==========================================
+        SystemLog.objects.create(
+            message=f"Payment SUCCESS: ₹{payment.amount} received from {c_name} for {product.title}",
+            log_type="Payment"
+        )
+        # ==========================================
         
     except razorpay.errors.SignatureVerificationError:
         payment.status = "FAILED"
         payment.save()
+
+        # ==========================================
+        # DYNAMIC LOG: SIGNATURE FAILED
+        # ==========================================
+        SystemLog.objects.create(
+            message=f"Critical: Signature mismatch for Order #{razorpay_order_id}",
+            log_type="Error"
+        )
+        # ==========================================
+
         return redirect(reverse("payments:payment_result", args=[pk]))
 
     # EMAIL CALL FIX
@@ -186,10 +206,20 @@ def payment_success(request, pk):
 def payment_failed(request):
     order_id = request.POST.get("order_id")
     Payment.objects.filter(razorpay_order_id=order_id).update(status="FAILED")
+    # DYNAMIC LOG: PAYMENT FAILED
+    SystemLog.objects.create(
+        message=f"Transaction Failed: Order ID #{order_id} was unsuccessful",
+        log_type="Error"
+    )
     return JsonResponse({"retry": True}, status=402)
 
 def retry_payment(request, order_id):
     old = get_object_or_404(Payment, razorpay_order_id=order_id, status="FAILED")
+    # DYNAMIC LOG: RETRY ATTEMPT
+    SystemLog.objects.create(
+        message=f"Retry Initiated: User attempting payment again for {old.product.title}",
+        log_type="System"
+    )
     new_order = client.order.create({"amount": old.amount, "currency": "INR", "receipt": f"retry_{old.product.id}", "payment_capture": 1})
     Payment.objects.create(product=old.product, session_id=request.session.session_key, razorpay_order_id=new_order["id"], amount=old.amount, status="INIT", email=old.email, customer_name=old.customer_name)
     return render(request, "payments/payment.html", {"product": old.product, "amount": old.amount, "razorpay_key_id": settings.RAZORPAY_KEY_ID, "razorpay_order_id": new_order["id"]})

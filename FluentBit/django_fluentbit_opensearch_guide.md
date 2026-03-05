@@ -118,11 +118,6 @@ LOGGING = {
             "level": "INFO",
             "propagate": False,
         },
-        "db_monitor": {
-            "handlers": ["file_info", "file_error", "console"],
-            "level": "INFO",
-            "propagate": False,
-        },
         "pages": {
             "handlers": ["file_info", "file_error", "console"],
             "level": "INFO",

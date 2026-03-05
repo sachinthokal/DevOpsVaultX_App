@@ -9,7 +9,9 @@ from django.urls import re_path # Navin import
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path('owner-dashboard/', admin.site.urls),
+    path('admin-dashboard/', admin.site.urls),
+    path('owner-dashboard/', include('dashboard.urls')),
+
 
     # App URLs
     path('', include('pages.urls')),
