@@ -130,8 +130,8 @@ def contact(request):
             email_msg.send()
             
             logger.info(f"Email sent successfully from {email}")
-            messages.success(request, "✅️ Email Sent !! Expect an email response from our support engineers within 24 hours.",extra_tags='contact_msg')
-
+            messages.success(request, "✅️ Email Sent !! Expect an email response within 24 hours.",extra_tags='contact_msg')
+            # messages.success(request, "✅️ Email Sent !!",extra_tags='email_sent')
         except Exception as e:
             # Middleware extra data capture karel
             logger.error(f"Critical SMTP Error: {str(e)}", extra={

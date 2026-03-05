@@ -92,9 +92,9 @@ INSTALLED_APPS = [
     # Custom apps
     'accounts',
     'products',
+    'dashboard',
     'pages',
     'payments',
-    'db_monitor',
     'insights',
     'vaultx',
 ]

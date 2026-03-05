@@ -1,0 +1,318 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevOpsVaultX | Command Center v2.0</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css" />
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      :root {
+        --bg-deep: #0b0e14;
+        --panel-bg: #161b22;
+        --border-clr: #30363d;
+        --accent: #58a6ff;
+        --success: #238636;
+        --terminal-green: #3fb950;
+      }
+
+      body {
+        background-color: var(--bg-deep);
+        color: #c9d1d9;
+        font-family: "Inter", -apple-system, sans-serif;
+        margin: 0;
+        padding-bottom: 30px;
+        overflow-x: hidden;
+      }
+
+      .main-container { padding: 15px; max-width: 1600px; margin: auto; }
+
+      .glass-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-clr);
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        height: 100%;
+      }
+
+      .top-nav {
+        background: #11141a;
+        border-bottom: 1px solid var(--border-clr);
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .filter-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+      .filter-pill {
+        background: #21262d;
+        border: 1px solid var(--border-clr);
+        color: #c9d1d9;
+        padding: 6px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        font-weight: 600;
+        transition: 0.2s;
+      }
+      .filter-pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+      .date-input {
+        background: #0d1117 !important;
+        border: 1px solid var(--border-clr) !important;
+        color: var(--accent) !important;
+        font-size: 0.75rem;
+        padding: 6px 12px;
+        border-radius: 6px;
+        width: 220px;
+      }
+
+      .stat-box { padding: 15px; text-align: center; }
+      .stat-value { font-size: 30px; font-weight: 800; color: var(--accent); display: block; }
+      .stat-label { font-size: medium; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; }
+
+      .chart-container { height: 320px; padding: 15px; }
+      
+      /* Terminal Fix for TV */
+      .terminal-container {
+        height: 320px;
+        background: #010409 !important;
+        border: 1px solid var(--success) !important;
+        font-family: "Fira Code", monospace;
+        padding: 10px;
+        overflow: hidden; /* बाहेरील स्क्रोल बंद */
+        color: var(--terminal-green);
+        display: flex;
+        flex-direction: column;
+      }
+
+      #dynamic-logs {
+        flex-grow: 1;
+        overflow-y: auto; /* आतील स्क्रोल चालू */
+        padding-right: 5px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--success) transparent;
+      }
+
+      .modal-content { background: var(--panel-bg); border: 1px solid var(--accent); border-radius: 12px; }
+      .modal-header { border-bottom: 1px solid var(--border-clr); }
+      .diag-box {
+        background: #0d1117;
+        border-radius: 8px;
+        padding: 15px;
+        font-family: monospace;
+        font-size: 0.85rem;
+        color: #79c0ff;
+        border: 1px solid #30363d;
+      }
+
+      ::-webkit-scrollbar { width: 4px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: var(--success); border-radius: 10px; }
+
+      /* System Status Styles */
+      .centered-stat { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 15px !important; min-height: 125px; }
+      .neural-monitor { padding: 12px; background: rgba(10, 15, 25, 0.9) !important; border: 1px solid rgba(255, 255, 255, 0.05); min-height: 125px; }
+      .neural-grid { display: flex; flex-direction: column; gap: 6px; }
+      .chip-inline-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+      .neural-chip { border-radius: 6px; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.3s ease; }
+      .success-border { border-left: 3px solid #00ff88 !important; background: linear-gradient(90deg, rgba(0, 255, 136, 0.08) 0%, transparent 100%) !important; }
+      .success-border .chip-val { color: #00ff88; }
+      .error-border { border-left: 3px solid #ff4444 !important; }
+      .error-border .chip-val { color: #ff4444; }
+      .warning-border { border-left: 3px solid #ffbb00 !important; }
+      .warning-border .chip-val { color: #ffbb00; }
+      .chip-val { font-size: 1rem; font-weight: 800; font-family: "JetBrains Mono", monospace; }
+      .pulse-dot { height: 5px; width: 5px; border-radius: 50%; animation: pulse 2s infinite; background: #00ff88; display: inline-block; }
+      @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+      @media (max-width: 768px) {
+        .chart-container, .terminal-container { height: 280px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="top-nav">
+      <div class="brand">
+        <h5 class="m-0 fw-bold"><span style="color: var(--accent)">DVX</span> COMMAND CENTER</h5>
+      </div>
+      <div class="filter-group">
+        <div class="filter-pill {% if selected_range == '1hr' %}active{% endif %}" onclick="applyFilter('1hr')">1H</div>
+        <div class="filter-pill {% if selected_range == '6hr' %}active{% endif %}" onclick="applyFilter('6hr')">6H</div>
+        <div class="filter-pill {% if selected_range == '1day' %}active{% endif %}" onclick="applyFilter('1day')">24H</div>
+        <div class="filter-pill {% if selected_range == '7days' or not selected_range %}active{% endif %}" onclick="applyFilter('7days')">7D</div>
+        <input type="text" id="rangePicker" class="date-input" name="range" autocomplete="off" placeholder="Select Custom Range" />
+        <button class="btn btn-sm btn-primary px-3 fw-bold" style="font-size: 0.75rem" onclick="location.reload()">SYNC</button>
+      </div>
+    </nav>
+
+    <div class="main-container">
+      <div class="row g-3 mb-3">
+        <div class="col-6 col-md-3">
+          <div class="glass-card stat-box centered-stat">
+            <span class="stat-label">REVENUE_QUOTA</span>
+            <span class="stat-value">₹{{total_sales}}</span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="glass-card stat-box centered-stat">
+            <span class="stat-label">TRANSACTION_NODES</span>
+            <span class="stat-value text-success">{{total_orders}}</span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="glass-card stat-box centered-stat">
+            <span class="stat-label">USER_IDENTITY_POOL</span>
+            <span class="stat-value text-info">{{total_users}}</span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="glass-card stat-box neural-monitor">
+            <span class="stat-label mb-2 d-block text-center">SYSTEM_STATUS</span>
+            <div class="neural-grid">
+              <div class="neural-chip success-border">
+                <div class="chip-inline-row">
+                  <div class="chip-header"><span class="pulse-dot"></span> <small>SUCCESS_NODES</small></div>
+                  <div class="chip-body"><span class="chip-val" style="font-size: large;">{{ lifetime_success }}</span><span class="unit" style="font-size: x-small;">OK</span></div>
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <div class="neural-chip error-border flex-fill">
+                  <div class="chip-body text-center"><small class="d-block">ERR</small><span class="chip-val mini">{{ lifetime_failed }}</span></div>
+                </div>
+                <div class="neural-chip warning-border flex-fill">
+                  <div class="chip-body text-center"><small class="d-block">INIT</small><span class="chip-val mini">{{ lifetime_pending }}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-6 col-md-3">
+            <div class="glass-card stat-box"><span class="stat-label">PERIODIC_REVENUE</span><span class="stat-value">₹{{periodic_sales}}</span></div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card stat-box"><span class="stat-label">PERIODIC_ORDERS</span><span class="stat-value text-success">{{periodic_orders}}</span></div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card stat-box"><span class="stat-label">PERIODIC_USERS</span><span class="stat-value text-info">{{periodic_users}}</span></div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card stat-box"><span class="stat-label">PROTOCOL</span><span class="stat-value text-white">SECURE</span></div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-lg-8"><div class="glass-card chart-container"><canvas id="mainChart"></canvas></div></div>
+        <div class="col-lg-4">
+          <div class="glass-card terminal-container">
+            <div style="font-size: 0.7rem; color: #8b949e" class="mb-2">SYSTEM_LOGS_STREAM</div>
+            <div id="dynamic-logs" style="font-size: 0.75rem">
+              <div>> System boot sequence initiated...</div>
+              <div class="text-white-50">> Connected to DB_CLUSTER_01</div>
+              <div class="text-success">> Security Protocol Active</div>
+              <hr class="border-secondary my-1">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="diagModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h6 class="modal-title fw-bold" id="popupTitle">SYSTEM_DIAGNOSTIC</h6>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+              <div class="diag-box"><div id="popupMeta" class="mb-3">Fetching...</div></div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+       function applyFilter(range) { window.location.href = "?range=" + range; }
+
+       const ctx = document.getElementById('mainChart').getContext('2d');
+       new Chart(ctx, {
+           type: 'line',
+           data: {
+               labels: {{ chart_labels|safe }},
+               datasets: [{
+                   label: 'Revenue',
+                   data: {{ chart_data|safe }},
+                   borderColor: '#58a6ff',
+                   backgroundColor: 'rgba(88, 166, 255, 0.1)',
+                   fill: true,
+                   tension: 0.4
+               }]
+           },
+           options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+       });
+
+       function showPopup(title, meta) {
+           document.getElementById('popupTitle').innerText = "NODE_VIEW: " + title.toUpperCase();
+           document.getElementById('popupMeta').innerHTML = `<span class="text-success">> STATUS: OK</span><br><span>> TASK: ${meta}</span>`;
+           new bootstrap.Modal(document.getElementById('diagModal')).show();
+       }
+
+       flatpickr("#rangePicker", { mode: "range", enableTime: true, dateFormat: "Y-m-d H:i", theme: "dark" });
+
+       // Terminal Dynamic Logic - TV Optimized
+        async function fetchLogs() {
+            try {
+                const response = await fetch("{% url 'dashboard:get_logs' %}");
+                const data = await response.json();
+                const logContainer = document.getElementById('dynamic-logs');
+                
+                const logsToShow = data.logs.reverse(); 
+                logContainer.innerHTML = ''; 
+
+                for (const log of logsToShow) {
+                    const line = document.createElement('div');
+                    line.className = "mb-1";
+                    
+                    let colorClass = "text-white-50"; 
+                    if(log.type === 'Payment') colorClass = "text-success";
+                    else if(log.type === 'User') colorClass = "text-info";
+                    else if(log.type === 'Product') colorClass = "text-warning";
+                    else if(log.type === 'Error') colorClass = "text-danger";
+
+                    line.innerHTML = `<span class="text-muted" style="font-size:0.65rem">[${log.time}]</span> <span class="${colorClass}">> [${log.type}]</span> ${log.msg}`;
+                    line.style.opacity = "0";
+                    logContainer.appendChild(line);
+
+                    // १ सेकंद गॅप (TV साठी वाचनीय)
+                    await new Promise(resolve => setTimeout(resolve, 1000)); 
+                    line.style.opacity = "1";
+
+                    // Force Scroll to Bottom (TV fix)
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                }
+                // बॅच संपल्यावर एकदा पुन्हा तळाला ढकला
+                logContainer.scrollTop = logContainer.scrollHeight;
+
+            } catch (err) { console.error("Log error:", err); }
+        }
+
+        setInterval(fetchLogs, 40000); 
+        fetchLogs();
+    </script>
+  </body>
+</html>

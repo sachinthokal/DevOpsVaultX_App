@@ -158,20 +158,6 @@
           {% endfor %}
       {% endif %}
 
-      // Swal function for cleaner code
-      function showSwal(msg, tags) {
-          Swal.fire({
-              title: tags.includes('success') ? "Success" : "System Alert",
-              text: msg,
-              icon: tags.includes('success') ? "success" : (tags.includes('error') ? "error" : "info"),
-              confirmButtonColor: '#8b5cf6',
-              background: '#0f172a',
-              color: '#ffffff',
-              timer: 5000,
-              timerProgressBar: true
-          });
-      }
-
       const form = document.getElementById('devopsContactForm');
       if (form) {
           form.addEventListener('submit', function() {
