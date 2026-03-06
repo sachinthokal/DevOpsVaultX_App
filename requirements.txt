@@ -16,7 +16,7 @@ colorama==0.4.6
 cron_descriptor==2.0.6
 cryptography==46.0.5
 cssselect2==0.9.0
-Django==5.2.10
+Django==6.0.3
 django-cors-headers==4.9.0
 django-extensions==4.1
 django-timezone-field==7.2.1
