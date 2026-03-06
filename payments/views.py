@@ -130,6 +130,7 @@ def buy_product(request, pk):
         "customer_email": customer_email, 
         "customer_name": customer_name,
     })
+
 # ======================
 # 2. PAYMENT SUCCESS HANDLER
 # ======================
@@ -237,8 +238,13 @@ def razorpay_webhook(request):
         if data.get("event") == "payment.captured":
             Payment.objects.filter(razorpay_order_id=data["payload"]["payment"]["entity"]["order_id"]).update(status="SUCCESS", paid=True, is_active=True)
         return HttpResponse(status=200)
-    except: return HttpResponse(status=400)
+    except Exception as e:
+        logger.error(f"Webhook Error: {str(e)}")
+        return HttpResponse(status=400)
 
+# ======================
+# 5. PAYMENT RESULT
+# ======================
 def payment_result(request, pk):
     product = get_object_or_404(Product, pk=pk)
     db_paid = Payment.objects.filter(product=product, session_id=request.session.session_key, status="SUCCESS").exists()

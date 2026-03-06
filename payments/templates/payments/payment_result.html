@@ -179,80 +179,95 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const toast = document.getElementById("toast");
-        const statusIcon = document.getElementById("statusIcon");
-        const statusTitle = document.getElementById("statusTitle");
-        const statusMessage = document.getElementById("statusMessage");
-        const actionArea = document.getElementById("actionArea");
-        const downloadLink = document.getElementById("downloadLink");
-        const downloadBtn = document.getElementById("downloadBtn");
-        const timerSpan = document.getElementById("timer");
-        const progressFill = document.querySelector(".progress-fill");
 
-        const paymentStatus = "{{ status|default:'failed' }}";
-        const isFree = "{{ is_free|yesno:'true,false' }}"; 
+    const toast = document.getElementById("toast");
+    const statusIcon = document.getElementById("statusIcon");
+    const statusTitle = document.getElementById("statusTitle");
+    const statusMessage = document.getElementById("statusMessage");
+    const actionArea = document.getElementById("actionArea");
+    const downloadLink = document.getElementById("downloadLink");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const timerSpan = document.getElementById("timer");
+    const progressFill = document.querySelector(".progress-fill");
 
-        // 1. Entrance Animation
-        setTimeout(() => toast.classList.add("show"), 200);
+    const paymentStatus = "{{ status|default:'failed' }}";
+    const isFree = "{{ is_free|yesno:'true,false' }}";
 
-        // 2. State Management
-        if (paymentStatus === "success") {
-            toast.classList.add("success-mode");
-            statusIcon.textContent = "✓";
-            
-            if (isFree === "true") {
-                statusTitle.textContent = "Access Granted";
-                statusMessage.textContent = "The resource is free! Initializing your secure vault download...";
-            } else {
-                statusTitle.textContent = "Payment Verified";
-                statusMessage.textContent = "Transaction confirmed. Your DevOps assets are ready for deployment.";
-            }
+    // Toast animation
+    if (toast) {
+        setTimeout(() => toast.classList.add("show"), 300);
+    }
 
-            // 3. Auto-Download & Action Reveal
+    if (paymentStatus === "success") {
+
+        toast.classList.add("success-mode");
+        statusIcon.textContent = "✓";
+
+        if (isFree === "true") {
+            statusTitle.textContent = "Access Granted";
+            statusMessage.textContent = "Free asset unlocked. Preparing secure download...";
+        } else {
+            statusTitle.textContent = "Payment Verified";
+            statusMessage.textContent = "Transaction confirmed. Preparing your DevOps asset.";
+        }
+
+        // 2 sec नंतर download start
+        setTimeout(() => {
+
             if (downloadLink) {
                 setTimeout(() => {
-                    downloadLink.click(); 
-                    if(actionArea) {
-                        actionArea.style.display = "block";
-                        // Start Progress Bar Animation (6 seconds)
-                        if(progressFill) progressFill.style.transition = "width 6s linear";
-                        if(progressFill) setTimeout(() => progressFill.style.width = "100%", 50);
-                        
-                        // Countdown Timer
-                        let timeLeft = 5;
-                        const countdown = setInterval(() => {
-                            timeLeft--;
-                            if(timerSpan) timerSpan.textContent = timeLeft;
-                            if(timeLeft <= 0) clearInterval(countdown);
-                        }, 1000);
-                    }
-                }, 1200);
+                    downloadLink.click();
+                }, 100);
             }
 
-            // 4. Final Redirect
-            setTimeout(() => {
-                window.location.href = "{% url 'vaultx:index' %}";
-            }, 6500);
+            if (actionArea) actionArea.style.display = "block";
 
-        } else {
-            // Failure State
-            toast.classList.add("failed-mode");
-            statusIcon.textContent = "✕";
-            statusTitle.textContent = "Node Error";
-            statusMessage.textContent = "Transaction failed or handshake timed out. Please try again.";
-            
-            setTimeout(() => {
-                window.location.href = "{% url 'products:list' %}";
-            }, 4000);
-        }
+            if (progressFill) {
+                progressFill.style.transition = "width 5s linear";
+                progressFill.style.width = "100%";
+            }
 
-        // Manual Download Click
-        if (downloadBtn) {
-            downloadBtn.addEventListener("click", () => {
-                downloadLink.click();
-            });
-        }
-    });
+            // countdown
+            let timeLeft = 5;
+
+            const countdown = setInterval(() => {
+
+                timeLeft--;
+
+                if (timerSpan) timerSpan.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+
+                    clearInterval(countdown);
+
+                    // vault redirect
+                    window.location.href = "{% url 'vaultx:index' %}";
+                }
+
+            }, 1000);
+
+        }, 2000);
+
+    } else {
+
+        toast.classList.add("failed-mode");
+        statusIcon.textContent = "✕";
+        statusTitle.textContent = "Node Error";
+        statusMessage.textContent = "Transaction failed. Please try again.";
+
+        setTimeout(() => {
+            window.location.href = "{% url 'products:list' %}";
+        }, 4000);
+    }
+
+    // manual download button
+    if (downloadBtn) {
+        downloadBtn.addEventListener("click", () => {
+            if (downloadLink) downloadLink.click();
+        });
+    }
+
+});
 </script>
 <script>
     // Browser history lock to prevent back navigation

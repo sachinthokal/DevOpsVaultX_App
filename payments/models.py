@@ -1,8 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
 from products.models import Product
+import uuid
 
 class Payment(models.Model):
+
+    secure_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
     STATUS_CHOICES = (
         ("INIT", "INIT"),
         ("FAILED", "FAILED"),

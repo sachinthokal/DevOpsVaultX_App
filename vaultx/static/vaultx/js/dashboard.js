@@ -87,28 +87,52 @@ function removeItem(paymentId) {
     });
 }
 
-function handleDownload(productId, paymentId, btnElement) {
+function handleDownload(productId, token, btnElement) {
+
     const originalText = btnElement.innerText;
     btnElement.innerText = "WAIT...";
     btnElement.disabled = true;
 
-    fetch(`/vaultx/download/${productId}/${paymentId}/`, {
-        headers: { "X-Requested-With": "XMLHttpRequest" },
+    fetch(`/vaultx/download/${token}/${productId}/`, {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
     })
     .then(res => res.json())
     .then(data => {
+
         if (data.status === "success") {
-            window.location.href = data.download_url;
-            setTimeout(() => { location.reload(); }, 2000); 
+
+            // actual download trigger
+            const link = document.createElement("a");
+            link.href = data.download_url;
+            link.download = "";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            setTimeout(() => {
+                window.location.replace("/vaultx/");
+            }, 2000);
+
         } else {
-            Swal.fire({ title: "Error", text: data.message, icon: "error", background: "#050811", color: "#fff" });
+
+            Swal.fire({
+                title: "Error",
+                text: data.message,
+                icon: "error",
+                background: "#050811",
+                color: "#fff"
+            });
+
             btnElement.innerText = originalText;
             btnElement.disabled = false;
         }
+
     })
     .catch(() => {
+
         btnElement.innerText = originalText;
         btnElement.disabled = false;
+
     });
 }
 
@@ -137,8 +161,10 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('.download-trigger').forEach(btn => {
         btn.addEventListener('click', function() {
             const pId = this.dataset.productId;
-            const payId = this.dataset.paymentId;
-            handleDownload(pId, payId, this);
+            const token = this.dataset.token;
+            // console.log("Product:", pId)
+            // console.log("Token:", token)
+            handleDownload(pId, token, this);
         });
     });
 
@@ -149,20 +175,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (typeof openModal === 'function') openModal('loginModal');
         });
     }
-
-    // Django Messages
-    document.querySelectorAll(".django-message").forEach((msg) => {
-        const type = msg.dataset.type;
-        const text = msg.dataset.text;
-        Swal.fire({
-            title: type === "error" ? "ACCESS DENIED" : "SUCCESSFUL",
-            text: text,
-            icon: type === "error" ? "error" : "success",
-            background: "#050811",
-            color: "#fff",
-            timer: type === "success" ? 3000 : null
-        });
-    });
 
     // Back Button Loop Prevention
     history.pushState(null, null, location.href);

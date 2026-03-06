@@ -51,11 +51,24 @@ def vaultx_home(request):
             display_payment.purchase_count = total_count
             final_items[p_id] = display_payment
 
+    # Convert dict to sorted list (latest first)
+    sorted_payments = sorted(
+        final_items.values(),
+        key=lambda x: x.created_at,
+        reverse=True
+    )
+
     context = {
-        "payments": list(final_items.values()),
+        "payments": sorted_payments,
         "is_logged_in": True,
         "customer_name": request.user.username,
     }
+
+    # context = {
+    #     "payments": list(final_items.values()),
+    #     "is_logged_in": True,
+    #     "customer_name": request.user.username,
+    # }
     return render(request, "vaultx/dashboard.html", context)
 
 
@@ -114,40 +127,99 @@ def generate_receipt_pdf(request, order_id):
 # ======================
 # 3. SECURE DOWNLOAD (Credit Logic)
 # ======================
-def download_file(request, product_id, payment_id):
-    # १. फाईल आणि पेमेंट रेकॉर्ड मिळवा
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import JsonResponse, HttpResponseForbidden, FileResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.db.models import F
+import os
+
+@login_required
+def download_file(request, token, product_id):
+
+    # 1️⃣ Product fetch
     product = get_object_or_404(Product, pk=product_id)
-    payment = get_object_or_404(Payment, id=payment_id, email=request.user.email)
 
-    is_forcing = request.GET.get('force_download') == '1'
+    # 2️⃣ Payment fetch using secure_token
+    payment = get_object_or_404(
+        Payment,
+        secure_token=token,
+        product_id=product_id,
+        user=request.user
+    )
 
-    # २. AJAX Request: क्रेडिट चेक आणि वजावट
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest' and not is_forcing:
-        
-        # क्रेडिट शिल्लक आहे का ते तपासा
+    # 3️⃣ payment status validation
+    if payment.status not in ["SUCCESS", "COMPLETED"] and payment.amount != 0:
+        messages.error(request, "Invalid payment status.")
+        return redirect("vaultx:index")
+
+    # 4️⃣ File existence check
+    if not product.file or not os.path.exists(product.file.path):
+        messages.error(request, "File not available.")
+        return redirect("vaultx:index")
+
+    # ======================
+    # AJAX CREDIT CHECK
+    # ======================
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+
         if payment.download_used >= payment.download_limit:
-            return JsonResponse({"status": "error", "message": "Download limit reached for this purchase."}, status=400)
+            return JsonResponse({
+                "status": "error",
+                "message": "Download limit reached."
+            }, status=400)
 
-        if not product.file or not os.path.exists(product.file.path):
-            return JsonResponse({"status": "error", "message": "File not found on server."}, status=404)
+        # 🔐 store authorization in session
+        request.session['download_auth'] = str(payment.secure_token)
 
-        # क्रेडिट कमी करा
-        payment.download_used += 1
+        return JsonResponse({
+            "status": "success",
+            "download_url": f"/vaultx/download/{token}/{product_id}/?download=1"
+        })
+
+    # ======================
+    # ACTUAL FILE DOWNLOAD
+    # ======================
+    if request.GET.get("download") == "1":
+
+        # 🔐 verify session authorization
+        session_token = request.session.get("download_auth")
+
+        if not session_token or session_token != str(payment.secure_token):
+            messages.error(request, "Unauthorized download attempt.")
+            return redirect("vaultx:index")
+
+        # remove session after use
+        del request.session["download_auth"]
+
+        # re-check limit
         if payment.download_used >= payment.download_limit:
-            payment.is_active = False
-        payment.save()
+            messages.error(request, "Download limit reached. Please renew the asset.")
+            return redirect("vaultx:index")
 
-        # परतीची URL (ह्याच फंक्शनला पुन्हा कॉल करेल पण force_download=1 सह)
-        download_url = f"/vaultx/download/{product_id}/{payment_id}/?force_download=1"
-        return JsonResponse({"status": "success", "download_url": download_url})
-
-    # ३. प्रत्यक्ष फाईल डाउनलोड (जेव्हा force_download=1 असेल)
-    if is_forcing:
         try:
-            response = FileResponse(open(product.file.path, "rb"), as_attachment=True)
+
+            # safe increment
+            Payment.objects.filter(id=payment.id).update(
+                download_used=F('download_used') + 1
+            )
+
+            payment.refresh_from_db()
+
+            if payment.download_used >= payment.download_limit:
+                payment.is_active = False
+                payment.save(update_fields=["is_active"])
+
+            response = FileResponse(
+                open(product.file.path, "rb"),
+                as_attachment=True
+            )
+
             response["Content-Disposition"] = f'attachment; filename="{os.path.basename(product.file.path)}"'
+
             return response
-        except Exception as e:
+
+        except Exception:
             return HttpResponseForbidden("File access error")
 
-    return redirect('vaultx:index')
+    return HttpResponseForbidden("Invalid request")

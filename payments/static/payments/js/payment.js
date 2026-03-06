@@ -5,15 +5,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Backend sathi data submit karnare function
     function submitPaymentData(p_id, o_id, s_id) {
-        Swal.fire({
-            title: "FINALIZING ACCESS...",
-            html: `<div class="spinner-border text-primary" role="status"></div><p style="margin-top:15px;">SETTING UP YOUR PRIVATE VAULT...</p>`,
-            background: "#1e293b",
-            color: "#ffffff",
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            didOpen: () => Swal.showLoading(),
-        });
 
         const form = document.createElement("form");
         form.method = "POST";
@@ -24,8 +15,8 @@ document.addEventListener("DOMContentLoaded", function () {
             razorpay_order_id: o_id || "FREE_ORDER",
             razorpay_signature: s_id || "FREE_SIGNATURE",
             csrfmiddlewaretoken: config.csrfToken,
-            customer_name: config.customerName, 
-            email: config.customerEmail, 
+            customer_name: config.customerName,
+            email: config.customerEmail,
         };
 
         Object.entries(fields).forEach(([name, value]) => {
@@ -37,7 +28,25 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         document.body.appendChild(form);
-        form.submit();
+
+        // Swal loader
+        Swal.fire({
+            title: "FINALIZING ACCESS...",
+            html: `<div class="spinner-border text-primary" role="status"></div>
+                   <p style="margin-top:15px;">SETTING UP YOUR PRIVATE VAULT...</p>`,
+            background: "#1e293b",
+            color: "#ffffff",
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+
+                // ✅ 5 second delay
+                setTimeout(() => {
+                    form.submit();
+                }, 5000);
+            }
+        });
     }
 
     const payButton = document.getElementById("pay-button");
@@ -45,11 +54,11 @@ document.addEventListener("DOMContentLoaded", function () {
         payButton.addEventListener("click", function (e) {
             if (e) e.preventDefault();
 
-            // 1. Jar product FREE asel tar direct submit kara
+            // FREE product
             if (config.isFree) {
                 submitPaymentData();
             } 
-            // 2. Jar PAID asel tar Razorpay modal open kara
+            // PAID product
             else {
                 const options = {
                     key: config.razorpayKeyId,
@@ -71,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     theme: { color: "#bf03ed" },
                 };
+
                 const razorpay = new Razorpay(options);
                 razorpay.open();
             }
