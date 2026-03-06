@@ -1,16 +1,21 @@
 import csv
-from django.http import JsonResponse
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
+from django.shortcuts import render, redirect
 from django.apps import apps
 from django.db.models import Sum
 from django.utils import timezone
 from datetime import timedelta
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from dashboard.models import SystemLog
+
+# ------------------------- AUTH CHECK ---------------------------------
+# फक्त Superuser (Owner) लाच प्रवेश मिळावा यासाठी फंक्शन
+def is_owner(user):
+    return user.is_authenticated and user.is_superuser
 
 # ------------------------- Admin Dashboards ---------------------------------
 @login_required
+@user_passes_test(is_owner, login_url='home') # जर सुपरयुजर नसेल तर होम पेजला पाठवेल
 def admin_dashboard(request):
     # मॉडेल डायनॅमिकली गेट करा
     User = apps.get_model('auth', 'User')
@@ -22,16 +27,15 @@ def admin_dashboard(request):
     now = timezone.now()
     tz = timezone.get_current_timezone()
 
-    # --- विभाग १: LIFETIME STATS (वरच्या कार्ड्ससाठी - फिक्स डेटा) ---
+    # --- विभाग १: LIFETIME STATS ---
     all_payments = Payment.objects.all()
     lifetime_sales = (all_payments.aggregate(total=Sum('amount'))['total'] or 0) / 100
     lifetime_orders = all_payments.count()
     lifetime_users_count = User.objects.all().count()
 
-    # --- विभाग १.१: LIFETIME STATUS BREAKDOWN (हा बदल केला आहे - all_payments वापरले आहे) ---
+    # --- विभाग १.१: LIFETIME STATUS BREAKDOWN ---
     lifetime_success = all_payments.filter(status='success').count()
     lifetime_failed = all_payments.filter(status='failed').count()
-    # तुझ्या DB नुसार 'pending' किंवा 'init' जे असेल ते:
     lifetime_pending = all_payments.filter(status__in=['pending', 'init']).count()
 
     # --- विभाग २: RANGE FILTER LOGIC ---
@@ -46,7 +50,7 @@ def admin_dashboard(request):
     }
     start_date = ranges.get(range_type, now - timedelta(days=7))
 
-    # --- विभाग ३: PERIODIC STATS (खालच्या कार्ड्ससाठी - फिल्टरनुसार) ---
+    # --- विभाग ३: PERIODIC STATS ---
     filtered_payments = Payment.objects.filter(created_at__gte=start_date)
     
     periodic_sales_paise = filtered_payments.aggregate(total=Sum('amount'))['total'] or 0
@@ -103,7 +107,6 @@ def admin_dashboard(request):
     # --- विभाग ५: कॉन्टेक्स्ट ---
     context = {
         'selected_range': range_type.upper(),
-        # वरचे फिक्स कार्ड्स
         'total_sales': "{:,}".format(int(lifetime_sales)),
         'total_orders': lifetime_orders,
         'total_users': lifetime_users_count,
@@ -111,12 +114,10 @@ def admin_dashboard(request):
         'lifetime_failed': lifetime_failed,
         'lifetime_pending': lifetime_pending,
 
-        # खालचे बदलणारे कार्ड्स
         'periodic_sales': "{:,}".format(int(periodic_sales)),
         'periodic_orders': periodic_orders,
         'periodic_users': periodic_new_users,
         
-        # टेबल डेटा
         'users': User.objects.all().order_by('-id')[:15],
         'insights': InsightsPost.objects.all().order_by('-id')[:15],
         'messages': ContactMessage.objects.all().order_by('-id')[:15],
@@ -136,12 +137,14 @@ def admin_dashboard(request):
 
 
 # ------------------------- SYS_LOGS ---------------------------------
+@login_required
+@user_passes_test(is_owner)
 def get_latest_logs(request):
-    # शेवटचे २० लॉग्स घ्या
     logs = SystemLog.objects.all().order_by('-created_at')[:20]
     log_data = []
     for log in logs:
         log_data.append({
+            'id': log.id,
             'msg': log.message,
             'type': log.log_type,
             'time': log.created_at.strftime("%H:%M:%S")
