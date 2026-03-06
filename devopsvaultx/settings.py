@@ -270,15 +270,15 @@ LOGGING = {
             "backupCount": 5,
             "formatter": "json",
         },
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "formatter": "json",
-        },
+        # "console": {
+        #     "level": "DEBUG",
+        #     "class": "logging.StreamHandler",
+        #     "formatter": "json",
+        # },
     },
     "loggers": {
         "request.audit": {
-            "handlers": ["file_info", "file_error", "console"],
+            "handlers": ["file_info", "file_error"],
             "level": "DEBUG" if DEBUG else "INFO",
             "propagate": False,
         },

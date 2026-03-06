@@ -2,6 +2,7 @@ import json
 import razorpay
 import logging
 import os
+import random
 import datetime
 import threading
 import uuid
@@ -27,14 +28,14 @@ client = razorpay.Client(
 )
 
 # ======================
+# 0. PAYMENT PRODUCT INIT PAGE
+# ======================
+def some_index_view(request):
+    return redirect('/')
+
+# ======================
 # 1. BUY PRODUCT (Fixed: Random ID & Credit Reset)
 # ======================
-import random
-from django.urls import reverse
-from django.shortcuts import get_object_or_404, redirect, render
-from .models import Payment
-from products.models import Product
-
 def buy_product(request, pk):
     product = get_object_or_404(Product, pk=pk, is_active=True)
     
