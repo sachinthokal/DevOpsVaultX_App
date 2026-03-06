@@ -1,9 +1,9 @@
-name: Django Tag-based Deployment
+name: DevOpsVaultX Image Build and Push
 
 on:
   push:
     tags:
-      - 'v*' # जेव्हा v1.0.1, v2.0.0 असे टॅग येतील तेव्हाच रन होईल
+      - 'v*' # Run on tag v1.0.1, v2.0.0
 
 jobs:
   test:

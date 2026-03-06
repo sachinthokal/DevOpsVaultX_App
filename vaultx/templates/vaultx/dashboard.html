@@ -79,7 +79,7 @@
         <button class="btn-download active-btn download-trigger" 
                 id="btn-{{ payment.id }}"
                 data-product-id="{{ payment.product.id }}" 
-                data-payment-id="{{ payment.id }}">Download</button>
+                data-token="{{ payment.secure_token }}">Download</button>
       {% endif %}
     </div>
   </div>
