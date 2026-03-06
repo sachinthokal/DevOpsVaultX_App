@@ -4,6 +4,10 @@ from . import views
 app_name = "payments"
 
 urlpatterns = [
+
+    # 0. Blank payment page for test case
+    path("", views.some_index_view, name="index"),
+
     # १. Product खरेदी करण्यासाठी आणि पेमेंट पेज दाखवण्यासाठी
     path("buy/<int:pk>/", views.buy_product, name="buy_product"), 
     
