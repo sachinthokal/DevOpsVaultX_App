@@ -34,9 +34,9 @@ def admin_dashboard(request):
     lifetime_users_count = User.objects.all().count()
 
     # --- विभाग १.१: LIFETIME STATUS BREAKDOWN ---
-    lifetime_success = all_payments.filter(status='success').count()
-    lifetime_failed = all_payments.filter(status='failed').count()
-    lifetime_pending = all_payments.filter(status__in=['pending', 'init']).count()
+    lifetime_success = all_payments.filter(status='SUCCESS').count()
+    lifetime_failed = all_payments.filter(status='FAILED').count()
+    lifetime_pending = all_payments.filter(status__in=['INIT']).count()
 
     # --- विभाग २: RANGE FILTER LOGIC ---
     range_type = request.GET.get('range', '7days') 

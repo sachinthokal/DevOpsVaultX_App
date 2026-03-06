@@ -168,8 +168,9 @@ def payment_success(request, pk):
         # ==========================================
         # DYNAMIC LOG START: PAYMENT SUCCESS
         # ==========================================
+        amt_rupees = payment.amount / 100
         SystemLog.objects.create(
-            message=f"Payment SUCCESS: ₹{payment.amount} received from {c_name} for {product.title}",
+            message=f"Payment SUCCESS: ₹{amt_rupees} received from {c_name} for {product.title}",
             log_type="Payment"
         )
         # ==========================================
