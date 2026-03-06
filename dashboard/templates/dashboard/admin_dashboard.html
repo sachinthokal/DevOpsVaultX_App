@@ -5,10 +5,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DevOpsVaultX | Command Center v2.0</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css" />
-    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css"
+    />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{% static 'images/favicon.ico' %}"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       :root {
@@ -23,13 +36,20 @@
       body {
         background-color: var(--bg-deep);
         color: #c9d1d9;
-        font-family: "Inter", -apple-system, sans-serif;
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
         margin: 0;
         padding-bottom: 30px;
         overflow-x: hidden;
       }
 
-      .main-container { padding: 15px; max-width: 1600px; margin: auto; }
+      .main-container {
+        padding: 15px;
+        max-width: 1600px;
+        margin: auto;
+      }
 
       .glass-card {
         background: var(--panel-bg);
@@ -51,7 +71,27 @@
         gap: 15px;
       }
 
-      .filter-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      /* Mobile optimization for Nav */
+      @media (max-width: 576px) {
+        .top-nav {
+          justify-content: center;
+          text-align: center;
+        }
+        .filter-group {
+          justify-content: center;
+          width: 100%;
+        }
+        .date-input {
+          width: 100% !important;
+        }
+      }
+
+      .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
 
       .filter-pill {
         background: #21262d;
@@ -64,7 +104,11 @@
         font-weight: 600;
         transition: 0.2s;
       }
-      .filter-pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+      .filter-pill.active {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+      }
 
       .date-input {
         background: #0d1117 !important;
@@ -73,23 +117,38 @@
         font-size: 0.75rem;
         padding: 6px 12px;
         border-radius: 6px;
-        width: 220px;
+        width: 200px;
       }
 
-      .stat-box { padding: 15px; text-align: center; }
-      .stat-value { font-size: 30px; font-weight: 800; color: var(--accent); display: block; }
-      .stat-label { font-size: medium; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; }
+      .stat-box {
+        padding: 15px;
+        text-align: center;
+      }
+      .stat-value {
+        font-size: clamp(1.2rem, 4vw, 1.8rem);
+        font-weight: 800;
+        color: var(--accent);
+        display: block;
+      }
+      .stat-label {
+        font-size: 0.7rem;
+        color: #8b949e;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
 
-      .chart-container { height: 320px; padding: 15px; }
-      
-      /* Terminal Fix for TV */
+      .chart-container {
+        height: 350px;
+        padding: 15px;
+      }
+
       .terminal-container {
-        height: 320px;
+        height: 350px;
         background: #010409 !important;
         border: 1px solid var(--success) !important;
         font-family: "Fira Code", monospace;
         padding: 10px;
-        overflow: hidden; /* बाहेरील स्क्रोल बंद */
+        overflow: hidden;
         color: var(--terminal-green);
         display: flex;
         flex-direction: column;
@@ -97,66 +156,138 @@
 
       #dynamic-logs {
         flex-grow: 1;
-        overflow-y: auto; /* आतील स्क्रोल चालू */
+        overflow-y: auto;
         padding-right: 5px;
         scrollbar-width: thin;
         scrollbar-color: var(--success) transparent;
       }
 
-      .modal-content { background: var(--panel-bg); border: 1px solid var(--accent); border-radius: 12px; }
-      .modal-header { border-bottom: 1px solid var(--border-clr); }
-      .diag-box {
-        background: #0d1117;
-        border-radius: 8px;
-        padding: 15px;
+      /* System Status Styles */
+      .centered-stat {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        min-height: 110px;
+      }
+      .neural-monitor {
+        padding: 12px;
+        background: rgba(10, 15, 25, 0.9) !important;
+        min-height: 110px;
+      }
+      .neural-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .chip-inline-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+      .neural-chip {
+        border-radius: 6px;
+        padding: 6px 10px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .success-border {
+        border-left: 3px solid #00ff88 !important;
+      }
+      .chip-val {
+        font-size: 1rem;
+        font-weight: 800;
         font-family: monospace;
-        font-size: 0.85rem;
-        color: #79c0ff;
-        border: 1px solid #30363d;
+      }
+      small{    
+        font-size: 0.7rem;
+        color: #8b949e;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .pulse-dot {
+        height: 6px;
+        width: 6px;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+        background: #00ff88;
+        display: inline-block;
+        margin-right: 5px;
+      }
+      @keyframes pulse {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+        100% {
+          opacity: 1;
+        }
       }
 
-      ::-webkit-scrollbar { width: 4px; }
-      ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { background: var(--success); border-radius: 10px; }
-
-      /* System Status Styles */
-      .centered-stat { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 15px !important; min-height: 125px; }
-      .neural-monitor { padding: 12px; background: rgba(10, 15, 25, 0.9) !important; border: 1px solid rgba(255, 255, 255, 0.05); min-height: 125px; }
-      .neural-grid { display: flex; flex-direction: column; gap: 6px; }
-      .chip-inline-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-      .neural-chip { border-radius: 6px; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.3s ease; }
-      .success-border { border-left: 3px solid #00ff88 !important; background: linear-gradient(90deg, rgba(0, 255, 136, 0.08) 0%, transparent 100%) !important; }
-      .success-border .chip-val { color: #00ff88; }
-      .error-border { border-left: 3px solid #ff4444 !important; }
-      .error-border .chip-val { color: #ff4444; }
-      .warning-border { border-left: 3px solid #ffbb00 !important; }
-      .warning-border .chip-val { color: #ffbb00; }
-      .chip-val { font-size: 1rem; font-weight: 800; font-family: "JetBrains Mono", monospace; }
-      .pulse-dot { height: 5px; width: 5px; border-radius: 50%; animation: pulse 2s infinite; background: #00ff88; display: inline-block; }
-      @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-
-      @media (max-width: 768px) {
-        .chart-container, .terminal-container { height: 280px; }
+      /* Responsive Adjustments */
+      @media (max-width: 991px) {
+        .chart-container,
+        .terminal-container {
+          height: 300px;
+        }
       }
     </style>
   </head>
   <body>
     <nav class="top-nav">
       <div class="brand">
-        <h5 class="m-0 fw-bold"><span style="color: var(--accent)">DVX</span> COMMAND CENTER</h5>
+        <h5 class="m-0 fw-bold">
+          <span style="color: var(--accent)">DVX</span> COMMAND CENTER
+        </h5>
       </div>
       <div class="filter-group">
-        <div class="filter-pill {% if selected_range == '1hr' %}active{% endif %}" onclick="applyFilter('1hr')">1H</div>
-        <div class="filter-pill {% if selected_range == '6hr' %}active{% endif %}" onclick="applyFilter('6hr')">6H</div>
-        <div class="filter-pill {% if selected_range == '1day' %}active{% endif %}" onclick="applyFilter('1day')">24H</div>
-        <div class="filter-pill {% if selected_range == '7days' or not selected_range %}active{% endif %}" onclick="applyFilter('7days')">7D</div>
-        <input type="text" id="rangePicker" class="date-input" name="range" autocomplete="off" placeholder="Select Custom Range" />
-        <button class="btn btn-sm btn-primary px-3 fw-bold" style="font-size: 0.75rem" onclick="location.reload()">SYNC</button>
+        <div
+          class="filter-pill {% if selected_range == '1hr' %}active{% endif %}"
+          onclick="applyFilter('1hr')"
+        >
+          1H
+        </div>
+        <div
+          class="filter-pill {% if selected_range == '6hr' %}active{% endif %}"
+          onclick="applyFilter('6hr')"
+        >
+          6H
+        </div>
+        <div
+          class="filter-pill {% if selected_range == '1day' %}active{% endif %}"
+          onclick="applyFilter('1day')"
+        >
+          24H
+        </div>
+        <div
+          class="filter-pill {% if selected_range == '7days' or not selected_range %}active{% endif %}"
+          onclick="applyFilter('7days')"
+        >
+          7D
+        </div>
+        <input
+          type="text"
+          id="rangePicker"
+          class="date-input"
+          name="range"
+          autocomplete="off"
+          placeholder="Custom Range"
+        />
+        <button
+          class="btn btn-sm btn-primary px-3 fw-bold"
+          onclick="location.reload()"
+        >
+          SYNC
+        </button>
       </div>
     </nav>
 
     <div class="main-container">
-      <div class="row g-3 mb-3">
+      <div class="row g-2 g-md-3 mb-3">
         <div class="col-6 col-md-3">
           <div class="glass-card stat-box centered-stat">
             <span class="stat-label">REVENUE_QUOTA</span>
@@ -171,26 +302,39 @@
         </div>
         <div class="col-6 col-md-3">
           <div class="glass-card stat-box centered-stat">
-            <span class="stat-label">USER_IDENTITY_POOL</span>
+            <span class="stat-label">USER_POOL</span>
             <span class="stat-value text-info">{{total_users}}</span>
           </div>
         </div>
         <div class="col-6 col-md-3">
-          <div class="glass-card stat-box neural-monitor">
-            <span class="stat-label mb-2 d-block text-center">SYSTEM_STATUS</span>
+          <div class="glass-card neural-monitor">
             <div class="neural-grid">
               <div class="neural-chip success-border">
                 <div class="chip-inline-row">
-                  <div class="chip-header"><span class="pulse-dot"></span> <small>SUCCESS_NODES</small></div>
-                  <div class="chip-body"><span class="chip-val" style="font-size: large;">{{ lifetime_success }}</span><span class="unit" style="font-size: x-small;">OK</span></div>
+                  <small><span class="pulse-dot"></span>SUCCESS</small>
+                  <span class="chip-val text-success"
+                    >{{ lifetime_success }}</span
+                  >
                 </div>
               </div>
-              <div class="d-flex gap-2">
-                <div class="neural-chip error-border flex-fill">
-                  <div class="chip-body text-center"><small class="d-block">ERR</small><span class="chip-val mini">{{ lifetime_failed }}</span></div>
+              <div class="d-flex gap-1">
+                <div
+                  class="neural-chip flex-fill text-center p-1"
+                  style="border-left: 2px solid #ff4444"
+                >
+                  <small class="d-block">error</small
+                  ><span class="chip-val" style="color: #ff4444"
+                    >{{ lifetime_failed }}</span
+                  >
                 </div>
-                <div class="neural-chip warning-border flex-fill">
-                  <div class="chip-body text-center"><small class="d-block">INIT</small><span class="chip-val mini">{{ lifetime_pending }}</span></div>
+                <div
+                  class="neural-chip flex-fill text-center p-1"
+                  style="border-left: 2px solid #ffbb00"
+                >
+                  <small class="d-block">INIT</small
+                  ><span class="chip-val" style="color: #ffbb00"
+                    >{{ lifetime_pending }}</span
+                  >
                 </div>
               </div>
             </div>
@@ -198,31 +342,48 @@
         </div>
       </div>
 
-      <div class="row g-3 mb-3">
+      <div class="row g-2 g-md-3 mb-3">
         <div class="col-6 col-md-3">
-            <div class="glass-card stat-box"><span class="stat-label">PERIODIC_REVENUE</span><span class="stat-value">₹{{periodic_sales}}</span></div>
+          <div class="glass-card stat-box centered-stat">
+            <span class="stat-label">PERIODIC_REV</span
+            ><span class="stat-value">₹{{periodic_sales}}</span>
+          </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="glass-card stat-box"><span class="stat-label">PERIODIC_ORDERS</span><span class="stat-value text-success">{{periodic_orders}}</span></div>
+          <div class="glass-card stat-box centered-stat">
+            <span class="stat-label">PERIODIC_ORD</span
+            ><span class="stat-value text-success">{{periodic_orders}}</span>
+          </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="glass-card stat-box"><span class="stat-label">PERIODIC_USERS</span><span class="stat-value text-info">{{periodic_users}}</span></div>
+          <div class="glass-card stat-box centered-stat">
+            <span class="stat-label">PERIODIC_USR</span
+            ><span class="stat-value text-info">{{periodic_users}}</span>
+          </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="glass-card stat-box"><span class="stat-label">PROTOCOL</span><span class="stat-value text-white">SECURE</span></div>
+          <div class="glass-card stat-box centered-stat">
+            <span class="stat-label">PROTOCOL</span
+            ><span class="stat-value text-white" style="font-size: 1.2rem"
+              >SECURE</span
+            >
+          </div>
         </div>
       </div>
 
-      <div class="row g-3 mb-3">
-        <div class="col-lg-8"><div class="glass-card chart-container"><canvas id="mainChart"></canvas></div></div>
+      <div class="row g-3">
+        <div class="col-lg-8">
+          <div class="glass-card chart-container">
+            <canvas id="mainChart"></canvas>
+          </div>
+        </div>
         <div class="col-lg-4">
           <div class="glass-card terminal-container">
-            <div style="font-size: 0.7rem; color: #8b949e" class="mb-2">SYSTEM_LOGS_STREAM</div>
+            <div style="font-size: 0.7rem; color: #8b949e" class="mb-2">
+              SYSTEM_LOGS_STREAM
+            </div>
             <div id="dynamic-logs" style="font-size: 0.75rem">
-              <div>> System boot sequence initiated...</div>
-              <div class="text-white-50">> Connected to DB_CLUSTER_01</div>
-              <div class="text-success">> Security Protocol Active</div>
-              <hr class="border-secondary my-1">
+              <div>> Initializing...</div>
             </div>
           </div>
         </div>
@@ -230,89 +391,148 @@
     </div>
 
     <div class="modal fade" id="diagModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h6 class="modal-title fw-bold" id="popupTitle">SYSTEM_DIAGNOSTIC</h6>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-              <div class="diag-box"><div id="popupMeta" class="mb-3">Fetching...</div></div>
-            </div>
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content text-white">
+          <div class="modal-header">
+            <h6 class="modal-title fw-bold" id="popupTitle">
+              SYSTEM_DIAGNOSTIC
+            </h6>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="diag-box"><div id="popupMeta">Fetching...</div></div>
           </div>
         </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script>
-       function applyFilter(range) { window.location.href = "?range=" + range; }
+      function applyFilter(range) { window.location.href = "?range=" + range; }
 
-       const ctx = document.getElementById('mainChart').getContext('2d');
-       new Chart(ctx, {
-           type: 'line',
-           data: {
-               labels: {{ chart_labels|safe }},
-               datasets: [{
-                   label: 'Revenue',
-                   data: {{ chart_data|safe }},
-                   borderColor: '#58a6ff',
-                   backgroundColor: 'rgba(88, 166, 255, 0.1)',
-                   fill: true,
-                   tension: 0.4
-               }]
-           },
-           options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-       });
+      const ctx = document.getElementById('mainChart').getContext('2d');
+      new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: {{ chart_labels|safe }},
+              datasets: [{
+                  label: 'Revenue',
+                  data: {{ chart_data|safe }},
+                  borderColor: '#58a6ff',
+                  backgroundColor: 'rgba(88, 166, 255, 0.1)',
+                  fill: true,
+                  tension: 0.4
+              }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
 
-       function showPopup(title, meta) {
-           document.getElementById('popupTitle').innerText = "NODE_VIEW: " + title.toUpperCase();
-           document.getElementById('popupMeta').innerHTML = `<span class="text-success">> STATUS: OK</span><br><span>> TASK: ${meta}</span>`;
-           new bootstrap.Modal(document.getElementById('diagModal')).show();
-       }
+      // Accessibility Fix for Flatpickr in onReady
+      flatpickr("#rangePicker", {
+           mode: "range",
+           enableTime: true,
+           dateFormat: "Y-m-d H:i",
+           theme: "dark",
+           onReady: function(selectedDates, dateStr, instance) {
+               const container = instance.calendarContainer;
+               const inputs = [
+                   { sel: '.flatpickr-monthDropdown-months', id: 'fp-month', name: 'month' },
+                   { sel: '.flatpickr-hour', id: 'fp-hour', name: 'hour' },
+                   { sel: '.flatpickr-minute', id: 'fp-minute', name: 'minute' },
+                   { sel: '.numInput.cur-year', id: 'fp-year', name: 'year' }
+               ];
+               inputs.forEach(item => {
+                   const el = container.querySelector(item.sel);
+                   if (el) {
+                       el.setAttribute('id', item.id);
+                       el.setAttribute('name', item.name);
+                   }
+               });
+           }
+      });
 
-       flatpickr("#rangePicker", { mode: "range", enableTime: true, dateFormat: "Y-m-d H:i", theme: "dark" });
+      // १. टायपिंग इफेक्टसाठी डिले फंक्शन
+      const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-       // Terminal Dynamic Logic - TV Optimized
-        async function fetchLogs() {
-            try {
-                const response = await fetch("{% url 'dashboard:get_logs' %}");
-                const data = await response.json();
-                const logContainer = document.getElementById('dynamic-logs');
-                
-                const logsToShow = data.logs.reverse(); 
-                logContainer.innerHTML = ''; 
+      // २. आधी दाखवलेल्या लॉग्सचे ID साठवण्यासाठी Set
+      let displayedLogIds = new Set();
+      let isFetching = false; // नवीन एन्ट्रीज प्रोसेस होत असताना दुसरी रिक्वेस्ट टाळण्यासाठी
 
-                for (const log of logsToShow) {
-                    const line = document.createElement('div');
-                    line.className = "mb-1";
-                    
-                    let colorClass = "text-white-50"; 
-                    if(log.type === 'Payment') colorClass = "text-success";
-                    else if(log.type === 'User') colorClass = "text-info";
-                    else if(log.type === 'Product') colorClass = "text-warning";
-                    else if(log.type === 'Error') colorClass = "text-danger";
+      async function fetchLogs() {
+          // जर आधीची प्रोसेस सुरू असेल, तर पुन्हा रन करू नका (डबल प्रिटिंग टाळण्यासाठी)
+          if (isFetching) return;
+          
+          try {
+              isFetching = true;
+              const response = await fetch("{% url 'dashboard:get_logs' %}");
+              const data = await response.json();
+              const logContainer = document.getElementById('dynamic-logs');
+              
+              if (!logContainer) {
+                  isFetching = false;
+                  return;
+              }
 
-                    line.innerHTML = `<span class="text-muted" style="font-size:0.65rem">[${log.time}]</span> <span class="${colorClass}">> [${log.type}]</span> ${log.msg}`;
-                    line.style.opacity = "0";
-                    logContainer.appendChild(line);
+              // ३. सर्व्हरकडून येणारे लॉग्स रिव्हर्स करा (जुना ते नवा असा क्रम)
+              const logsFromServer = data.logs.reverse(); 
 
-                    // १ सेकंद गॅप (TV साठी वाचनीय)
-                    await new Promise(resolve => setTimeout(resolve, 1000)); 
-                    line.style.opacity = "1";
+              // ४. फक्त तेच लॉग्स निवडा जे आधी स्क्रीनवर दाखवलेले नाहीत
+              const freshLogs = logsFromServer.filter(log => !displayedLogIds.has(log.id));
 
-                    // Force Scroll to Bottom (TV fix)
-                    logContainer.scrollTop = logContainer.scrollHeight;
-                }
-                // बॅच संपल्यावर एकदा पुन्हा तळाला ढकला
-                logContainer.scrollTop = logContainer.scrollHeight;
+              for (const log of freshLogs) {
+                  // ५. महत्त्वाचे: लूपमध्ये मेसेज प्रिंट करण्यापूर्वीच ID सेटमध्ये टाका
+                  // जेणेकरून पुढच्या fetch मध्ये तो पुन्हा 'Fresh' वाटणार नाही
+                  displayedLogIds.add(log.id);
 
-            } catch (err) { console.error("Log error:", err); }
-        }
+                  const line = document.createElement('div');
+                  line.className = "mb-1";
 
-        setInterval(fetchLogs, 40000); 
-        fetchLogs();
+                  // रंगाचे लॉजिक (इथे तुम्ही 'Product' किंवा 'System' टाईप्स सुद्धा ॲड करू शकता)
+                  let colorClass = "text-white-50";
+                  if (log.type === 'Payment') colorClass = "text-success";
+                  else if (log.type === 'User') colorClass = "text-info";
+                  else if (log.type === 'Error') colorClass = "text-danger";
+                  else if (log.type === 'Product' || log.type === 'System') colorClass = "text-primary";
+
+                  const now = new Date();
+                  const liveTime = now.getHours().toString().padStart(2, '0') + ":" + 
+                  now.getMinutes().toString().padStart(2, '0') + ":" + 
+                  now.getSeconds().toString().padStart(2, '0');
+
+                  // मेसेज सेट करा
+                  line.innerHTML = `<span style="font-size:0.65rem; color: #8b949e">[${liveTime}]</span> <span class="${colorClass}">></span> ${log.msg} [${log.id}]`;
+
+                  // ६. नवीन ओळ शेवटी जोडा
+                  logContainer.appendChild(line);
+
+                  // ऑटो-स्क्रोल
+                  logContainer.scrollTo({
+                      top: logContainer.scrollHeight,
+                      behavior: 'smooth'
+                  });
+
+                  // टायपिंग डिले (३०००ms ऐवजी ३००ms-५००ms सुचवतो, टीव्हीवर खूप स्लो वाटू नये म्हणून)
+                  await delay(3000); 
+              }
+
+          } catch (err) {
+              console.error("Log error:", err);
+          } finally {
+              isFetching = false; // प्रोसेस पूर्ण झाल्यावर नवीन रिक्वेस्टसाठी रस्ता मोकळा करा
+          }
+      }
+
+      // दर ४० सेकंदांनी चेक करा
+      setInterval(fetchLogs, 40000);
+
+      // पेज लोड झाल्यावर लगेच एकदा रन करा
+      fetchLogs();
     </script>
   </body>
 </html>
