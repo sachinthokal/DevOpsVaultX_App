@@ -38,7 +38,7 @@ pycparser==3.0
 pydyf==0.12.1
 pyHanko==0.33.0
 pyhanko-certvalidator==0.29.1
-pypdf==6.7.4
+pypdf==6.7.5
 pyphen==0.17.2
 python-bidi==0.6.7
 python-crontab==3.3.0
