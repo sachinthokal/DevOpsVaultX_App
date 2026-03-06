@@ -1,0 +1,8 @@
+# This is a CODEOWNERS file.
+
+# 1. Global Owner
+# This person will be requested for review for ANY change in the repo.
+* @sachinthokal
+
+# 4. Security & Configuration
+/.github/workflows/ @sachinthokal

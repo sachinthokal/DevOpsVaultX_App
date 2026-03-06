@@ -1,15 +1,16 @@
-## PR Summary
-<!-- Issue Deatils -->
+## 📝 Summary
+Briefly describe the changes in this PR.
 
-## Related Issue
-<!-- Link issue here: #123 -->
+## 🚀 Type of Change
+- [ ] 🐞 Bug fix
+- [ ] ✨ New feature
+- [ ] 📝 Documentation
 
-## Changes
-### 1. <!-- Changes 1 -->
-### 2. <!-- Changes 2 -->
-### 3. <!-- Changes 3 -->
+## ✅ Checklist
+- [ ] My code follows the style guidelines.
+- [ ] I have performed a self-review.
+- [ ] I have commented my code where needed.
+- [ ] My changes generate no new warnings.
 
-## Checklist
-- [ ] Code builds correctly
-- [ ] All tests pass
-- [ ] Documentation updated
+## 🔗 Related Issue
+Fixes # [Issue Number]
