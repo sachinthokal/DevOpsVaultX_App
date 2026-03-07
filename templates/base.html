@@ -100,7 +100,7 @@
         <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">HOME</a>
         <a href="{% url 'products:list' %}" class="{% if '/products/' in request.path %}active{% endif %}">PRODUCTS</a>
         <a href="{% url 'insights:home' %}" class="{% if '/insights/' in request.path %}active{% endif %}">INSIGHTS</a>
-        <a href="{% url 'vaultx:index' %}" class="{% if 'vaultx' in request.path %}active{% endif %}">VAULTX</a>
+        <a href="{% url 'vaultx:index' %}" class="{% if '/vaultx/' in request.path %}active{% endif %}">VAULTX</a>
         <a href="{% url 'about' %}" class="{% if request.path == '/about/' %}active{% endif %}">ABOUT</a>
         <a href="{% url 'contact' %}" class="{% if request.path == '/contact/' %}active{% endif %}">CONTACT</a>
 

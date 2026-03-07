@@ -100,6 +100,12 @@ INSTALLED_APPS = [
 ]
 
 # ==================================================
+# SESSION_COOKIE
+# ==================================================
+SESSION_COOKIE_AGE = 3600  # 1 hour in seconds
+SESSION_SAVE_EVERY_REQUEST = True # User activity nantar session reset hoin
+
+# ==================================================
 # Middleware
 # ==================================================
 MIDDLEWARE = [
