@@ -73,13 +73,14 @@ body {
 /* --- Grid Fix: Desktop var 5 items --- */
 .home-products-grid {
   display: grid;
-  /* desktop sathi columns fix kele */
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  /* बदल: 1fr ऐवजी तुमच्या कार्डची max-width (350px) इथे वापरा */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 350px)); 
   gap: 25px;
   max-width: 1400px;
   margin: 40px auto;
   padding: 0 20px;
-  justify-content: center;
+  /* यामुळे कार्ड्स ग्रिडच्या सेंटरला येतील */
+  justify-content: center; 
 }
 
 /* --- Card Styling --- */
@@ -91,10 +92,14 @@ body {
   padding: 15px;
   transition: all 0.3s ease;
   display: flex;
-  justify-content: flex-start; /* Content varun suru hoil */
-  height: 100%; /* Sarv cards chi height same karel */
+  justify-content: flex-start;
+  height: 100%;
   flex-direction: column;
   position: relative;
+  max-width: 350px; 
+  width: 100%;
+  /* सुरक्षिततेसाठी margin auto ठेवा */
+  margin: 0 auto; 
 }
 
 .home-product-card:hover {
