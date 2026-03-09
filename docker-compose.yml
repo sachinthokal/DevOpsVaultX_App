@@ -3,7 +3,7 @@ services:
   # Django Web Service
   # =========================
   devopsvaultx_web:
-    image: sachinthokal/devopsvaultx:1.0.0
+    image: ${{ secrets.DOCKERHUB_USERNAME }}/devopsvaultx:latest
     container_name: devopsvaultx_app
     restart: always
     env_file:
