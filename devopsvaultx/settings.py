@@ -227,8 +227,8 @@ else:
 # ==================================================
 # Razorpay
 # ==================================================
-RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID')
-RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET')
+RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID', default='rzp_test_S867h1Jsjz4a0u')
+RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET', default='cUuVjTsoVlxbXMohuNEJ9QSN')
 
 # ==================================================
 # Email
