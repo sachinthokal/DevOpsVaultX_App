@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load markdown_tags %}
 <link rel="stylesheet" href="{% static 'insights/css/insights_detail.css' %}">
 {% block content %}
 <section class="insights-detail-wrapper">
@@ -41,7 +42,7 @@
             <div class="ultra-content-box">
                 <h1 id="article-title">{{ post.title }}</h1>
                 <article class="ultra-article" id="article-content">
-                    {{ post.content|linebreaks }}
+                    {{ post.content }}
                 </article>
             </div>
 

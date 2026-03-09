@@ -112,6 +112,16 @@
             </div>
             <span>{{ user.first_name|upper }} {{ user.last_name|upper }}</span>
             <div id="dropMenu" class="dropdown-content">
+              
+              {% if user.is_superuser %}
+                <a href="/admin-dashboard/" target="_blank">
+                  <i class="fas fa-user-shield"></i> Admin Dashboard
+                </a>
+                <a href="{% url 'dashboard:admin_dashboard' %}"> 
+                  <i class="fas fa-chart-line"></i> Owner Dashboard
+                </a>
+                <hr style="border: 0.5px solid #eee; margin: 5px 0;">
+              {% endif %}
               <a href="javascript:void(0)" onclick="openModal('profileModal')">
                 <i class="fas fa-user-edit"></i> Profile
               </a>

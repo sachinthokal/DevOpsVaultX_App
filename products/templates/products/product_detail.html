@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load markdown_tags %}
 
 {% block content %}
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -32,7 +33,13 @@
                 <div class="premium-data-box">
                     <div class="data-badge">PRODUCT_METADATA</div>
                     
-                    <div style="margin-top: 20px; line-height: 1.6; color: #cbd5e1; font-size: 1.05rem; white-space: pre-line; letter-spacing: 0.2px;">{% if product.description %}{{ product.description }}{% else %}<span style="opacity: 0.5;">Awaiting data decryption... No metadata available.</span>{% endif %}</div>
+                    <div class="markdown-body" style="max-width: 600px; margin: 0 auto; margin-top: 20px; line-height: 1.6; color: #cbd5e1; font-size: 1.05rem; letter-spacing: 0.2px;">
+                        {% if product.description %}
+                            {{ product.description|markdown_to_html|safe}}
+                        {% else %}
+                            <span style="opacity: 0.5;">Awaiting data decryption... No metadata available.</span>
+                        {% endif %}
+                    </div>
 
                     <div style="margin-top: 20px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
                         <div style="display: flex; gap: 20px;">
