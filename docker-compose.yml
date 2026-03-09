@@ -3,6 +3,7 @@ services:
   # Django Web Service
   # =========================
   devopsvaultx_web:
+    build: .
     image: sachinthokal/devopsvaultx:latest
     container_name: devopsvaultx_app
     restart: always

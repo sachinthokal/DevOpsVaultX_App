@@ -29,7 +29,7 @@ jobs:
         run: |
           docker compose up -d devopsvaultx_db
           sleep 10 #
-          docker compose run --rm devopsvaultx_web python manage.py test
+          docker compose run --rm --build devopsvaultx_web python manage.py test
           docker compose down
 
   # --------------------------------------------------
