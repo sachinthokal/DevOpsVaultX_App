@@ -3,13 +3,13 @@ name: DevOpsVaultX CI/CD Workflow
 on:
   push:
     tags:
-      - 'v*' # v1.0.0, v1.1.0 अशा टॅग्सवर ट्रिगर होईल
+      - 'v*' # Trigger on tags like v1.0.0, v2.1.0
 
 jobs:
   # --------------------------------------------------
-  # JOB 1: TEST (Docker Compose द्वारे)
+  # JOB 1: TEST - Run Django Tests using Docker Compose
   # --------------------------------------------------
-  test:
+  devopsvaultx_test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -17,7 +17,7 @@ jobs:
 
       - name: Create Temporary Env for Test
         run: |
-          # Django & DB
+          echo "Creating temporary .env file for testing..."
           echo "SECRET_KEY=django-insecure-test-key-123" >> .env
           echo "DEBUG=True" >> .env
           echo "ALLOWED_HOSTS=localhost,127.0.0.1" >> .env
@@ -27,12 +27,8 @@ jobs:
           echo "POSTGRES_PASSWORD=admin" >> .env
           echo "POSTGRES_HOST=devopsvaultx_db" >> .env
           echo "POSTGRES_PORT=5432" >> .env
-          
-          # Razorpay (हे डमी व्हॅल्यूज एरर थांबवतील)
           echo "RAZORPAY_KEY_ID=rzp_test_dummy" >> .env
           echo "RAZORPAY_KEY_SECRET=dummy_secret" >> .env
-          
-          # Email Settings (हे मिसिंग असल्यामुळे सुद्धा एरर येऊ शकतो)
           echo "EMAIL_HOST=smtp.gmail.com" >> .env
           echo "EMAIL_PORT=587" >> .env
           echo "EMAIL_USE_TLS=True" >> .env
@@ -41,19 +37,22 @@ jobs:
           echo "CONTACT_EMAIL_SUBJECT=TestSubject" >> .env
           echo "CONTACT_RECEIVER_EMAIL=admin@test.com" >> .env
 
-      - name: Run Django Tests
+      - name: Run DevOpsVaultX Tests
         run: |
+          echo "Starting Database container..."
           docker compose up -d devopsvaultx_db
-          sleep 10 #
+          sleep 10
+          echo "Building app and running Django tests..."
           docker compose run --rm --build devopsvaultx_web python manage.py test
+          echo "Cleaning up test containers..."
           docker compose down
 
   # --------------------------------------------------
-  # JOB 2: BUILD AND PUSH
+  # JOB 2: BUILD AND PUSH - Build Image and Push to Docker Hub
   # --------------------------------------------------
-  build-and-push:
+  devopsvaultx_build_and_push:
     runs-on: ubuntu-latest
-    needs: test
+    needs: devopsvaultx_test
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -68,22 +67,33 @@ jobs:
         id: vars
         run: |
           RAW_TAG=${GITHUB_REF_NAME}
-          echo "VERSION=${RAW_TAG#v}" >> $GITHUB_ENV
+          VERSION=${RAW_TAG#v}
+          echo "Full Tag: $RAW_TAG"
+          echo "Version for Docker: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Build and Push Docker Image
         run: |
           IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/devopsvaultx
+          
+          echo "Building image: $IMAGE_NAME:${{ env.VERSION }}"
           docker build -t $IMAGE_NAME:${{ env.VERSION }} .
+          
+          echo "Building image: $IMAGE_NAME:latest"
           docker build -t $IMAGE_NAME:latest .
+          
+          echo "Pushing images to Docker Hub..."
           docker push $IMAGE_NAME:${{ env.VERSION }}
           docker push $IMAGE_NAME:latest
+          
+          echo "Images pushed successfully!"
 
   # --------------------------------------------------
-  # JOB 3: DEPLOY (EC2 वर)
+  # JOB 3: DEPLOY - Update Code and Containers on EC2
   # --------------------------------------------------
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-push
+    needs: devopsvaultx_build_and_push
     steps:
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@master
@@ -92,24 +102,28 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # १. प्रोजेक्ट फोल्डरमध्ये जा (जर नसेल तर तयार होईल)
+            echo "Connected to EC2. Starting deployment..."
             mkdir -p /home/ubuntu/app
             cd /home/ubuntu/app
 
-            # २. कोड पुल करणे (पहिली वेळ असेल तर 'git clone' मॅन्युअली आधी करा)
+            echo "Updating source code from GitHub..."
             if [ ! -d ".git" ]; then
               git clone https://github.com/${{ github.repository }} .
             else
               git pull origin main
             fi
 
-            # ३. GitHub Secret मधून .env फाईल तयार करणे
+            echo "Updating .env file from GitHub Secrets..."
             echo "${{ secrets.ENV_FILE }}" > .env
 
-            # ४. नवीन इमेजेस पुल करणे आणि कंटेनर्स रीस्टार्ट करणे
+            echo "Pulling latest images and restarting containers..."
             docker compose pull
             docker compose up -d --build
 
-            # ५. डेटाबेस माइग्रेशन आणि क्लिनअप
+            echo "Running database migrations..."
             docker compose exec -T devopsvaultx_web python manage.py migrate --noinput
+            
+            echo "Cleaning up unused Docker images..."
+            
             docker image prune -f
+            echo "Deployment finished successfully!"
