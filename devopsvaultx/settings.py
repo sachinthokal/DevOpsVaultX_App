@@ -150,9 +150,9 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('POSTGRES_DB'),
-        'USER': config('POSTGRES_USER'),
-        'PASSWORD': config('POSTGRES_PASSWORD'),
+        'NAME': config('POSTGRES_DB', default='devopsvaultx_db'),
+        'USER': config('POSTGRES_USER', default='admin'),
+        'PASSWORD': config('POSTGRES_PASSWORD', default='admin'),
         'HOST': config('POSTGRES_HOST', default='localhost'), # Docker network sathi service name garjeche aahe
         'PORT': config('POSTGRES_PORT', default='5432'),
     }
