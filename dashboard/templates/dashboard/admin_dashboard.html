@@ -44,6 +44,10 @@
         padding-bottom: 30px;
         overflow-x: hidden;
       }
+      .row a{
+        text-decoration: none;
+        color: #c9d1d9;
+      }
 
       .main-container {
         padding: 15px;
@@ -287,6 +291,8 @@
     </nav>
 
     <div class="main-container">
+      <div class="row g-2 g-md-3 mb-3" style="margin-left: 20px; text-transform: uppercase; font-size: 0.8rem; font-weight: 600;">
+       <a href="{% url 'pages:home' %}"> ⬅ Back to Home </a></div>
       <div class="row g-2 g-md-3 mb-3">
         <div class="col-6 col-md-3">
           <div class="glass-card stat-box centered-stat">

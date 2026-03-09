@@ -48,7 +48,7 @@ def login_view(request):
                 clean_url = next_url.split('?')[0]
                 return redirect(clean_url)
             
-            return redirect(request.META.get('HTTP_REFERER', 'home'))
+            return redirect(request.META.get('HTTP_REFERER', '/'))
         else:
             # --- STEP 2: FAILED LOG ---
             SystemLog.objects.create(
@@ -60,7 +60,7 @@ def login_view(request):
             # Log failed login attempt
             logger.warning(f"Failed login attempt for username: {u}")
             
-    return redirect(request.META.get('HTTP_REFERER', 'home'))
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 
 def logout_view(request):
     """ User logout """
@@ -74,7 +74,7 @@ def logout_view(request):
     logout(request)
     logger.info(f"User logged out: {user_log}")
     messages.info(request, "Successfully logged out. See you soon!")
-    return redirect('home')
+    return redirect('/')
 
 # ==========================================
 # 2. PROFILE MANAGEMENT
