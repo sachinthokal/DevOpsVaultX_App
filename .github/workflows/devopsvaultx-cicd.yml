@@ -17,13 +17,29 @@ jobs:
 
       - name: Create Temporary Env for Test
         run: |
-          echo "SECRET_KEY=test_key" >> .env
+          # Django & DB
+          echo "SECRET_KEY=django-insecure-test-key-123" >> .env
           echo "DEBUG=True" >> .env
+          echo "ALLOWED_HOSTS=localhost,127.0.0.1" >> .env
+          echo "CSRF_TRUSTED_ORIGINS=http://localhost:8000" >> .env
           echo "POSTGRES_DB=devopsvaultx_db" >> .env
           echo "POSTGRES_USER=admin" >> .env
           echo "POSTGRES_PASSWORD=admin" >> .env
           echo "POSTGRES_HOST=devopsvaultx_db" >> .env
           echo "POSTGRES_PORT=5432" >> .env
+          
+          # Razorpay (हे डमी व्हॅल्यूज एरर थांबवतील)
+          echo "RAZORPAY_KEY_ID=rzp_test_dummy" >> .env
+          echo "RAZORPAY_KEY_SECRET=dummy_secret" >> .env
+          
+          # Email Settings (हे मिसिंग असल्यामुळे सुद्धा एरर येऊ शकतो)
+          echo "EMAIL_HOST=smtp.gmail.com" >> .env
+          echo "EMAIL_PORT=587" >> .env
+          echo "EMAIL_USE_TLS=True" >> .env
+          echo "EMAIL_HOST_USER=test@gmail.com" >> .env
+          echo "EMAIL_HOST_PASSWORD=testpassword" >> .env
+          echo "CONTACT_EMAIL_SUBJECT=TestSubject" >> .env
+          echo "CONTACT_RECEIVER_EMAIL=admin@test.com" >> .env
 
       - name: Run Django Tests
         run: |
