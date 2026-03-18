@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 class Product(models.Model):
     CATEGORY_CHOICES = [
@@ -34,3 +35,8 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
+    
+    # --- HE NAVIN ADD KARA ---
+    def get_absolute_url(self):
+        # Tumhi urls.py madhe 'details' nav dile aahe, mhanun ithe pan 'details' vapra
+        return reverse('products:details', kwargs={'pk': self.pk})
