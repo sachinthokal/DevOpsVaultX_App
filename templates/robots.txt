@@ -1,6 +1,12 @@
 User-agent: *
+
+# 1. Dashboards ani Internal paths block kara (Security + SEO)
+Disallow: /admin-dashboard/
+Disallow: /owner-dashboard/
+Disallow: /payments/
+
+# 2. Public pages allow kara
 Allow: /
 
-Sitemap: https://anthroposophical-temple-benignantly.ngrok-free.dev/sitemap.xml
-
-
+# 3. Dynamic Sitemap Link (Essential for Google Search Console)
+Sitemap: https://devopsvaultx.com/sitemap.xml

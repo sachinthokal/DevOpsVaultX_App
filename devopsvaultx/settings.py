@@ -85,6 +85,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
 
     'django_extensions',
     'corsheaders',
@@ -98,6 +100,8 @@ INSTALLED_APPS = [
     'insights',
     'vaultx',
 ]
+
+SITE_ID = 1
 
 # ==================================================
 # SESSION_COOKIE

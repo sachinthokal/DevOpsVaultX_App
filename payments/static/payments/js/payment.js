@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         name: config.customerName, 
                         email: config.customerEmail 
                     },
-                    theme: { color: "#bf03ed" },
+                    theme: { color: "#540069" },
                 };
 
                 const razorpay = new Razorpay(options);
