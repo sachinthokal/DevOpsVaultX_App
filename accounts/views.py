@@ -2,7 +2,7 @@ import json
 import random
 import logging
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.mail import EmailMultiAlternatives
 from dashboard.models import SystemLog
+from django.db import IntegrityError
 
 # Logger initialization to match your middleware audit logs
 logger = logging.getLogger("request.audit")
@@ -79,39 +80,54 @@ def logout_view(request):
 # ==========================================
 # 2. PROFILE MANAGEMENT
 # ==========================================
-
 @login_required
 def update_profile(request):
-    """ User profile update (AJAX or Form) """
+    """ Handle user profile updates including password change """
     if request.method == 'POST':
         try:
             user = request.user
             old_username = user.username
+            
+            # Fetch data from POST request
+            new_username = request.POST.get('username', user.username)
+            new_email = request.POST.get('email', user.email)
+            
+            # 1. USERNAME/EMAIL UNIQUE CHECK
+            # Prevent update if the new username is already taken by another user
+            if User.objects.exclude(pk=user.pk).filter(username=new_username).exists():
+                messages.error(request, "This username is already taken.")
+                return redirect(request.META.get('HTTP_REFERER', '/'))
+
             user.first_name = request.POST.get('first_name', user.first_name)
             user.last_name = request.POST.get('last_name', user.last_name)
-            user.username = request.POST.get('username', user.username)
-            user.email = request.POST.get('email', user.email)
+            user.username = new_username
+            user.email = new_email
             
             new_pass = request.POST.get('new_password')
-            if new_pass:
-                user.set_password(new_pass)
-                
-            user.save()
             
-            if new_pass:
-                login(request, user)
+            # 2. PASSWORD UPDATE LOGIC
+            if new_pass and len(new_pass.strip()) > 0:
+                user.set_password(new_pass)
+                user.save()
+                # Update session to prevent logout after password change
+                update_session_auth_hash(request, user)
+            else:
+                user.save()
                 
+            # Logging and System Audit
             logger.info(f"Profile updated for user: {old_username}")
-            # --- STEP 2: PROFILE LOG ---
             SystemLog.objects.create(
                 message=f"Profile Updated: Profile modified for @{old_username}",
                 log_type="User"
             )
-            # ---------------------------
+            
             messages.success(request, "Profile updated successfully!")
+            
+        except IntegrityError:
+            messages.error(request, "Username or Email already exists.")
         except Exception as e:
             logger.error(f"Profile update failed for {request.user.username}: {str(e)}")
-            messages.error(request, "Error updating profile.")
+            messages.error(request, "A technical error occurred.")
     
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -221,42 +237,51 @@ def send_otp(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid Request'}, status=400)
 
 def verify_otp_and_register(request):
+    """ Verify OTP and complete user registration """
     if request.method == 'POST':
         try:
             user_otp = request.POST.get('otp')
             stored_otp = request.session.get('email_otp')
             reg_data = request.session.get('registration_data')
 
+            # 1. Validate OTP
             if not stored_otp or user_otp != stored_otp:
                 logger.warning(f"Invalid OTP attempt for email: {reg_data.get('email') if reg_data else 'Unknown'}")
                 return JsonResponse({'status': 'error', 'message': 'Invalid or Expired OTP'}, status=400)
 
+            # 2. Check if session data exists
             if not reg_data:
                 return JsonResponse({'status': 'error', 'message': 'Session Expired. Please Try Again.'}, status=400)
 
+            # 3. Final check for existing username
             if User.objects.filter(username=reg_data['username']).exists():
                 return JsonResponse({'status': 'error', 'message': 'Username Already Taken'}, status=400)
 
-            # Create new user
-            user = User.objects.create(
+            # 4. Create and save user correctly
+            user = User(
                 username=reg_data['username'],
                 email=reg_data['email'],
-                password=reg_data['password'],
                 first_name=reg_data.get('first_name', ''),
                 last_name=reg_data.get('last_name', '')
             )
+            # Assign the already hashed password from session
+            user.password = reg_data['password'] 
+            user.save()
             
+            # 5. Log the user in
             login(request, user)
-            # --- STEP 2: NEW REGISTRATION LOG ---
+            
+            # --- SYSTEM AUDIT LOG ---
             SystemLog.objects.create(
                 message=f"New Profile Initialized: User @{user.username} joined DevOpsVaultX",
                 log_type="User"
             )
-            # ------------------------------------
-            logger.info(f"New user registered and verified: {user.username}")
-            messages.success(request, f"Welcome to DevOpsVaultX, {user.username}!")
+            # ------------------------
 
-            # Cleanup session data
+            logger.info(f"New user registered and verified: {user.username}")
+            messages.success(request, f"Welcome to DevOpsVaultX, {user.username}! 🛡️🚀")
+
+            # 6. Cleanup session data
             request.session.pop('email_otp', None)
             request.session.pop('registration_data', None)
 

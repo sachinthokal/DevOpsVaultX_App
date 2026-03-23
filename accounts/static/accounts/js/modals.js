@@ -221,7 +221,6 @@ function togglePass(id, icon) {
 }
 
 function checkStrength(input, name) {
-    // फक्त पहिल्या पासवर्ड फील्डला ट्रॅक करण्यासाठी (Confirmation ला नको)
     if (name.includes('confirm')) return;
 
     const bar = document.getElementById('strength-bar');
@@ -267,6 +266,20 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleRegPass.addEventListener('click', function() {
             const type = regPassInput.getAttribute('type') === 'password' ? 'text' : 'password';
             regPassInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+        });
+    }
+
+    // ३. Update Profile
+    const toggleProfPass = document.querySelector('#toggleProfPass');
+    const profPassInput = document.querySelector('#prof_new_pass');
+
+    if(toggleProfPass) {
+        toggleProfPass.addEventListener('click', function() {
+            const type = profPassInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            profPassInput.setAttribute('type', type);
+            
+            this.classList.toggle('fa-eye');
             this.classList.toggle('fa-eye-slash');
         });
     }
