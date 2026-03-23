@@ -39,10 +39,10 @@
         </aside>
 
         <main class="ultra-main-card">
-            <div class="ultra-content-box">
+            <div class="ultra-content-box markdown-body">
                 <h1 id="article-title">{{ post.title }}</h1>
                 <article class="ultra-article" id="article-content">
-                    {{ post.content }}
+                    {{ post.content |markdown_to_html|safe }}
                 </article>
             </div>
 

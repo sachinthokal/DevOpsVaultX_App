@@ -90,6 +90,7 @@ INSTALLED_APPS = [
 
     'django_extensions',
     'corsheaders',
+    'core',
 
     # Custom apps
     'accounts',
@@ -108,7 +109,7 @@ APPEND_SLASH = True
 # SESSION_COOKIE
 # ==================================================
 SESSION_COOKIE_AGE = 3600  # 1 hour in seconds
-SESSION_SAVE_EVERY_REQUEST = True # User activity nantar session reset hoin
+SESSION_SAVE_EVERY_REQUEST = True # User activity session reset
 
 # ==================================================
 # Middleware
