@@ -243,3 +243,31 @@ function checkStrength(input, name) {
 }
 
 // ==================================
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // १. Login Pass
+    const toggleLoginPass = document.querySelector('#toggleLoginPass');
+    const loginPassInput = document.querySelector('#login_pass');
+
+    if(toggleLoginPass) {
+        toggleLoginPass.addEventListener('click', function() {
+            const type = loginPassInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            loginPassInput.setAttribute('type', type);
+            // eye icon event
+            this.classList.toggle('fa-eye-slash');
+        });
+    }
+
+    // २. Register Pass
+    const toggleRegPass = document.querySelector('#toggleRegPass');
+    const regPassInput = document.querySelector('#reg_pass');
+
+    if(toggleRegPass) {
+        toggleRegPass.addEventListener('click', function() {
+            const type = regPassInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            regPassInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+        });
+    }
+});
