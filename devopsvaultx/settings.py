@@ -102,6 +102,7 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 1
+APPEND_SLASH = True
 
 # ==================================================
 # SESSION_COOKIE
