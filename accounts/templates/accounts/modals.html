@@ -49,8 +49,8 @@
             <button type="submit" class="auth-btn">Login</button>
         </form>
         <div class="link-section">
-            <p><a href="{% url 'accounts:password_reset' %}">Forgot Password?</a></p>
-            <p style="color: #000000;">New here? <a href="javascript:void(0)" onclick="switchModal('loginModal', 'registerModal')">Create
+            <p><a href="{% url 'accounts:password_reset' %}" title="Reset your forgotten password">Forgot Password?</a></p>
+            <p style="color: #000000;">New here? <a href="javascript:void(0)"  title="New User" onclick="switchModal('loginModal', 'registerModal')">Create
                     Account</a></p>
         </div>
     </div>
@@ -127,7 +127,7 @@
                 <span id="timer_text" style="font-size: 14px; color: #94a3b8;">
                     Resend code in <span id="timer_count" style="color: #ff4500; font-weight: bold;">60</span>s
                 </span>
-                <a href="javascript:void(0)" id="resend_link" onclick="sendOTP(true)"
+                <a href="javascript:void(0)" id="resend_link" onclick="sendOTP(true)" title="Resend otp"
                     style="display: none; color: #ff4500; font-weight: 600; text-decoration: none; font-size: 14px;">
                     RESEND OTP
             </a>

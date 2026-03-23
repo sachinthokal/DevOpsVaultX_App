@@ -15,10 +15,20 @@
 
       gtag('config', 'G-CXM0N4RYKE');
     </script>
-    <title>DevOpsVaultX | DevOps Tools, Scripts & Learning Resources</title>
-    <meta name="description" content="Explore DevOpsVaultX for expert DevOps tools, automation scripts, and comprehensive learning resources. Master CI/CD, cloud infrastructure, and modern practices.">
+
+    <title>DevOpsVaultX | DevOps Notes, Tools & Learning Resources</title>
+    <meta name="description" content="DevOpsVaultX offers expert tools, automation scripts, and learning resources. Master CI/CD, cloud infrastructure, and modern practices with us.">
+    
+    <meta name="keywords" content="DevOpsVaultX, DevOps tools, DevOps Notes, automation scripts, CI/CD, cloud infrastructure, Kubernetes, Docker, Jenkins, Terraform, Azure, AWS, Notes">
+    
+    <meta name="robots" content="index, follow">
+
+    <meta name="author" content="DevOpsVaultX">
+    <link rel="publisher" href="https://devopsvaultx.com/">
+
     <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
     <link rel="canonical" href="https://devopsvaultx.com{{ request.path }}" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
@@ -90,11 +100,12 @@
     <div id="toast-container" class="global-toast-container"></div>
 
     <header class="site-navbar">
-      <a href="/" aria-label="DevOpsVaultX Home">
+      <a href="/" title="DevOpsVaultX Home" aria-label="DevOpsVaultX Home">
         <div class="logo-container">
           <img
             src="{% static 'images/favicon-32x32.png' %}"
-            alt="DevOpsVaultX Logo"
+            alt="DevOpsVaultX Official Logo" 
+            title="DevOpsVaultX - Secure, Automate, Scale"
             class="nav-logo"
             width="32"
             height="32"
@@ -106,16 +117,16 @@
       </a>
 
       <nav class="nav-links" aria-label="Main Navigation">
-        <a href="{% url 'pages:home' %}" class="{% if request.path == '/' %}active{% endif %}">HOME</a>
-        <a href="{% url 'products:list' %}" class="{% if '/products/' in request.path %}active{% endif %}">PRODUCTS</a>
-        <a href="{% url 'insights:home' %}" class="{% if '/insights/' in request.path %}active{% endif %}">INSIGHTS</a>
-        <a href="{% url 'vaultx:index' %}" class="{% if '/vaultx/' in request.path %}active{% endif %}">VAULTX</a>
-        <a href="{% url 'pages:about' %}" class="{% if request.path == '/about/' %}active{% endif %}">ABOUT</a>
-        <a href="{% url 'pages:contact' %}" class="{% if request.path == '/contact/' %}active{% endif %}">CONTACT</a>
+        <a href="{% url 'pages:home' %}" title="Go to Home" class="{% if request.path == '/' %}active{% endif %}">HOME</a>
+        <a href="{% url 'products:list' %}" title="View DevOps Products" class="{% if '/products/' in request.path %}active{% endif %}">PRODUCTS</a>
+        <a href="{% url 'insights:home' %}" title="Read DevOps Insights" class="{% if '/insights/' in request.path %}active{% endif %}">INSIGHTS</a>
+        <a href="{% url 'vaultx:index' %}" title="Access VaultX Resources" class="{% if '/vaultx/' in request.path %}active{% endif %}">VAULTX</a>
+        <a href="{% url 'pages:about' %}" title="About DevOpsVaultX" class="{% if request.path == '/about/' %}active{% endif %}">ABOUT</a>
+        <a href="{% url 'pages:contact' %}" title="Contact Us" class="{% if request.path == '/contact/' %}active{% endif %}">CONTACT</a>
 
         <div class="auth-section">
           {% if user.is_authenticated %}
-          <div class="profile-nav" onclick="toggleDrop(event)">
+          <div class="profile-nav" onclick="toggleDrop(event)" title="View Profile Menu">
             <div class="avatar">
               {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
             </div>
@@ -123,25 +134,25 @@
             <div id="dropMenu" class="dropdown-content">
               
               {% if user.is_superuser %}
-                <a href="/admin-dashboard/" target="_blank">
+                <a href="/admin-dashboard/" target="_blank" title="Open Admin Dashboard">
                   <i class="fas fa-user-shield"></i> Admin Dashboard
                 </a>
-                <a href="{% url 'dashboard:admin_dashboard' %}"> 
+                <a href="{% url 'dashboard:admin_dashboard' %}" title="Open Owner Dashboard"> 
                   <i class="fas fa-chart-line"></i> Owner Dashboard
                 </a>
                 <hr style="border: 0.5px solid #eee; margin: 5px 0;">
               {% endif %}
-              <a href="javascript:void(0)" onclick="openModal('profileModal')">
+              <a href="javascript:void(0)" onclick="openModal('profileModal')" title="Edit Your Profile">
                 <i class="fas fa-user-edit"></i> Profile
               </a>
-              <a href="{% url 'accounts:logout' %}">
+              <a href="{% url 'accounts:logout' %}" title="Logout from Account">
                 <i class="fas fa-sign-out-alt"></i> Logout
               </a>
             </div>
           </div>
           {% else %}
-          <button href="javascript:void(0)" onclick="openModal('loginModal')" class="login-btn-creative">LOGIN</button>
-          <button href="javascript:void(0)" onclick="openModal('registerModal')" class="join-btn-creative">JOIN US</button>
+          <button href="javascript:void(0)" onclick="openModal('loginModal')" title="Login to your account" class="login-btn-creative">LOGIN</button>
+          <button href="javascript:void(0)" onclick="openModal('registerModal')" title="Create a new account" class="join-btn-creative">JOIN US</button>
           {% endif %}
         </div>
       </nav>
@@ -160,11 +171,11 @@
         </div>
         <div class="footer-social">
           <div class="icons">
-            <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
-            <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
-            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-            <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" rel="noopener" title="Follow us on GitHub" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            <a href="#" rel="noopener" title="Follow us on X (Twitter)" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+            <a href="#" rel="noopener" title="Connect on LinkedIn" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="#" rel="noopener" title="Follow us on Instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" rel="noopener" title="Contact on WhatsApp" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
           </div>
         </div>
       </div>

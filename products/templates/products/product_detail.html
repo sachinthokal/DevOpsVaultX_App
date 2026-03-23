@@ -8,13 +8,13 @@
 
 <div class="viewport-container">
     <div class="observation-deck">
-        <a href="{% url 'products:list' %}" class="btn-back">
+        <a href="{% url 'products:list' %}" title="Go back to DevOps products list" class="btn-back">
             <i class="fas fa-arrow-left"></i> BACK_TO_LIST
         </a>
 
         <div class="img-wrap">
             {% if product.image %}
-               <img src="{% if ':/' in product.image.name %}{{ product.image.name }}{% else %}{{ product.image.url }}{% endif %}" class="liquid-img" alt="Product">
+               <img src="{% if ':/' in product.image.name %}{{ product.image.name }}{% else %}{{ product.image.url }}{% endif %}" class="liquid-img" alt="{{ product.title }} - DevOpsVaultX Asset" title="Preview of {{ product.title }}">
             {% else %}
                 <i class="fas fa-cube fa-6x" style="opacity: 0.1;"></i>
             {% endif %}
@@ -60,7 +60,7 @@
                 </span>
             </div>
             
-            <a href="{% url 'products:buy_now' product.pk %}" class="unlock-btn">
+            <a href="{% url 'products:buy_now' product.pk %}" class="unlock-btn" title="{% if product.price == 0 %}Download {{ product.title }} for free{% else %}Purchase and unlock {{ product.title }}{% endif %}">
                 {% if product.price == 0 %}DOWNLOAD <i class="fas fa-download"></i>{% else %}UNLOCK ASSET <i class="fas fa-unlock-alt"></i>{% endif %}
             </a>
         </div>

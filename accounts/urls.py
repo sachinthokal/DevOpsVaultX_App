@@ -22,7 +22,6 @@ urlpatterns = [
     path('password-reset/', 
      auth_views.PasswordResetView.as_view(
          template_name='accounts/password_reset.html',
-         # ही ओळ खूप महत्त्वाची आहे, यामुळे डिफॉल्ट venv फाईल स्किप होईल:
          email_template_name='accounts/password_reset_email.html', 
          html_email_template_name='accounts/password_reset_email.html',
          subject_template_name='accounts/password_reset_subject.txt',

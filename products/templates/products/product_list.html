@@ -10,11 +10,11 @@
 <div class="nav-container">
     <div class="brand-title">PRODUCT VAULT<span>X</span></div>
     <div class="segment-wrapper">
-        <button class="segment-btn active" data-filter="all">Explore All</button>
-        <button class="segment-btn" data-filter="notes">Notes</button>
-        <button class="segment-btn" data-filter="courses">Courses</button>
-        <button class="segment-btn" data-filter="templates">Templates</button>
-        <button class="segment-btn" data-filter="tools">Tools</button>
+        <button class="segment-btn active" data-filter="all" title="Show all DevOps resources">Explore All</button>
+        <button class="segment-btn" data-filter="notes" title="Filter by DevOps Notes">Notes</button>
+        <button class="segment-btn" data-filter="courses" title="Filter by DevOps Courses">Courses</button>
+        <button class="segment-btn" data-filter="templates" title="Filter by Automation Templates">Templates</button>
+        <button class="segment-btn" data-filter="tools" title="Filter by DevOps Tools">Tools</button>
     </div>
 </div>
 
@@ -30,7 +30,7 @@
 
                 <div class="card-preview-area">
                     {% if product.image %}
-                        <img src="{% if ':/' in product.image.name %}{{ product.image.name }}{% else %}{{ product.image.url }}{% endif %}" alt="" onerror="this.parentElement.innerHTML='<div class=\'no-preview-placeholder\'><i class=\'fas fa-image\'></i><span>NO PREVIEW</span></div>';" loading="lazy">                    {% else %}
+                        <img src="{% if ':/' in product.image.name %}{{ product.image.name }}{% else %}{{ product.image.url }}{% endif %}" alt="{{ product.name }} Preview" title="View details for {{ product.name }}" onerror="this.parentElement.innerHTML='<div class=\'no-preview-placeholder\'><i class=\'fas fa-image\'></i><span>NO PREVIEW</span></div>';" loading="lazy">                    {% else %}
                         <div class="no-preview-placeholder">
                             <i class="fas fa-image"></i>
                             <span>NO PREVIEW</span>
@@ -50,7 +50,7 @@
                                 <span class="tag-price">₹{{ product.price }}</span>
                             {% endif %}
                         </div>
-                        <a href="{% url 'products:details' product.pk %}" class="btn-action">
+                        <a href="{% url 'products:details' product.pk %}" class="btn-action" title="View details for {{ product.title }}">
                             VIEW <i class="fas fa-chevron-right" style="font-size: 8px;"></i>
                         </a>
                     </div>
