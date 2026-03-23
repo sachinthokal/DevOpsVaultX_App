@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{% static 'pages/css/home.css' %}">
 
 <div class="home-section">
-    <img src="{% static 'images/hero-bg-3.webp' %}" class="home-hero-image" alt="DevOps Home" width="1920" height="1080" loading="lazy">
+    <img src="{% static 'images/hero-bg-3.webp' %}" class="home-hero-image" alt="DevOps Automation and Cloud Infrastructure Background" title="Mastering DevOps with DevOpsVaultX" width="1920" height="1080" loading="lazy">
     <div class="home-text">
         <h1>LEARN DEVOPS THE SMART WAY</h1>
         <p>Practical guides, tools, and real-world resources for engineers.</p>
@@ -28,6 +28,7 @@
                         {% if product.image %}
                             <img src="{{ product.image.url }}" 
                                  alt="{{ product.title }}" 
+                                 title="{{ product.title }}"
                                  class="home-card-thumbnail"
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" loading="lazy">
                             
@@ -51,7 +52,7 @@
                             <span class="home-price-tag">
                                 {% if product.price == 0 %}FREE{% else %}₹ {{ product.price }}{% endif %}
                             </span>
-                            <a href="{% url 'products:details' product.pk %}" class="home-btn-secondary">VIEW DETAILS</a>
+                            <a href="{% url 'products:details' product.pk %}" title="View Product {{product.pk}} Details" class="home-btn-secondary">VIEW DETAILS</a>
                         </div>
                     </div>
                 </article>
