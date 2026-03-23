@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - 'v*' # Trigger on tags like v1.0.0, v2.1.0
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   # --------------------------------------------------
