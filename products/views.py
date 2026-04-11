@@ -4,9 +4,6 @@ from django.urls import reverse
 from products.models import Product
 
 
-
-# टीप: Payment मॉडेलला वर इम्पोर्ट करू नका, त्यामुळे ImportError येतो.
-
 # ======================
 # Home Page
 # ======================

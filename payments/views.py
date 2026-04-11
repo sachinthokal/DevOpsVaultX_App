@@ -1,7 +1,6 @@
 import json
 import razorpay
 import logging
-import os
 import random
 import datetime
 import threading
@@ -33,9 +32,8 @@ client = razorpay.Client(
 def some_index_view(request):
     return redirect('/')
 
-# ======================
-# 1. BUY PRODUCT (Fixed: Random ID & Credit Reset)
-# ======================
+from django.db import transaction
+
 def buy_product(request, pk):
     product = get_object_or_404(Product, pk=pk, is_active=True)
     
@@ -43,84 +41,89 @@ def buy_product(request, pk):
         request.session.create()
     session_id = request.session.session_key
 
-    # 1. User details fix kara
+    # 1. User details detection
     customer_email = None
     customer_name = None
     current_user = None
 
     if request.user.is_authenticated:
-        current_user = request.user  # Ha 'user' field madhe save karaycha aahe
+        current_user = request.user
         customer_email = request.user.email
-        customer_name = request.user.first_name + " " + request.user.last_name if request.user.first_name and request.user.last_name else request.user.username
+        customer_name = f"{request.user.first_name} {request.user.last_name}".strip() or request.user.username
     else:
         customer_email = request.POST.get('email') or request.session.get('customer_email')
         customer_name = request.POST.get('customer_name') or request.session.get('customer_name')
 
-    # Session data update kara
     request.session['customer_email'] = customer_email
     request.session['customer_name'] = customer_name
 
-    # Renewal check
-    is_renewal_payment = Payment.objects.filter(
-        email=customer_email, 
-        product=product, 
-        status="SUCCESS"
-    ).exists()
-
-    # 2. FREE PRODUCT LOGIC (With User Link)
-    if product.price == 0:
+    # 2. Sequence Protection & Logic Wrap
+    # Transaction atomic vapra mhanje data save honyat error yenar nahi
+    with transaction.atomic():
         
-        # Current Date dynamic ghenyasathi (Format: DDMMYYYY)
-        # Example: 28022026
-        date_str = datetime.datetime.now().strftime("%d%m%Y") 
-        
-        # 1. Unique Order ID Format: ORD-FREE-28022026-XXXX
-        unique_order_id = f"ORD-FREE-{date_str}-{uuid.uuid4().hex[:8].upper()}"
-        
-        # 2. Dummy Payment ID Format: PAY-FREE-28022026-XXXXXXXXXX
-        dummy_payment_id = f"PAY-FREE-{date_str}-{uuid.uuid4().hex[:8].upper()}"
-        
-        Payment.objects.create(
-            user=current_user,  # ITHE USER LINK KELA AAHE
+        # Renewal check & Old records cleanup
+        # Navin purchase kartana junya entries la "is_active=False" kara
+        Payment.objects.filter(
+            user=current_user, 
             product=product, 
-            session_id=session_id,
-            email=customer_email,
+            status__in=["SUCCESS", "COMPLETED"]
+        ).update(is_active=False)
+
+        is_renewal_payment = Payment.objects.filter(
+            email=customer_email, 
+            product=product, 
+            status__in=["SUCCESS", "COMPLETED"]
+        ).exists()
+
+        # 3. FREE PRODUCT LOGIC
+        if product.price == 0:
+            date_str = datetime.datetime.now().strftime("%d%m%Y") 
+            unique_order_id = f"ORD-FREE-{date_str}-{uuid.uuid4().hex[:8].upper()}"
+            dummy_payment_id = f"PAY-FREE-{date_str}-{uuid.uuid4().hex[:8].upper()}"
+            
+            # create madhe ID deu naka, Django la automatic gheu dya
+            Payment.objects.create(
+                user=current_user,
+                product=product, 
+                session_id=session_id,
+                email=customer_email,
+                customer_name=customer_name,
+                razorpay_order_id=unique_order_id,
+                razorpay_payment_id=dummy_payment_id,
+                amount=0,
+                is_renewal=is_renewal_payment,
+                status="SUCCESS", 
+                paid=True, 
+                download_limit=5, 
+                download_used=0,
+                is_active=True # Navin record active rahil
+            )
+            request.session[f"paid_{pk}"] = True
+            return redirect(reverse("payments:payment_result", args=[pk]))
+
+        # 4. PAID PRODUCT LOGIC
+        amount = int(product.price * 100)
+        razorpay_order = client.order.create({
+            "amount": amount, 
+            "currency": "INR", 
+            "receipt": f"rcpt_{uuid.uuid4().hex[:6]}", # Unique receipt
+            "payment_capture": 1
+        })
+
+        Payment.objects.create(
+            user=current_user,
+            product=product, 
+            session_id=session_id, 
+            email=customer_email, 
             customer_name=customer_name,
-            razorpay_order_id=unique_order_id,
-            razorpay_payment_id=dummy_payment_id,  # Free Dummy ID
-            amount=0,
+            razorpay_order_id=razorpay_order["id"], 
+            amount=amount,
             is_renewal=is_renewal_payment,
-            status="SUCCESS", 
-            paid=True, 
+            status="INIT", 
             download_limit=5, 
             download_used=0,
-            is_active=True
+            is_active=False # Payment success nantar payment_success view madhe True hoil
         )
-        request.session[f"paid_{pk}"] = True
-        return redirect(reverse("payments:payment_result", args=[pk]))
-
-    # 3. PAID PRODUCT LOGIC (With User Link)
-    amount = int(product.price * 100)
-    razorpay_order = client.order.create({
-        "amount": amount, 
-        "currency": "INR", 
-        "receipt": f"p_{product.id}_{random.randint(10,99)}", 
-        "payment_capture": 1
-    })
-
-    Payment.objects.create(
-        user=current_user,  # ITHE USER LINK KELA AAHE
-        product=product, 
-        session_id=session_id, 
-        email=customer_email, 
-        customer_name=customer_name,
-        razorpay_order_id=razorpay_order["id"], 
-        amount=amount,
-        is_renewal=is_renewal_payment,
-        status="INIT", 
-        download_limit=5, 
-        download_used=0
-    )
 
     return render(request, "payments/payment.html", {
         "product": product, 
@@ -142,65 +145,68 @@ def payment_success(request, pk):
     product = get_object_or_404(Product, pk=pk)
     razorpay_order_id = request.POST.get("razorpay_order_id")
     
-    # नाव आणि ईमेल पुन्हा एकदा खात्री करून घ्या
     c_name = request.POST.get('customer_name') or request.session.get('customer_name')
     c_email = request.POST.get('email') or request.session.get('customer_email')
 
+    # Important: Order ID pramane payment record shoda
     payment = Payment.objects.filter(razorpay_order_id=razorpay_order_id).first()
     if not payment:
         return HttpResponseForbidden("Payment record not found.")
 
     try:
+        # 1. Razorpay Signature Verification
         client.utility.verify_payment_signature({
             "razorpay_payment_id": request.POST.get("razorpay_payment_id"),
             "razorpay_order_id": razorpay_order_id,
             "razorpay_signature": request.POST.get("razorpay_signature"),
         })
+
+        # 2. Update Payment Metadata
         payment.razorpay_payment_id = request.POST.get("razorpay_payment_id")
         payment.razorpay_signature = request.POST.get("razorpay_signature")
-        payment.status, payment.paid, payment.is_active = "SUCCESS", True, True
         
-        # जर पेमेंट एन्ट्री वेळी नाव नसेल तर इथे अपडेट करा
+        # ✅ KEY FIX: Reset credits for the new purchase
+        payment.status = "SUCCESS"
+        payment.paid = True
+        payment.is_active = True
+        payment.download_used = 0  # Navin purchase aahe, mhanun used 0 pahije
+        payment.download_limit = 5 # Default limit set kara
+        
+        # User auth check and link
+        if request.user.is_authenticated:
+            payment.user = request.user
+        
         if not payment.customer_name: payment.customer_name = c_name
         if not payment.email: payment.email = c_email
+        
         payment.save()
 
-        # ==========================================
-        # DYNAMIC LOG START: PAYMENT SUCCESS
-        # ==========================================
+        # System Logging
         amt_rupees = payment.amount / 100
         SystemLog.objects.create(
-            message=f"Payment SUCCESS: ₹{amt_rupees} received from {c_name} for {product.title}",
+            message=f"Payment SUCCESS: ₹{amt_rupees} for {product.title} (User: {c_email})",
             log_type="Payment"
         )
-        # ==========================================
         
     except razorpay.errors.SignatureVerificationError:
         payment.status = "FAILED"
         payment.save()
-
-        # ==========================================
-        # DYNAMIC LOG: SIGNATURE FAILED
-        # ==========================================
         SystemLog.objects.create(
             message=f"Critical: Signature mismatch for Order #{razorpay_order_id}",
             log_type="Error"
         )
-        # ==========================================
-
         return redirect(reverse("payments:payment_result", args=[pk]))
 
-    # EMAIL CALL FIX
+    # 3. Handle Emails in Background
     if c_email:
-        # Threading vapra jevane page fast reload hoil
         threading.Thread(
             target=send_payment_success_email, 
             args=(c_email, product.title, c_name)
         ).start()
 
+    # Session flag set kara result page sathi
     request.session[f"paid_{pk}"] = True
     return redirect(reverse("payments:payment_result", args=[pk]))
-
 
 # ======================
 # 4. RETRY & FAILURE

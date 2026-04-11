@@ -10,51 +10,51 @@ def vaultx_home(request):
     if not request.user.is_authenticated:
         return render(request, "vaultx/dashboard.html", {"payments": [], "is_logged_in": False})
 
-    # 1. Purna History: Count sathi sagle यशस्वी payments ghya (Deleted pan dakhva count madhe)
+    # 1. Purna History fetch kara (Latest ID first sathi '-id' vapra)
     all_successful_payments = Payment.objects.filter(
         Q(user=request.user) | Q(email=request.user.email),
-        Q(status="SUCCESS") | Q(status="COMPLETED") | Q(amount=0)
-    )
+        Q(status__in=["SUCCESS", "COMPLETED"]) | Q(amount=0)
+    ).order_by('-id')
 
-    # Product wise count kadha
+    # Product wise total purchase count
     purchase_counts = all_successful_payments.values('product_id').annotate(total=Count('id'))
     counts_dict = {item['product_id']: item['total'] for item in purchase_counts}
 
-    # 2. Display Logic: Fakt te payments dakhva je user ne delete nahi kele
+    # 2. Display Logic: Non-deleted payments
     display_qs = all_successful_payments.filter(is_deleted_by_user=False).select_related('product')
 
     final_items = {}
     
-    # Pratyek product sathi ek best record nivda
-    for p_id, total_count in counts_dict.items():
-        # Jar user ne sagale records delete kele astil tar to product dakhvu naka
-        active_display = display_qs.filter(product_id=p_id).order_by('-id')
-        
-        if not active_display.exists():
-            continue
+    # Unique product IDs chi list
+    product_ids = display_qs.values_list('product_id', flat=True).distinct()
 
-        # Try to find an active one (not fully used)
-        display_payment = active_display.filter(
+    for p_id in product_ids:
+        # Ya product che sagle records ghy
+        product_records = display_qs.filter(product_id=p_id)
+
+        # ✅ CRITICAL FIX: Pahalanda te record shodha jyache CREDITS BAKI aahet
+        # Filter madhe 'is_active=True' ani 'download_used < limit' aslela record priority var ghy
+        display_payment = product_records.filter(
             download_used__lt=F('download_limit'),
             is_active=True
         ).first()
 
-        # Jar active nasel tar latest available record ghya
+        # Jar ek pan active record nasel, tarach latest expired record dakhva
         if not display_payment:
-            display_payment = active_display.first()
+            display_payment = product_records.first()
 
         if display_payment:
             product = display_payment.product
-            # File existence check
+            # File check logic
             display_payment.file_exists = bool(product.file and os.path.exists(product.file.path))
-            # FIX: Purna history cha count dakhva
-            display_payment.purchase_count = total_count
+            # History count set kara
+            display_payment.purchase_count = counts_dict.get(p_id, 1)
             final_items[p_id] = display_payment
 
-    # Convert dict to sorted list (latest first)
+    # Dashboard var sorting (Latest active purchase var yaava)
     sorted_payments = sorted(
         final_items.values(),
-        key=lambda x: x.created_at,
+        key=lambda x: x.id, 
         reverse=True
     )
 
@@ -63,12 +63,6 @@ def vaultx_home(request):
         "is_logged_in": True,
         "customer_name": request.user.username,
     }
-
-    # context = {
-    #     "payments": list(final_items.values()),
-    #     "is_logged_in": True,
-    #     "customer_name": request.user.username,
-    # }
     return render(request, "vaultx/dashboard.html", context)
 
 
