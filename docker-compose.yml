@@ -39,7 +39,7 @@ services:
       - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-      - db_logs:/var/log/postgresql
+      - ./logs/db:/var/log/postgresql
     networks:
       - devopsvaultx_network
 
@@ -58,7 +58,7 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt
       - static_volume:/app/staticfiles
       - media_volume:/app/media
-      - nginx_logs:/var/log/nginx
+      - ./logs/nginx:/var/log/nginx
     depends_on:
       - devopsvaultx_web
     networks:
@@ -118,8 +118,8 @@ services:
       - ./FluentBit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
       - ./FluentBit/parsers.conf:/fluent-bit/etc/parsers.conf
       - app_logs:/mnt/logs/app:ro
-      - nginx_logs:/mnt/logs/nginx:ro
-      - db_logs:/mnt/logs/db:ro
+      - ./logs/nginx:/mnt/logs/nginx:ro
+      - ./logs/db:/mnt/logs/db:ro
     depends_on:
       - opensearch
     networks:

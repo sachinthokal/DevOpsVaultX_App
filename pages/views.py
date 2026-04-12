@@ -144,6 +144,6 @@ def contact(request):
             else:
                 messages.error(request, "⚠️ System busy. Please try sending the email again later.")
 
-        return redirect('contact') 
+        return redirect('pages:contact')
 
     return render(request, "pages/contact.html", context)
