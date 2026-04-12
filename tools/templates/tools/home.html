@@ -1,139 +1,157 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block meta_tags %}
+<title>DevOpsVaultX TOOLS - High Performance DevOps Utilities Hub | DevOpsVaultX</title>
+<meta name="description"
+    content="Explore VaultX Tools: A professional collection of DevOps utilities including JSON fixers, YAML converters, Secret generators and Base64 tools. Fast, secure, and developer-friendly.">
+<meta name="keywords"
+    content="DevOps tools, online JSON fixer, YAML converter, secret generator, Base64 tool, SRE utilities, automation toolkit">
+<link rel="canonical" href="https://devopsvaultx.com/tools/">
+{% endblock %}
+
 {% block content %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "VaultX Tools",
-  "url": "https://devopsvaultx.com{{ request.path }}",
-  "description": "DevOpsVaultX Tools provides essential utilities for DevOps engineers including JSON Fixer, Base64 converter, and more.",
-  "applicationCategory": "DeveloperApplication",
-  "operatingSystem": "All"
-}
-</script>
+<head>
+    <link rel="stylesheet" href="{% static 'tools/css/home.css' %}">
+</head>
 
-<div class="container-fluid px-4">
-
+<div class="tools-dashboard">
     <header class="dashboard-header">
-        <link rel="stylesheet" href="{% static 'tools/css/home.css' %}">
-        <div class="title-area">
-            <h1 style="padding: 5px; font-size: 24px; font-weight: 600; margin: 0;">VAULTX TOOLS</h1>
+        <h1>DEVOPSVAULTX TOOLS</h1>
+        <div class="search-container">
+            <input type="text" id="toolSearch" class="search-input" placeholder="Search tools (Ctrl + F)"
+                aria-label="Search DevOps tools">
         </div>
-        <input type="text" id="toolSearch" class="search-input" placeholder="Search tools (⌘ + K)"
-            aria-label="Search DevOps tools">
     </header>
 
-    <div class="cat-divider" style="margin-top: 45px;">Core DevOps</div>
-    <div class="compact-grid">
-        <a href="{% url 'tools:json_fix' %}" class="tool-tile" title="Fix and Format JSON Online">
-            <div class="tile-icon">{}</div>
-            <span class="tile-label">JSON Fix</span>
-        </a>
+    <main id="toolsGrid">
+        <section>
+            <div class="cat-divider">Core DevOps</div>
+            <div class="compact-grid">
+                <a href="{% url 'tools:json_fix' %}" class="tool-tile">
+                    <div class="tile-icon" style="font-size: 30px; color: white;">{ }</div>
+                    <span class="tile-label">JSON Fixer</span>
+                </a>
+                <a href="{% url 'tools:yaml_json' %}" class="tool-tile">
+                    <div class="tile-icon">🔄</div>
+                    <span class="tile-label">YAML/JSON</span>
+                </a>
+                <a href="{% url 'tools:beautify' %}" class="tool-tile">
+                    <div class="tile-icon">✨</div>
+                    <span class="tile-label">Code Polisher</span>
+                </a>
+                <a href="{% url 'tools:base64' %}" class="tool-tile">
+                    <div class="tile-icon">🔢</div>
+                    <span class="tile-label">Base64</span>
+                </a>
+                <a href="{% url 'tools:secret_gen' %}" class="tool-tile">
+                    <div class="tile-icon">🔐</div>
+                    <span class="tile-label">Secret Gen</span>
+                </a>
+            </div>
+            <!-- <div class="compact-grid" style="margin-top: 20px;">
+                <a href="{% url 'tools:json_fix' %}" class="tool-tile">
+                    <div class="tile-icon">📦</div>
+                    <span class="tile-label">JSON Fixer</span>
+                </a>
+                <a href="{% url 'tools:yaml_json' %}" class="tool-tile">
+                    <div class="tile-icon">🔄</div>
+                    <span class="tile-label">YAML/JSON</span>
+                </a>
+                <a href="{% url 'tools:beautify' %}" class="tool-tile">
+                    <div class="tile-icon">✨</div>
+                    <span class="tile-label">Code Polisher</span>
+                </a>
+                <a href="{% url 'tools:base64' %}" class="tool-tile">
+                    <div class="tile-icon">🔢</div>
+                    <span class="tile-label">Base64</span>
+                </a>
+                <a href="{% url 'tools:secret_gen' %}" class="tool-tile">
+                    <div class="tile-icon">🔐</div>
+                    <span class="tile-label">Secret Gen</span>
+                </a>
+            </div> -->
+        </section>
 
-        <a href="#" class="tool-tile" title="Base64 Encode and Decode Utility">
-            <div class="tile-icon">64</div>
-            <span class="tile-label">Base64</span>
-        </a>
+        <section>
+            <div class="cat-divider">Text & Media</div>
+            <div class="compact-grid">
+                <a href="{% url 'tools:case_converter' %}" class="tool-tile">
+                    <div class="tile-icon" style="font-size: 30px; color: chartreuse;">Aa</div>
+                    <span class="tile-label">Case Converter</span>
+                </a>
+                <a class="tool-tile disabled">
+                    <span class="coming-soon-badge">Soon</span>
+                    <div class="tile-icon">🔠</div>
+                    <span class="tile-label">Big Text Generator</span>
+                </a>
+                <a class="tool-tile disabled">
+                    <span class="coming-soon-badge">Soon</span>
+                    <div class="tile-icon">🔍</div>
+                    <span class="tile-label">Find & Replace Text</span>
+                </a>
+                <a class="tool-tile disabled">
+                    <span class="coming-soon-badge">Soon</span>
+                    <div class="tile-icon">📝</div>
+                    <span class="tile-label">Duplicate Finder</span>
+                </a>
+                <a class="tool-tile disabled">
+                    <span class="coming-soon-badge">Soon</span>
+                    <div class="tile-icon">🗑️</div>
+                    <span class="tile-label">Character Removal</span>
+                </a>
+            </div>
+        </section>
 
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">PW</div>
-            <span class="tile-label">Secret Gen</span>
-        </a>
-
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">YM</div>
-            <span class="tile-label">YAML/JSON</span>
-        </a>
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">URL</div>
-            <span class="tile-label">Encoder</span>
-        </a>
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">&lt;&gt;</div>
-            <span class="tile-label">Beautify</span>
-        </a>
-    </div>
-
-    <div class="cat-divider">Text & Content</div>
-    <div class="compact-grid">
-        <a href="#" class="tool-tile" title="Convert Text Case">
-            <div class="tile-icon">🖼️</div>
-            <span class="tile-label">Convert Case</span>
-        </a>
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">✂️</div>
-            <span class="tile-label">BG Cut</span>
-        </a>
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">SEO</div>
-            <span class="tile-label">Analyze</span>
-        </a>
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">📝</div>
-            <span class="tile-label">Word Count</span>
-        </a>
-    </div>
-
-    <div class="cat-divider">Image & Media</div>
-    <div class="compact-grid">
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">🖼️</div>
-            <span class="tile-label">Resize</span>
-        </a>
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">✂️</div>
-            <span class="tile-label">BG Cut</span>
-        </a>
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">SEO</div>
-            <span class="tile-label">Analyze</span>
-        </a>
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">📝</div>
-            <span class="tile-label">Word Count</span>
-        </a>
-    </div>
-
-    <div class="cat-divider">Font Styles</div>
-    <div class="compact-grid">
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">🖼️</div>
-            <span class="tile-label">Resize</span>
-        </a>
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">✂️</div>
-            <span class="tile-label">BG Cut</span>
-        </a>
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">SEO</div>
-            <span class="tile-label">Analyze</span>
-        </a>
-        <a href="#" class="tool-tile disabled" rel="nofollow">
-            <span class="coming-soon-badge">Soon</span>
-            <div class="tile-icon">📝</div>
-            <span class="tile-label">Word Count</span>
-        </a>
-    </div>
+        <section>
+            <div class="cat-divider">Font Styles</div>
+            <div class="compact-grid">
+                <a class="tool-tile disabled">
+                    <span class="coming-soon-badge">Soon</span>
+                    <div class="tile-icon" style="color: rgb(33, 158, 242); font-weight: bolder;">B</div>
+                    <span class="tile-label">Bold Text</span>
+                </a>
+                <a class="tool-tile disabled">
+                    <span class="coming-soon-badge">Soon</span>
+                    <div class="tile-icon">🎨</div>
+                    <span class="tile-label">Fancy Text</span>
+                </a>
+                <a class="tool-tile disabled">
+                    <span class="coming-soon-badge">Soon</span>
+                    <div class="tile-icon" style="color: orange;">T̶e̶x̶t̶</div>
+                    <span class="tile-label">Strikethrough Text</span>
+                </a>
+                <a class="tool-tile disabled">
+                    <span class="coming-soon-badge">Soon</span>
+                    <div class="tile-icon" style="font-size: 30px; color: chartreuse;">eͭxͤpͯrͭession</div>
+                    <span class="tile-label">Stacked Text</span>
+                </a>
+                <a class="tool-tile disabled">
+                    <span class="coming-soon-badge">Soon</span>
+                    <div class="tile-icon" style="color: deeppink;">𝕋𝕖𝕩𝕥</div>
+                    <span class="tile-label">Double-Struck Text</span>
+                </a>
+            </div>
+        </section>
+    </main>
 </div>
 
+<footer class="tool-footer">
+    <div class="footer-copyright">
+        <p>Welcome to VaultX Tools, a high-performance utility hub built specifically for modern DevOps workflows. From
+            converting complex Kubernetes manifests to encoding cloud secrets and polishing automation scripts, our
+            tools are designed to be fast, secure, and developer-friendly. Streamline your daily technical tasks and
+            eliminate manual errors with our all-in-one automation toolkit.</p>
+    </div>
+    <div class="footer-links">
+        <a href="{% url 'pages:about' %}">Terms of Service</a>
+        <a href="{% url 'pages:about' %}">Privacy Policy</a>
+        <a href="{% url 'pages:about' %}">Support</a>
+    </div>
+</footer>
+
 <script>
-    // Search functionality - logic intact
+    // Search Logic (Kept Intact)
     document.getElementById('toolSearch').addEventListener('keyup', function () {
         let filter = this.value.toLowerCase();
         let tiles = document.querySelectorAll('.tool-tile');

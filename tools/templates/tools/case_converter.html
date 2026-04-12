@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta_tags %}
+<title>Case Converter - Professional Text Formatter | DevOpsVaultX</title>
+<meta name="description"
+    content="Convert text to UPPERCASE, lowercase, Title Case, and more instantly. Professional DevOps-grade text formatting tool by DevOpsVaultX.">
+<link rel="canonical" href="https://devopsvaultx.com/tools/case-converter">
+{% endblock %}
+
+{% block content %}
+
+<head>
+    <link rel="stylesheet" href="{% static 'tools/css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'tools/css/case_converter.css' %}">
+</head>
+<div class="vault-breadcrumb" style="margin-bottom: 10px; font-size: 12px; color: #8b949e;">
+    <a href="{% url 'tools:tool_home' %}" style="color: inherit; text-decoration: none;">⬅ Tools</a> // CASE CONVERTER
+</div>
+
+<div class="tool-wrapper">
+    <header class="header-section">
+        <h1>Case Converter</h1>
+    </header>
+
+    <main class="converter-card">
+        <div class="editor-toolbar">
+            <span class="toolbar-label">Input Content</span>
+            <div class="stats-container">
+                <span>Words: <strong id="wordCount">0</strong></span>
+                <span>Chars: <strong id="charCount">0</strong></span>
+            </div>
+        </div>
+
+        <textarea id="inputText" placeholder="Paste or type your text here..."></textarea>
+
+        <div class="controls-panel">
+            <div class="btn-grid">
+                <button class="btn-case" onclick="process('upper')">UPPERCASE</button>
+                <button class="btn-case" onclick="process('lower')">lowercase</button>
+                <button class="btn-case" onclick="process('sentence')">Sentence case</button>
+                <button class="btn-case" onclick="process('title')">Title Case</button>
+                <button class="btn-case" onclick="process('capitalize')">Capitalize Word</button>
+                <button class="btn-case" onclick="process('alternating')">aLtErNaTiNg</button>
+                <button class="btn-case" onclick="process('inverse')">InVeRsE</button>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn-dvx btn-primary" onclick="copyText()">📋 Copy Result</button>
+                <button class="btn-dvx btn-secondary" onclick="downloadText()">📥 Download .txt</button>
+                <button class="btn-dvx btn-clear" onclick="clearAll()">🗑️ Clear</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<footer class="tool-footer">
+    <div class="footer-copyright">
+        <p>Streamline your text formatting with the VaultX Case Converter. Whether you're fixing documentation, cleaning
+            up code comments, or adjusting API payloads, our converter provides instant results with zero data leaving
+            your browser. Built for speed and developer productivity in real production environments.</p>
+    </div>
+    <div class="footer-links">
+        <a href="{% url 'pages:about' %}">Terms of Service</a>
+        <a href="{% url 'pages:about' %}">Privacy Policy</a>
+        <a href="{% url 'pages:about' %}">Support</a>
+    </div>
+</footer>
+
+<script>
+    const ta = document.getElementById('inputText');
+
+    ta.addEventListener('input', () => {
+        const text = ta.value;
+        document.getElementById('charCount').innerText = text.length;
+        document.getElementById('wordCount').innerText = text.trim() ? text.trim().split(/\s+/).length : 0;
+    });
+
+    function process(type) {
+        let val = ta.value;
+        if (!val) return;
+
+        switch (type) {
+            case 'upper': val = val.toUpperCase(); break;
+            case 'lower': val = val.toLowerCase(); break;
+            case 'sentence': val = val.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase()); break;
+            case 'title': val = val.toLowerCase().split(' ').map(s => s.charAt(0).toUpperCase() + s.substring(1)).join(' '); break;
+            case 'capitalize': val = val.split(' ').map(s => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' '); break;
+            case 'alternating': val = val.split('').map((c, i) => i % 2 == 0 ? c.toLowerCase() : c.toUpperCase()).join(''); break;
+            case 'inverse': val = val.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join(''); break;
+        }
+        ta.value = val;
+    }
+
+    function copyText() {
+        if (!ta.value) return;
+        navigator.clipboard.writeText(ta.value);
+        const btn = event.target;
+        const original = btn.innerText;
+        btn.innerText = "✅ Copied!";
+        setTimeout(() => btn.innerText = original, 2000);
+    }
+
+    function clearAll() {
+        ta.value = '';
+        document.getElementById('charCount').innerText = '0';
+        document.getElementById('wordCount').innerText = '0';
+    }
+
+    function downloadText() {
+        if (!ta.value) return;
+        const blob = new Blob([ta.value], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'vaultx-formatted-text.txt';
+        a.click();
+    }
+</script>
+{% endblock %}

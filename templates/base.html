@@ -120,6 +120,7 @@
 
       <nav class="nav-links" aria-label="Main Navigation">
         <a href="{% url 'pages:home' %}" title="Go to Home" class="{% if request.path == '/' %}active{% endif %}">HOME</a>
+        <a href="{% url 'tools:tool_home' %}" title="View DevOps Tools" class="{% if '/tools/' in request.path %}active{% endif %}">TOOLS</a>
         <a href="{% url 'products:list' %}" title="View DevOps Products" class="{% if '/products/' in request.path %}active{% endif %}">PRODUCTS</a>
         <a href="{% url 'insights:home' %}" title="Read DevOps Insights" class="{% if '/insights/' in request.path %}active{% endif %}">INSIGHTS</a>
         <a href="{% url 'vaultx:index' %}" title="Access VaultX Resources" class="{% if '/vaultx/' in request.path %}active{% endif %}">VAULTX</a>

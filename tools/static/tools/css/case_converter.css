@@ -1,0 +1,160 @@
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --editor-bg: #1e1e1e;
+    --panel-bg: #161b22;
+    --border-color: #30363d;
+    --text-color: #adbac7;
+    --accent-color: #00d4aa;
+}
+
+.tool-wrapper {
+    padding: 20px 15px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header-section h1 {
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    font-weight: 800;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 10px;
+}
+
+/* VS Code Style Editor Card */
+.converter-card {
+    background: var(--panel-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.editor-toolbar {
+    background: #2d333b;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.toolbar-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 300px;
+    background: var(--editor-bg);
+    color: #d4d4d4;
+    padding: 20px;
+    border: none;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+}
+
+/* Case Buttons Grid */
+.controls-panel {
+    padding: 20px;
+    background: var(--panel-bg);
+}
+
+.btn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-case {
+    padding: 10px;
+    background: #21262d;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
+}
+
+.btn-case:hover {
+    border-color: #667eea;
+    background: #30363d;
+    color: white;
+}
+
+/* Bottom Action Bar */
+.action-bar {
+    display: flex;
+    gap: 15px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    flex-wrap: wrap;
+}
+
+.btn-dvx {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.btn-secondary {
+    background: #3fb950;
+    color: white;
+}
+
+.btn-clear {
+    background: #f85149;
+    color: white;
+}
+
+.stats-container {
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    color: #8b949e;
+}
+
+.stats-container strong {
+    color: var(--accent-color);
+}
+
+@media (max-width: 600px) {
+    .btn-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .action-bar button {
+        width: 100%;
+        justify-content: center;
+    }
+}

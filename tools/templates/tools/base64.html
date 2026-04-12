@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta_tags %}
+<title>Base64 Encoder & Decoder | Free Online DevOps Tool | DevOpsVaultX</title>
+<meta name="description"
+    content="Free online Base64 encoder and decoder tool. Securely encode and decode strings for Kubernetes secrets, CI/CD pipelines, and web development.">
+<meta name="keywords"
+    content="base64, base64 encoder, base64 decoder, kubernetes secrets encoder, devops tools, online converter">
+<meta name="author" content="DevOpsVaultX">
+<link rel="canonical" href="https://devopsvaultx.com/tools/base64">
+{% endblock %}
+
+{% block content %}
+
+<head>
+    <link rel="stylesheet" href="{% static 'tools/css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'tools/css/base64.css' %}">
+</head>
+<div class="vault-breadcrumb">
+    <a href="{% url 'tools:tool_home' %}" class="breadcrumb-link">⬅ Tools</a> // BASE64 ENCODER & DECODER
+</div>
+<div class="tool-section">
+    <header class="tool-header">
+        <h1>BASE64 ENCODER & DECODER</h1>
+    </header>
+
+    <main class="tool-card">
+        <div class="input-wrapper">
+            <label for="inputText">Raw Input</label>
+            <textarea id="inputText" placeholder="Enter text to encode or Base64 string to decode..."></textarea>
+            <p class="error-toast" id="errorMsg"></p>
+        </div>
+
+        <div class="button-container">
+            <button class="btn-dvx btn-primary" onclick="encodeBase64()">
+                <span>🔒</span> Encode
+            </button>
+            <button class="btn-dvx btn-secondary" onclick="decodeBase64()">
+                <span>🔓</span> Decode
+            </button>
+            <button class="btn-dvx btn-clear" onclick="clearAll()">
+                <span>🗑️</span> Clear
+            </button>
+        </div>
+
+        <div class="result-section">
+            <label
+                style="display:block; font-weight:700; margin-bottom:10px; color:#4a5568; font-size:0.9rem; text-transform:uppercase;">Processed
+                Output</label>
+            <div class="result-box" id="outputText"></div>
+            <button class="copy-button" id="copyBtn" onclick="copyResult()">Copy Output</button>
+        </div>
+    </main>
+</div>
+<footer class="tool-footer">
+    <div class="footer-copyright">
+        <p>Securely manage your sensitive data with the VaultX Base64 Tool. Essential for handling Kubernetes secrets
+            and CI/CD environment variables, this tool allows you to encode plain text or decode Base64 strings
+            instantly in your browser. Its clean interface and one-click copy feature make it a must-have utility for
+            every SRE and DevOps professional working with cloud-native configurations.</p>
+    </div>
+    <div class="footer-links">
+        <a href="{% url 'pages:about' %}">Terms of Service</a>
+        <a href="{% url 'pages:about' %}">Privacy Policy</a>
+        <a href="{% url 'pages:about' %}">Support</a>
+    </div>
+</footer>
+
+<script>
+    const inputText = document.getElementById('inputText');
+    const outputText = document.getElementById('outputText');
+    const errorMsg = document.getElementById('errorMsg');
+    const copyBtn = document.getElementById('copyBtn');
+
+    function showError(message) {
+        errorMsg.textContent = message;
+        errorMsg.style.display = 'block';
+        outputText.textContent = '';
+    }
+
+    function hideError() {
+        errorMsg.style.display = 'none';
+    }
+
+    function encodeBase64() {
+        hideError();
+        const input = inputText.value.trim();
+        if (!input) {
+            showError('Please enter text to encode');
+            return;
+        }
+        try {
+            // UTF-8 Safe Encoding
+            const encoded = btoa(unescape(encodeURIComponent(input)));
+            outputText.textContent = encoded;
+        } catch (e) {
+            showError('Encoding Error: ' + e.message);
+        }
+    }
+
+    function decodeBase64() {
+        hideError();
+        const input = inputText.value.trim();
+        if (!input) {
+            showError('Please enter a Base64 string to decode');
+            return;
+        }
+        try {
+            // UTF-8 Safe Decoding
+            const decoded = decodeURIComponent(escape(atob(input)));
+            outputText.textContent = decoded;
+        } catch (e) {
+            showError('Invalid Base64 string. Please check your input.');
+        }
+    }
+
+    function clearAll() {
+        inputText.value = '';
+        outputText.textContent = '';
+        hideError();
+    }
+
+    function copyResult() {
+        const result = outputText.textContent;
+        if (!result) return;
+
+        navigator.clipboard.writeText(result).then(() => {
+            copyBtn.textContent = 'Copied!';
+            copyBtn.classList.add('copied');
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy Output';
+                copyBtn.classList.remove('copied');
+            }, 2000);
+        });
+    }
+
+    // Ctrl + Enter shortcut
+    inputText.addEventListener('keydown', function (e) {
+        if (e.ctrlKey && e.key === 'Enter') {
+            encodeBase64();
+        }
+    });
+</script>
+{% endblock %}
