@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "VaultX Tools",
+  "url": "https://devopsvaultx.com{{ request.path }}",
+  "description": "DevOpsVaultX Tools provides essential utilities for DevOps engineers including JSON Fixer, Base64 converter, and more.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "All"
+}
+</script>
+
+<div class="container-fluid px-4">
+
+    <header class="dashboard-header">
+        <link rel="stylesheet" href="{% static 'tools/css/home.css' %}">
+        <div class="title-area">
+            <h1 style="padding: 5px; font-size: 24px; font-weight: 600; margin: 0;">VAULTX TOOLS</h1>
+        </div>
+        <input type="text" id="toolSearch" class="search-input" placeholder="Search tools (⌘ + K)"
+            aria-label="Search DevOps tools">
+    </header>
+
+    <div class="cat-divider" style="margin-top: 45px;">Core DevOps</div>
+    <div class="compact-grid">
+        <a href="{% url 'tools:json_fix' %}" class="tool-tile" title="Fix and Format JSON Online">
+            <div class="tile-icon">{}</div>
+            <span class="tile-label">JSON Fix</span>
+        </a>
+
+        <a href="#" class="tool-tile" title="Base64 Encode and Decode Utility">
+            <div class="tile-icon">64</div>
+            <span class="tile-label">Base64</span>
+        </a>
+
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">PW</div>
+            <span class="tile-label">Secret Gen</span>
+        </a>
+
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">YM</div>
+            <span class="tile-label">YAML/JSON</span>
+        </a>
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">URL</div>
+            <span class="tile-label">Encoder</span>
+        </a>
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">&lt;&gt;</div>
+            <span class="tile-label">Beautify</span>
+        </a>
+    </div>
+
+    <div class="cat-divider">Text & Content</div>
+    <div class="compact-grid">
+        <a href="#" class="tool-tile" title="Convert Text Case">
+            <div class="tile-icon">🖼️</div>
+            <span class="tile-label">Convert Case</span>
+        </a>
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">✂️</div>
+            <span class="tile-label">BG Cut</span>
+        </a>
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">SEO</div>
+            <span class="tile-label">Analyze</span>
+        </a>
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">📝</div>
+            <span class="tile-label">Word Count</span>
+        </a>
+    </div>
+
+    <div class="cat-divider">Image & Media</div>
+    <div class="compact-grid">
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">🖼️</div>
+            <span class="tile-label">Resize</span>
+        </a>
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">✂️</div>
+            <span class="tile-label">BG Cut</span>
+        </a>
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">SEO</div>
+            <span class="tile-label">Analyze</span>
+        </a>
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">📝</div>
+            <span class="tile-label">Word Count</span>
+        </a>
+    </div>
+
+    <div class="cat-divider">Font Styles</div>
+    <div class="compact-grid">
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">🖼️</div>
+            <span class="tile-label">Resize</span>
+        </a>
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">✂️</div>
+            <span class="tile-label">BG Cut</span>
+        </a>
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">SEO</div>
+            <span class="tile-label">Analyze</span>
+        </a>
+        <a href="#" class="tool-tile disabled" rel="nofollow">
+            <span class="coming-soon-badge">Soon</span>
+            <div class="tile-icon">📝</div>
+            <span class="tile-label">Word Count</span>
+        </a>
+    </div>
+</div>
+
+<script>
+    // Search functionality - logic intact
+    document.getElementById('toolSearch').addEventListener('keyup', function () {
+        let filter = this.value.toLowerCase();
+        let tiles = document.querySelectorAll('.tool-tile');
+        tiles.forEach(tile => {
+            let text = tile.innerText.toLowerCase();
+            tile.style.display = text.includes(filter) ? "flex" : "none";
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,189 @@
+:root {
+    --bg-color: #030712;
+    --card-bg: #111827;
+    --accent: #8b5cf6;
+    --border-color: #1f2937;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: #f3f4f6;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.site-content-wrapper{
+    padding: 20px;
+}
+
+/* Compact Header */
+.dashboard-header {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Elements wrap on mobile */
+    gap: 15px;
+}
+
+.title-area h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(45deg, #fff, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Small & Minimal Search */
+.search-input {
+    background: #1f2937;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: white;
+    width: 250px;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+}
+
+/* Super Compact Grid */
+.compact-grid {
+    display: grid;
+    /* auto-fill vaprelyamule screen size nusar columns badaltil */
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+}
+
+/* Creative Mini Card */
+.tool-tile {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 15px 5px;
+    text-align: center;
+    text-decoration: none;
+    color: #9ca3af;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.tool-tile:hover {
+    background: #1e293b;
+    border-color: var(--accent);
+    transform: translateY(-5px); /* Scale aivaji Translate mobile var smooth disto */
+    color: white;
+    z-index: 10;
+}
+
+.tool-tile .tile-icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+    background: rgba(139, 92, 246, 0.1);
+    width: 75px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 8px;
+    color: var(--accent);
+    transition: 0.3s;
+}
+
+.tool-tile:hover .tile-icon {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 0 15px var(--accent);
+}
+
+.tile-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    padding: 0 5px;
+}
+
+/* Section Divider */
+.cat-divider {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 30px 0 15px;
+    display: flex;
+    align-items: center;
+}
+
+.cat-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border-color);
+    margin-left: 15px;
+}
+
+/* Disabled state sathi */
+.tool-tile.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none; /* Click band karel */
+    filter: grayscale(0.8);
+}
+
+.coming-soon-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 0.55rem;
+    background: var(--accent);
+    color: white;
+    padding: 2px 5px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* --- MOBILE RESPONSIVE LOGIC --- */
+
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column; /* Mobile var logo aani search ekamekanchya khali */
+        align-items: flex-start;
+        padding: 15px 0;
+    }
+
+    .search-input {
+        width: 100%; /* Search bar full width on mobile */
+        box-sizing: border-box;
+    }
+
+    .title-area h2 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .compact-grid {
+        /* Chotyas mobile var 2 kiwa 3 columns bastil */
+        grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+        gap: 8px;
+    }
+    
+    .tool-tile {
+        padding: 12px 3px;
+    }
+
+    .tile-label {
+        font-size: 0.7rem;
+    }
+}

@@ -100,6 +100,7 @@ INSTALLED_APPS = [
     'payments',
     'insights',
     'vaultx',
+    'tools',
 ]
 
 SITE_ID = 1
