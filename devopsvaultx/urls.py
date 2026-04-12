@@ -28,6 +28,7 @@ urlpatterns = [
     path('payments/', include('payments.urls')),
     path('insights/', include('insights.urls')),
     path('vaultx/', include('vaultx.urls')),
+    path('tools/', include('tools.urls')),
 
     # SEO REQUIRED FILES
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),

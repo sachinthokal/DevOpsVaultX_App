@@ -1,0 +1,326 @@
+/* tools/css/json_fix_new.css */
+
+/* Global Vault Theme Variables */
+:root {
+    --vault-bg: #030712; /* Deep background matching your screenshot */
+    --vault-panel: #0f172a; /* Lighter navy for panels */
+    --vault-accent: #8b5cf6; /* Primary Violet */
+    --vault-accent-glow: rgba(139, 92, 246, 0.2);
+    --vault-text: #e2e8f0;
+    --vault-border: #1f2937;
+    --vault-success: #22c55e;
+}
+
+/* Page Setup */
+body {
+    background-color: var(--vault-bg);
+    color: var(--vault-text);
+    font-family: 'Inter', system-ui, sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+.vault-tool-page {
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+/* Header & Meta */
+.vault-header {
+    border-bottom: 1px solid var(--vault-border);
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.vault-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -1px;
+    margin: 0;
+}
+
+.vault-title span {
+    color: var(--vault-accent);
+}
+
+.vault-breadcrumb {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* --- THE WORKSPACE GRID --- */
+.vault-workspace {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+/* Panel Design (Neomorphic-Glass) */
+.vault-panel {
+    background: var(--vault-panel);
+    border: 1px solid var(--vault-border);
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.vault-panel:focus-within {
+    border-color: var(--vault-accent);
+    box-shadow: 0 0 25px var(--vault-accent-glow);
+}
+
+/* Panel Header */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.panel-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* The Futuristic Editor */
+.vault-editor {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    resize: none;
+    outline: none !important;
+    width: 100%;
+    min-height: 350px;
+}
+
+#json_output {
+    color: #38bdf8; /* Cyber Blue output */
+}
+
+/* Status Indicators */
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4b5563; /* Default gray */
+}
+
+.vault-panel.success .status-dot { background: var(--vault-success); }
+.vault-panel.error .status-dot { background: #ef4444; }
+
+/* --- ACTION BAR & BUTTONS --- */
+.vault-action-bar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* Premium Primary Button */
+.btn-vault-prime {
+    background: var(--vault-accent);
+    color: white;
+    border: none;
+    padding: 14px 35px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-vault-prime:hover {
+    background: #7c3aed;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+}
+
+/* Outline Secondary Buttons */
+.btn-vault-outline {
+    background: transparent;
+    border: 1px solid var(--vault-border);
+    color: #94a3b8;
+    padding: 14px 25px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: 600;
+}
+
+.btn-vault-outline:hover {
+    border-color: var(--vault-accent);
+    color: white;
+}
+
+/* Alert Notification */
+/* Small & Compact Toast Alert */
+.vault-alert {
+    position: fixed; /* Fixed so it stays on screen */
+    bottom: 70px;
+    left: 25px;
+    max-width: 320px; /* Small width */
+    background: rgba(239, 68, 68, 0.95); /* Semi-transparent red */
+    color: white;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-20px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 9999;
+}
+
+.vault-alert.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.vault-alert i {
+    font-size: 1.1rem;
+}
+
+/* Close button for Alert */
+.alert-close {
+    margin-left: auto;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: 0.3s;
+}
+
+.alert-close:hover { opacity: 1; }
+
+/* Responsive Alert for Mobile */
+@media (max-width: 480px) {
+    .vault-alert {
+        left: 15px;
+        right: 15px;
+        bottom: 15px;
+        max-width: none; /* Full width on tiny screens */
+    }
+}
+/* Container to hold gutter and textarea together */
+.editor-wrapper {
+    display: flex;
+    flex: 1;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--vault-border);
+}
+
+/* The Line Number Column */
+.line-numbers {
+    width: 40px;
+    padding: 25px 0; /* Match vault-editor padding */
+    text-align: center;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85rem;
+    color: #4b5563;
+    background: rgba(0, 0, 0, 0.3);
+    border-right: 1px solid var(--vault-border);
+    user-select: none;
+    line-height: 1.7; /* Crucial: Must match vault-editor line-height */
+    overflow: hidden;
+}
+
+/* Ensure editor line-height matches gutter */
+.vault-editor {
+    line-height: 1.7 !important;
+    padding: 25px 15px !important;
+}
+
+.line-numbers, .vault-editor {
+    /* Donhi kade same font-size aani line-height asne compulsory aahe */
+    font-size: 14px !important; 
+    line-height: 1.5 !important; 
+}
+
+.vault-breadcrumb {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.breadcrumb-link {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: 0.3s;
+    font-weight: 600;
+}
+
+.breadcrumb-link:hover {
+    color: var(--vault-accent); /* Violet color on hover */
+}
+
+.breadcrumb-separator {
+    color: #4b5563; /* Subtle gray for the // */
+    font-weight: 400;
+}
+
+/* Scrollbar Styling */
+textarea::-webkit-scrollbar { width: 8px; }
+textarea::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+/* --- MOBILE & ALL SCREEN RESPONSIVENESS --- */
+
+@media (max-width: 992px) {
+    .vault-workspace {
+        grid-template-columns: 1fr; /* Stacks panels vertically on smaller screens */
+        gap: 20px;
+    }
+    
+    .vault-tool-page {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .vault-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .vault-action-bar {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .btn-vault-prime, .btn-vault-outline {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'tools/css/json_fix_new.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<div class="vault-tool-page container-fluid">
+    <header class="vault-header">
+        <div class="header-main">
+            <div class="vault-breadcrumb">
+                <a href="{% url 'tools:tool_home' %}" class="breadcrumb-link">Tools</a> 
+                <span class="breadcrumb-separator">//</span> 
+                JSON Fixer
+            </div>
+        </div>
+    </header>
+
+    <form method="POST" id="jsonForm">
+        {% csrf_token %}
+
+        <div class="vault-workspace">
+            <div class="vault-panel {% if error %}error{% elif status == 'success' %}success{% endif %}">
+                <div class="panel-header">
+                    <span class="panel-label">Input Area</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="status-dot"></span>
+                        <span class="small text-muted fw-bold">RAW JSON</span>
+                    </div>
+                </div>
+                <div class="editor-wrapper">
+                    <div class="line-numbers" id="input_lines">1</div>
+                    <textarea name="json_input" class="vault-editor" id="json_input"
+                        oninput="updateLineNumbers('json_input', 'input_lines')"
+                        onscroll="syncScroll('json_input', 'input_lines')"
+                        placeholder="Paste messy JSON here...">{% if raw_input %}{{ raw_input }}{% else %}{{ request.POST.json_input }}{% endif %}</textarea>
+                </div>
+            </div>
+
+            <div class="vault-panel {% if status == 'success' %}success{% endif %}">
+                <div class="panel-header">
+                    <span class="panel-label">Output Area</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="status-dot"></span>
+                        <span class="small text-muted fw-bold">PROCESSED</span>
+                    </div>
+                </div>
+                <div class="editor-wrapper">
+                    <div class="line-numbers" id="output_lines">1</div>
+                    <textarea id="json_output" class="vault-editor" readonly
+                        onscroll="syncScroll('json_output', 'output_lines')"
+                        placeholder="Fixed JSON will appear here...">{{ result }}</textarea>
+                </div>
+
+                {% if error %}
+                <div id="errorToast" class="vault-alert {% if error %}visible{% endif %}">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <span>{{ error }}</span>
+                    <i class="fas fa-times alert-close" onclick="closeAlert()"></i>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="vault-action-bar">
+            <button type="submit" name="action" value="format" class="btn-vault-prime">
+                <i class="fas fa-magic"></i> Fix & Prettify
+            </button>
+            <button type="submit" name="action" value="minify" class="btn-vault-outline">
+                <i class="fas fa-compress-alt"></i> Minify JSON
+            </button>
+            <button type="button" onclick="clearFields()" class="btn-vault-outline text-muted">
+                <i class="fas fa-trash-alt"></i> Clear
+            </button>
+            <button type="button" onclick="copyToClipboard()" id="copy_btn" class="btn-vault-outline">
+                <i class="fas fa-copy"></i> Copy result
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // --- LINE NUMBER LOGIC ---
+    function updateLineNumbers(textareaId, gutterId) {
+        const textarea = document.getElementById(textareaId);
+        const gutter = document.getElementById(gutterId);
+        const lines = textarea.value.split('\n').length;
+        let lineNumbersHtml = '';
+        for (let i = 1; i <= lines; i++) {
+            lineNumbersHtml += i + '<br>';
+        }
+        gutter.innerHTML = lineNumbersHtml;
+    }
+
+    function syncScroll(textareaId, gutterId) {
+        const textarea = document.getElementById(textareaId);
+        const gutter = document.getElementById(gutterId);
+        gutter.scrollTop = textarea.scrollTop;
+    }
+
+    // Initialize line numbers on load
+    window.addEventListener('DOMContentLoaded', () => {
+        updateLineNumbers('json_input', 'input_lines');
+        updateLineNumbers('json_output', 'output_lines');
+    });
+
+    // --- EXISTING UTILITIES ---
+    function copyToClipboard() {
+        const output = document.getElementById('json_output');
+        const btn = document.getElementById('copy_btn');
+
+        if (!output.value || output.value.trim() === "") return;
+
+        navigator.clipboard.writeText(output.value).then(() => {
+            const originalText = "Copy result";
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            btn.classList.add('text-success', 'border-success');
+
+            setTimeout(() => {
+                btn.innerHTML = `<i class="fas fa-copy"></i> ${originalText}`;
+                btn.classList.remove('text-success', 'border-success');
+            }, 2500);
+        }).catch(err => {
+            output.select();
+            document.execCommand('copy');
+        });
+    }
+
+    function closeAlert() {
+        const alert = document.getElementById('errorToast');
+        if (alert) alert.classList.remove('visible');
+    }
+
+    {% if error %}
+    setTimeout(() => { closeAlert(); }, 5000);
+    {% endif %}
+
+    function clearFields() {
+        document.getElementById('json_input').value = '';
+        document.getElementById('json_output').value = '';
+        updateLineNumbers('json_input', 'input_lines');
+        updateLineNumbers('json_output', 'output_lines');
+        closeAlert();
+    }
+</script>
+{% endblock %}
