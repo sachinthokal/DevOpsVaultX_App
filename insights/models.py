@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from django.utils import timezone
 from datetime import timedelta
+from django.urls import reverse
 
 class InsightsPost(models.Model):
     CATEGORY_CHOICES = [
@@ -25,10 +26,8 @@ class InsightsPost(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        # 1. डेटाबेस टेबलचे नाव बदलण्यासाठी (तुमच्या आवडीचे नाव द्या)
-        db_table = 'devopsvaultx_insights_posts' # सध्या हे 'InsightsPost' आहे
+        db_table = 'devopsvaultx_insights_posts'
         
-        # 2. ऑर्डरिंग आणि नावे
         ordering = ['-is_pinned', 'priority', '-created_at']
         verbose_name = "DevOpsVaultX Insights Post"
         verbose_name_plural = "DevOpsVaultX Insights Posts"
@@ -39,7 +38,7 @@ class InsightsPost(models.Model):
             slug = base_slug
             counter = 1
 
-            # ड्युप्लिकेट स्लग टाळण्यासाठी लॉजिक
+
             while InsightsPost.objects.filter(slug=slug).exists():
                 slug = f"{base_slug}-{counter}"
                 counter += 1
@@ -50,13 +49,18 @@ class InsightsPost(models.Model):
 
     @property
     def is_new(self):
-        # १. जर Admin मधून 'mark_new' टिक केले असेल तर 'New' दाखवा
         if self.mark_new:
             return True
         
-        # २. किंवा जर पोस्ट २ दिवसांच्या आतली असेल तर 'New' दाखवा
         now = timezone.now()
         return self.created_at >= now - timedelta(days=2)
 
     def __str__(self):
         return self.title
+    
+
+    def get_absolute_url(self):
+        return reverse('insights:detail', kwargs={
+            'category': self.category, 
+            'slug': self.slug
+        })
