@@ -4,136 +4,145 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'tools/css/json_fix_new.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'tools/css/home.css' %}">
+
+<div class="vault-breadcrumb">
+    <a href="{% url 'tools:tool_home' %}" class="breadcrumb-link">⬅ Tools</a>
+    <span class="breadcrumb-separator">//</span> JSON FIXER
+</div>
 
 <div class="vault-tool-page container-fluid">
     <header class="vault-header">
         <div class="header-main">
-            <div class="vault-breadcrumb">
-                <a href="{% url 'tools:tool_home' %}" class="breadcrumb-link">Tools</a> 
-                <span class="breadcrumb-separator">//</span> 
-                JSON Fixer
-            </div>
+            <h1 class="vault-title">JSON FIXER</h1>
         </div>
     </header>
 
-    <form method="POST" id="jsonForm">
-        {% csrf_token %}
-
-        <div class="vault-workspace">
-            <div class="vault-panel {% if error %}error{% elif status == 'success' %}success{% endif %}">
-                <div class="panel-header">
-                    <span class="panel-label">Input Area</span>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="status-dot"></span>
-                        <span class="small text-muted fw-bold">RAW JSON</span>
-                    </div>
-                </div>
-                <div class="editor-wrapper">
-                    <div class="line-numbers" id="input_lines">1</div>
-                    <textarea name="json_input" class="vault-editor" id="json_input"
-                        oninput="updateLineNumbers('json_input', 'input_lines')"
-                        onscroll="syncScroll('json_input', 'input_lines')"
-                        placeholder="Paste messy JSON here...">{% if raw_input %}{{ raw_input }}{% else %}{{ request.POST.json_input }}{% endif %}</textarea>
+    <div class="vault-workspace">
+        <div class="vault-panel" id="panel_in">
+            <div class="panel-header">
+                <span class="panel-label">Input Area</span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="status-dot"></span>
+                    <span class="small text-muted fw-bold">RAW JSON</span>
                 </div>
             </div>
-
-            <div class="vault-panel {% if status == 'success' %}success{% endif %}">
-                <div class="panel-header">
-                    <span class="panel-label">Output Area</span>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="status-dot"></span>
-                        <span class="small text-muted fw-bold">PROCESSED</span>
-                    </div>
-                </div>
-                <div class="editor-wrapper">
-                    <div class="line-numbers" id="output_lines">1</div>
-                    <textarea id="json_output" class="vault-editor" readonly
-                        onscroll="syncScroll('json_output', 'output_lines')"
-                        placeholder="Fixed JSON will appear here...">{{ result }}</textarea>
-                </div>
-
-                {% if error %}
-                <div id="errorToast" class="vault-alert {% if error %}visible{% endif %}">
-                    <i class="fas fa-circle-exclamation"></i>
-                    <span>{{ error }}</span>
-                    <i class="fas fa-times alert-close" onclick="closeAlert()"></i>
-                </div>
-                {% endif %}
+            <div class="editor-wrapper">
+                <div class="line-numbers" id="input_lines">1</div>
+                <textarea class="vault-editor" id="json_input" oninput="updateLineNumbers('json_input', 'input_lines')"
+                    onscroll="syncScroll('json_input', 'input_lines')"
+                    placeholder="Paste messy JSON here... (missing quotes, trailing commas, etc.)"></textarea>
             </div>
         </div>
 
-        <div class="vault-action-bar">
-            <button type="submit" name="action" value="format" class="btn-vault-prime">
-                <i class="fas fa-magic"></i> Fix & Prettify
-            </button>
-            <button type="submit" name="action" value="minify" class="btn-vault-outline">
-                <i class="fas fa-compress-alt"></i> Minify JSON
-            </button>
-            <button type="button" onclick="clearFields()" class="btn-vault-outline text-muted">
-                <i class="fas fa-trash-alt"></i> Clear
-            </button>
-            <button type="button" onclick="copyToClipboard()" id="copy_btn" class="btn-vault-outline">
-                <i class="fas fa-copy"></i> Copy result
-            </button>
+        <div class="vault-panel" id="panel_out">
+            <div class="panel-header">
+                <span class="panel-label">Output Area</span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="status-dot"></span>
+                    <span class="small text-muted fw-bold">PROCESSED</span>
+                </div>
+            </div>
+            <div class="editor-wrapper">
+                <div class="line-numbers" id="output_lines">1</div>
+                <textarea id="json_output" class="vault-editor" readonly
+                    onscroll="syncScroll('json_output', 'output_lines')"
+                    placeholder="Fixed JSON will appear here..."></textarea>
+            </div>
+            <div id="errorToast" class="vault-alert">
+                <i class="fas fa-circle-exclamation"></i>
+                <span id="errText"></span>
+                <i class="fas fa-times alert-close" onclick="closeAlert()"></i>
+            </div>
         </div>
-    </form>
+    </div>
+
+    <div class="vault-action-bar">
+        <button type="button" onclick="fixAndFormat('format')" class="btn-vault-prime">
+            <i class="fas fa-magic"></i> Fix & Prettify
+        </button>
+        <button type="button" onclick="fixAndFormat('minify')" class="btn-vault-outline">
+            <i class="fas fa-compress-alt"></i> Minify JSON
+        </button>
+        <button type="button" onclick="clearFields()" class="btn-vault-outline text-muted">
+            <i class="fas fa-trash-alt"></i> Clear
+        </button>
+        <button type="button" onclick="copyToClipboard()" id="copy_btn" class="btn-vault-outline">
+            <i class="fas fa-copy"></i> Copy result
+        </button>
+    </div>
 </div>
+<footer class="tool-footer">
+    <div class="footer-copyright">
+        <p>Eliminate syntax errors and format messy data with the VaultX JSON Fixer. Designed specifically for DevOps
+            and SRE professionals, this tool automatically repairs common formatting issues like missing quotes,
+            trailing commas, and improper brackets. Whether you are debugging a complex API response or fixing a broken
+            configuration file, simply paste your raw input to get a valid, beautified, and production-ready JSON output
+            in milliseconds.</p>
+    </div>
+    <div class="footer-links">
+        <a href="{% url 'pages:about' %}">Terms of Service</a>
+        <a href="{% url 'pages:about' %}">Privacy Policy</a>
+        <a href="{% url 'pages:about' %}">Support</a>
+    </div>
+</footer>
 
 <script>
-    // --- LINE NUMBER LOGIC ---
-    function updateLineNumbers(textareaId, gutterId) {
-        const textarea = document.getElementById(textareaId);
-        const gutter = document.getElementById(gutterId);
-        const lines = textarea.value.split('\n').length;
-        let lineNumbersHtml = '';
-        for (let i = 1; i <= lines; i++) {
-            lineNumbersHtml += i + '<br>';
+    function updateLineNumbers(taId, lnId) {
+        const ta = document.getElementById(taId);
+        const ln = document.getElementById(lnId);
+        const lines = ta.value.split('\n').length;
+        ln.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join('<br>');
+    }
+
+    function syncScroll(taId, lnId) {
+        document.getElementById(lnId).scrollTop = document.getElementById(taId).scrollTop;
+    }
+
+    function fixAndFormat(mode) {
+        let input = document.getElementById('json_input').value.trim();
+        const output = document.getElementById('json_output');
+
+        if (!input) return;
+
+        try {
+            // --- THE "VAULTX" REPAIR LOGIC ---
+            let repaired = input
+                .replace(/'/g, '"') // 1. Fix Single Quotes
+                .replace(/,\s*([}\]])/g, '$1') // 2. Fix Trailing Commas
+                .replace(/([{,]\s*)([a-zA-Z0-9_]+?)\s*:/g, '$1"$2":') // 3. Fix Unquoted Keys
+                // 4. Fix Unquoted String Values (Like in your screenshot)
+                .replace(/:\s*([a-zA-Z0-9_-]+)(?=\s*[,}\]])/g, ': "$1"')
+                .replace(/\n/g, ' '); // Temporary flatten for parsing
+
+            const parsed = JSON.parse(repaired);
+
+            if (mode === 'minify') {
+                output.value = JSON.stringify(parsed);
+            } else {
+                output.value = JSON.stringify(parsed, null, 4);
+            }
+
+            document.getElementById('panel_out').classList.add('success');
+            document.getElementById('panel_in').classList.remove('error');
+            updateLineNumbers('json_output', 'output_lines');
+            closeAlert();
+        } catch (e) {
+            document.getElementById('errText').innerText = "❌ Hard Syntax Error: " + e.message;
+            document.getElementById('errorToast').classList.add('visible');
+            document.getElementById('panel_in').classList.add('error');
+            output.value = "";
         }
-        gutter.innerHTML = lineNumbersHtml;
     }
 
-    function syncScroll(textareaId, gutterId) {
-        const textarea = document.getElementById(textareaId);
-        const gutter = document.getElementById(gutterId);
-        gutter.scrollTop = textarea.scrollTop;
-    }
-
-    // Initialize line numbers on load
-    window.addEventListener('DOMContentLoaded', () => {
-        updateLineNumbers('json_input', 'input_lines');
-        updateLineNumbers('json_output', 'output_lines');
-    });
-
-    // --- EXISTING UTILITIES ---
     function copyToClipboard() {
         const output = document.getElementById('json_output');
+        if (!output.value) return;
+        navigator.clipboard.writeText(output.value);
         const btn = document.getElementById('copy_btn');
-
-        if (!output.value || output.value.trim() === "") return;
-
-        navigator.clipboard.writeText(output.value).then(() => {
-            const originalText = "Copy result";
-            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-            btn.classList.add('text-success', 'border-success');
-
-            setTimeout(() => {
-                btn.innerHTML = `<i class="fas fa-copy"></i> ${originalText}`;
-                btn.classList.remove('text-success', 'border-success');
-            }, 2500);
-        }).catch(err => {
-            output.select();
-            document.execCommand('copy');
-        });
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Copy result'; }, 2000);
     }
-
-    function closeAlert() {
-        const alert = document.getElementById('errorToast');
-        if (alert) alert.classList.remove('visible');
-    }
-
-    {% if error %}
-    setTimeout(() => { closeAlert(); }, 5000);
-    {% endif %}
 
     function clearFields() {
         document.getElementById('json_input').value = '';
@@ -142,5 +151,9 @@
         updateLineNumbers('json_output', 'output_lines');
         closeAlert();
     }
+
+    function closeAlert() { document.getElementById('errorToast').classList.remove('visible'); }
+
+    window.onload = () => { updateLineNumbers('json_input', 'input_lines'); };
 </script>
 {% endblock %}

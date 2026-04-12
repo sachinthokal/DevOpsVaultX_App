@@ -27,19 +27,18 @@ body {
 
 /* Header & Meta */
 .vault-header {
-    border-bottom: 1px solid var(--vault-border);
     padding-bottom: 20px;
-    margin-bottom: 30px;
     display: flex;
-    justify-content: space-between;
+    text-align: center;
+    justify-content: center;
     align-items: center;
 }
 
 .vault-title {
-    font-size: 1.8rem;
+    font-size: xx-large;
     font-weight: 800;
     color: white;
-    letter-spacing: -1px;
+    letter-spacing: 19px;
     margin: 0;
 }
 
@@ -264,31 +263,6 @@ body {
     line-height: 1.5 !important; 
 }
 
-.vault-breadcrumb {
-    color: #94a3b8;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.breadcrumb-link {
-    color: #94a3b8;
-    text-decoration: none;
-    transition: 0.3s;
-    font-weight: 600;
-}
-
-.breadcrumb-link:hover {
-    color: var(--vault-accent); /* Violet color on hover */
-}
-
-.breadcrumb-separator {
-    color: #4b5563; /* Subtle gray for the // */
-    font-weight: 400;
-}
 
 /* Scrollbar Styling */
 textarea::-webkit-scrollbar { width: 8px; }
