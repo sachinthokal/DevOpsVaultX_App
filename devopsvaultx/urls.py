@@ -8,12 +8,19 @@ from django.views.static import serve
 
 # --- SITEMAP IMPORTS ---
 from django.contrib.sitemaps.views import sitemap
-from products.sitemaps import StaticViewSitemap, ProductSitemap 
+from insights.sitemaps import InsightDynamicSitemap
+from pages.sitemaps import PagesStaticSitemap
+from products.sitemaps import ProductSitemap
+from tools.sitemaps import ToolStaticSitemap
+from vaultx.sitemaps import VaultxStaticSitemap 
 
 # Sitemap Dictionary
 sitemaps = {
-    'static': StaticViewSitemap,
-    'products': ProductSitemap,
+    'pages': PagesStaticSitemap,
+    'insights': InsightDynamicSitemap,
+    'products': ProductSitemap,  
+    'vaultx': VaultxStaticSitemap,
+    'tools': ToolStaticSitemap,
 }
 
 urlpatterns = [
@@ -33,15 +40,14 @@ urlpatterns = [
     # SEO REQUIRED FILES
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     
-    # 🔥 DYNAMIC SITEMAP FIX (TemplateView kadhun ha dynamic view vapra)
+    # 🔥 DYNAMIC SITEMAP FIX
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="django.contrib.sitemaps.views.sitemap"),
 
-    # 🔥 DUSRYA USERS SATHI FIX (Production and Debug both)
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
 ]
 
-# Local development sathi he pan rahu dya
+# Local development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

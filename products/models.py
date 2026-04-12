@@ -25,10 +25,10 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        # 1. डेटाबेस टेबलचे नाव बदलण्यासाठी
+        # 1. To Change Default Table Name
         db_table = 'devopsvaultx_products'
         
-        # 2. ऑर्डरिंग आणि नावे
+        # 2. Ordering and Names
         ordering = ['-created_at', '-id']
         verbose_name = "DevOpsVaultX Product"
         verbose_name_plural = "DevOpsVaultX Products"
@@ -36,7 +36,6 @@ class Product(models.Model):
     def __str__(self):
         return self.title
     
-    # --- HE NAVIN ADD KARA ---
+    # --- To Get URL ---
     def get_absolute_url(self):
-        # Tumhi urls.py madhe 'details' nav dile aahe, mhanun ithe pan 'details' vapra
         return reverse('products:details', kwargs={'pk': self.pk})
