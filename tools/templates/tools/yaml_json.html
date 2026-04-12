@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta_tags %}
+<title>YAML ↔ JSON Converter | VS Code Edition | DevOpsVaultX</title>
+<meta name="description"
+    content="Professional Online YAML to JSON Converter with VS Code theme. Best for Kubernetes manifests and cloud configurations.">
+{% endblock %}
+
+{% block content %}
+
+<head>
+    <link rel="stylesheet" href="{% static 'tools/css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'tools/css/yaml_json.css' %}">
+</head>
+<div class="vault-breadcrumb">
+    <a href="{% url 'tools:tool_home' %}" class="breadcrumb-link">⬅ Tools</a>
+    <span class="breadcrumb-separator">//</span>
+    YAML ↔ JSON CONVERTER
+</div>
+<div class="tool-wrapper">
+    <section class="header-section">
+        <h1>YAML ↔ JSON CONVERTER</h1>
+    </section>
+
+    <div class="controls">
+        <button class="btn-vscode" onclick="runConvert('yaml')">Convert to JSON</button>
+        <button class="btn-vscode" onclick="runConvert('json')">Convert to YAML</button>
+        <button class="btn-vscode btn-reset" onclick="fullReset()">Reset</button>
+    </div>
+
+    <main class="editor-grid">
+        <article class="vscode-window">
+            <div class="vscode-titlebar">
+                <div class="window-dots">
+                    <div class="dot dot-red"></div>
+                    <div class="dot dot-yellow"></div>
+                    <div class="dot dot-green"></div>
+                </div>
+                <div style="color:#858585; font-size:11px;">source_config.yaml</div>
+                <div></div>
+            </div>
+            <div class="file-tab">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#519aba">
+                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                    <polyline points="13 2 13 9 20 9"></polyline>
+                </svg>
+                input.yaml
+            </div>
+            <div class="editor-container">
+                <div id="inLine" class="line-numbers">1</div>
+                <textarea id="mainInput" placeholder="Paste code here..." onscroll="syncScroll('mainInput', 'inLine')"
+                    oninput="handleInput()"></textarea>
+            </div>
+        </article>
+
+        <article class="vscode-window">
+            <div class="vscode-titlebar">
+                <div class="window-dots">
+                    <div class="dot dot-red"></div>
+                    <div class="dot dot-yellow"></div>
+                    <div class="dot dot-green"></div>
+                </div>
+                <button id="copyBtn" onclick="copyResult()" 
+                        style="background:#007acc; border:none; color:white; font-size:11px; padding:4px 10px; border-radius:3px; cursor:pointer; font-weight:600; transition: all 0.2s ease; display:flex; align-items:center; gap:5px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copy Result
+                </button>
+            </div>
+            <div class="file-tab">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#ce9178">
+                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                    <polyline points="13 2 13 9 20 9"></polyline>
+                </svg>
+                output.json
+            </div>
+            <div class="editor-container">
+                <div id="outLine" class="line-numbers">1</div>
+                <textarea id="mainOutput" readonly placeholder="Result..."
+                    onscroll="syncScroll('mainOutput', 'outLine')"></textarea>
+            </div>
+        </article>
+    </main>
+</div>
+<footer class="tool-footer">
+    <div class="footer-copyright">
+        <p>Simplify your cloud configuration management with the VaultX YAML ↔ JSON Converter. This tool allows DevOps
+            engineers to instantly switch between formats, making it easy to debug Kubernetes manifests, Docker Compose
+            files, or complex API payloads. Simply paste your code, select the conversion direction, and get a perfectly
+            formatted result with precise indentation. It is built specifically to save time during deployment and
+            prevent
+            syntax errors in your automation scripts, ensuring a smooth CI/CD workflow.</p>
+    </div>
+    <div class="footer-links">
+        <a href="{% url 'pages:about' %}">Terms of Service</a>
+        <a href="{% url 'pages:about' %}">Privacy Policy</a>
+        <a href="{% url 'pages:about' %}">Support</a>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+<script>
+    const inputArea = document.getElementById('mainInput');
+    const outputArea = document.getElementById('mainOutput');
+
+    function handleInput() { updateLineNumbers('mainInput', 'inLine'); }
+
+    function updateLineNumbers(taId, lnId) {
+        const ta = document.getElementById(taId);
+        const ln = document.getElementById(lnId);
+        const lines = ta.value.split('\n').length;
+        let numbers = '';
+        for (let i = 1; i <= lines; i++) { numbers += i + '<br>'; }
+        ln.innerHTML = numbers;
+    }
+
+    function syncScroll(taId, lnId) {
+        const ta = document.getElementById(taId);
+        const ln = document.getElementById(lnId);
+        ln.scrollTop = ta.scrollTop;
+    }
+
+    function runConvert(target) {
+        const val = inputArea.value.trim();
+        if (!val) return;
+        try {
+            if (target === 'yaml') {
+                const data = jsyaml.load(val);
+                outputArea.value = JSON.stringify(data, null, 2);
+            } else {
+                const data = JSON.parse(val);
+                outputArea.value = jsyaml.dump(data, { indent: 2, lineWidth: -1 });
+            }
+            updateLineNumbers('mainOutput', 'outLine');
+        } catch (e) {
+            outputArea.value = "Error: " + e.message;
+        }
+    }
+
+    function copyResult() {
+        const btn = document.getElementById('copyBtn');
+        const outputArea = document.getElementById('mainOutput');
+
+        if (!outputArea.value || outputArea.value.startsWith('Error')) return;
+
+        navigator.clipboard.writeText(outputArea.value).then(() => {
+            // UI Feedback
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            btn.style.background = "#28a745"; // Success Green
+            btn.classList.add('copied');
+
+            // 2 seconds nantar original state la parat ana
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#007acc"; // VS Code Blue
+                btn.classList.remove('copied');
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+        });
+    }
+
+    function fullReset() {
+        inputArea.value = ''; outputArea.value = '';
+        updateLineNumbers('mainInput', 'inLine');
+        updateLineNumbers('mainOutput', 'outLine');
+    }
+
+    updateLineNumbers('mainInput', 'inLine');
+    updateLineNumbers('mainOutput', 'outLine');
+</script>
+{% endblock %}
