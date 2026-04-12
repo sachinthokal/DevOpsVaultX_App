@@ -1,0 +1,183 @@
+/* DevOpsVaultX Theme Integration */
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --glass-bg: linear-gradient(135deg, #3e3c3e 0%, #2b2728 100%);
+    --border-radius: 12px;
+}
+
+.tool-section {
+    padding: 0px 15px;
+    min-height: calc(100vh - 150px);
+}
+
+.tool-header {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #2d3748;
+}
+
+.tool-header h1 {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 800;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 15px;
+    letter-spacing: 10px;
+}
+
+.tool-header p {
+    color: #718096;
+    font-size: 1.1rem;
+}
+
+.tool-card {
+    border-radius: var(--border-radius);
+    padding: 30px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.input-wrapper {
+    margin-bottom: 25px;
+}
+
+.input-wrapper label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #4a5568;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 15px;
+    background: #f7fafc;
+    border: 2px solid #edf2f7;
+    border-radius: 10px;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    resize: vertical;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.button-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.btn-dvx {
+    padding: 14px 25px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: white;
+}
+
+.btn-dvx:active {
+    transform: translateY(1px);
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: var(--secondary-gradient);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+}
+
+.btn-clear {
+    background: var(--glass-bg);
+    color: #ffffff;
+}
+
+.btn-clear:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(21, 20, 21, 0.4);
+
+}
+
+.result-section {
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 2px solid #f7fafc;
+}
+
+.result-box {
+    background: #1a202c;
+    /* Dark background for result to make it look technical */
+    color: #cbd5e0;
+    padding: 20px;
+    border-radius: 10px;
+    font-family: 'Fira Code', monospace;
+    min-height: 120px;
+    word-break: break-all;
+    white-space: pre-wrap;
+    margin-bottom: 15px;
+    border: 1px solid #2d3748;
+}
+
+.copy-button {
+    background: #48bb78;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.copy-button:hover {
+    background: #38a169;
+}
+
+.copy-button.copied {
+    background: #3182ce;
+}
+
+.error-toast {
+    color: #e53e3e;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 8px;
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .button-container {
+        grid-template-columns: 1fr;
+    }
+}
