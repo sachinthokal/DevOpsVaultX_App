@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta_tags %}
+<title>Code Polisher - All-in-One Code Beautifier | DevOpsVaultX</title>
+<meta name="description"
+    content="Professional online code beautifier for YAML, JSON, Terraform, Java, Python, and SQL. Fast and SEO-friendly formatting tool for DevOps engineers.">
+<link rel="canonical" href="https://devopsvaultx.com/tools/beautify">
+{% endblock %}
+
+{% block content %}
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify-html.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <link rel="stylesheet" href="{% static 'tools/css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'tools/css/beautify.css' %}">
+</head>
+<div class="vault-breadcrumb" style="margin-top: 10px;">
+            <a href="{% url 'tools:tool_home' %}" class="breadcrumb-link" >⬅ Tools</a> // CODE BEAUTIFIER
+</div>
+<div class="container">
+    <header>
+        <h1>CODE BEAUTIFIER</h1>
+    </header>
+
+    <div class="tool-container">
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title">Input Code</span>
+                <select id="language">
+                    <option value="yaml">YAML / Kubernetes</option>
+                    <option value="json">JSON</option>
+                    <option value="terraform">Terraform (HCL)</option>
+                    <option value="javascript">JavaScript / TS</option>
+                    <option value="html">HTML / XML</option>
+                    <option value="css">CSS</option>
+                    <option value="programming">Java / C++ / C#</option>
+                    <option value="python">Python</option>
+                    <option value="sql">SQL Query</option>
+                </select>
+            </div>
+            <textarea id="inputCode" placeholder="Paste your messy code here..."></textarea>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title">Beautified Output</span>
+                <select id="indent">
+                    <option value="2">2 Spaces</option>
+                    <option value="4">4 Spaces</option>
+                    <option value="tab">Tab</option>
+                </select>
+            </div>
+            <textarea id="outputCode" placeholder="Clean code will appear here..." readonly></textarea>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn btn-primary" onclick="beautifyCode()">✨ Beautify Code</button>
+        <button class="btn btn-success" id="copyBtn" onclick="copyResult()">📋 Copy Result</button>
+        <button class="btn btn-secondary" onclick="clearAll()">🗑️ Clear</button>
+    </div>
+</div>
+<footer class="tool-footer">
+    <div class="footer-copyright">
+        <p>Bring professional standards to your scripts with the VaultX Code Polisher. Supporting YAML, Terraform, SQL,
+            and various programming languages, this tool automatically fixes messy indentation and structural alignment.
+            Whether you are cleaning up a minified configuration or organizing complex Terraform HCL, simply paste your
+            code to get a production-ready, readable output in seconds.</p>
+    </div>
+    <div class="footer-links">
+        <a href="{% url 'pages:about' %}">Terms of Service</a>
+        <a href="{% url 'pages:about' %}">Privacy Policy</a>
+        <a href="{% url 'pages:about' %}">Support</a>
+    </div>
+</footer>
+
+<script>
+    function beautifyCode() {
+        const inputArea = document.getElementById('inputCode');
+        const outputArea = document.getElementById('outputCode');
+        const language = document.getElementById('language').value;
+        const indentSize = parseInt(document.getElementById('indent').value) || 2;
+        const indentChar = document.getElementById('indent').value === 'tab' ? '\t' : ' ';
+
+        let val = inputArea.value.trim();
+        if (!val) {
+            outputArea.value = '⚠️ Please enter some code.';
+            return;
+        }
+
+        try {
+            let result = '';
+            const options = {
+                indent_size: indentSize,
+                indent_char: indentChar,
+                brace_style: "collapse",
+                preserve_newlines: true
+            };
+
+            // 🔥 LOGIC FIX: Handle single-line YAML/Terraform properly
+            if ((language === 'yaml' || language === 'terraform') && !val.includes('\n')) {
+                val = val.replace(/([a-zA-Z0-9_-]+:)\s*/g, '\n$1 ')
+                    .replace(/-\s+/g, '\n- ')
+                    .replace(/\n+/g, '\n')
+                    .trim();
+            }
+
+            switch (language) {
+                case 'json':
+                    result = JSON.stringify(JSON.parse(val), null, indentChar === '\t' ? '\t' : indentSize);
+                    break;
+
+                case 'yaml':
+                case 'terraform':
+                    const doc = jsyaml.load(val);
+                    result = jsyaml.dump(doc, { indent: indentSize, lineWidth: -1, noRefs: true, sortKeys: false });
+                    break;
+
+                case 'javascript':
+                case 'programming': // Using JS beautifier as a base for Java/C-style
+                    result = js_beautify(val, options);
+                    break;
+
+                case 'python':
+                    // Basic Python-style indent cleanup
+                    result = val.split('\n').map(l => l.trim()).filter(l => l).join('\n');
+                    result = genericFormat(result, indentChar.repeat(indentSize));
+                    break;
+
+                case 'css':
+                    result = css_beautify(val, options);
+                    break;
+
+                case 'html':
+                    result = html_beautify(val, options);
+                    break;
+
+                case 'sql':
+                    result = val.replace(/\s+/g, ' ')
+                        .replace(/\b(SELECT|FROM|WHERE|INSERT|UPDATE|SET|JOIN|ORDER BY|GROUP BY|VALUES)\b/ig, '\n$1')
+                        .trim();
+                    break;
+
+                default:
+                    result = val;
+            }
+
+            outputArea.value = result;
+        } catch (e) {
+            outputArea.value = "❌ Syntax Error: " + e.message + "\n\nTip: Ensure your code has colons (:) or braces {} in the right places.";
+        }
+    }
+
+    // Generic Indentation Fallback for Programming Languages
+    function genericFormat(code, indentStr) {
+        let level = 0;
+        return code.split('\n').map(line => {
+            line = line.trim();
+            if (line.match(/[}\]]/)) level = Math.max(0, level - 1);
+            let res = indentStr.repeat(level) + line;
+            if (line.match(/[{[]/)) level++;
+            return res;
+        }).join('\n');
+    }
+
+    async function copyResult() {
+        const outputArea = document.getElementById('outputCode');
+        const btn = document.getElementById('copyBtn');
+        if (!outputArea.value || outputArea.value.startsWith('❌') || outputArea.value.startsWith('⚠️')) return;
+
+        try {
+            await navigator.clipboard.writeText(outputArea.value);
+            const original = btn.innerHTML;
+            btn.innerHTML = "✅ Copied!";
+            setTimeout(() => { btn.innerHTML = original; }, 2000);
+        } catch (err) {
+            outputArea.select();
+            document.execCommand('copy');
+            btn.innerHTML = "✅ Copied!";
+            setTimeout(() => { btn.innerHTML = "📋 Copy Result"; }, 2000);
+        }
+    }
+
+    function clearAll() {
+        document.getElementById('inputCode').value = '';
+        document.getElementById('outputCode').value = '';
+    }
+</script>
+{% endblock %}
