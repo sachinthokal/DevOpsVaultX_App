@@ -132,11 +132,18 @@ jobs:
             echo "Restarting containers..."
             docker compose up -d
 
+            # --- PERMISSION FIX START ---
+            echo "Fixing Permissions for Static Files..."
+            docker compose exec -T devopsvaultx_web mkdir -p /app/staticfiles
+            docker compose exec -T devopsvaultx_web chown -R root:root /app/staticfiles
+            docker compose exec -T devopsvaultx_web chmod -R 777 /app/staticfiles
+            # --- PERMISSION FIX END ---
+
             echo "Running database migrations..."
             docker compose exec -T devopsvaultx_web python manage.py migrate --noinput
 
-            echo "Collecting static files..."
-            docker compose exec -T devopsvaultx_web python manage.py collectstatic --noinput
+            echo "Collecting static files (with --clear)..."
+            docker compose exec -T devopsvaultx_web python manage.py collectstatic --noinput --clear
 
             echo "Cleaning up unused Docker images..."
             docker image prune -f
