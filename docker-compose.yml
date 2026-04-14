@@ -41,7 +41,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
       - db_logs:/var/log/postgresql
-      - ./logs/devopsvaultx_db:/var/log/postgresql
     command: ["postgres", "-c", "logging_collector=on", "-c", "log_destination=stderr", "-c", "log_directory=/var/log/postgresql", "-c", "log_filename=postgresql.log"]
     networks:
       - devopsvaultx_network
@@ -62,7 +61,6 @@ services:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
       - nginx_logs:/var/log/nginx
-      - ./logs/devopsvaultx_nginx:/var/log/nginx
     depends_on:
       - devopsvaultx_web
     networks:
@@ -76,7 +74,6 @@ volumes:
   postgres_data:
   static_volume:
   media_volume:
-  opensearch_data:
   app_logs:
   db_logs:
   nginx_logs:
