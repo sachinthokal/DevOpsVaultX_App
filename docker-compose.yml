@@ -13,6 +13,7 @@ services:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
       - app_logs:/app/logs
+      - ./logs/devopsvaultx_app:/app/logs
     depends_on:
       - devopsvaultx_db
     networks:
@@ -40,6 +41,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
       - db_logs:/var/log/postgresql
+      - ./logs/devopsvaultx_db:/var/log/postgresql
     command: ["postgres", "-c", "logging_collector=on", "-c", "log_destination=stderr", "-c", "log_directory=/var/log/postgresql", "-c", "log_filename=postgresql.log"]
     networks:
       - devopsvaultx_network
@@ -59,72 +61,13 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt
       - static_volume:/app/staticfiles
       - media_volume:/app/media
-      - ./logs/nginx:/var/log/nginx
+      - nginx_logs:/var/log/nginx
+      - ./logs/devopsvaultx_nginx:/var/log/nginx
     depends_on:
       - devopsvaultx_web
     networks:
       - devopsvaultx_network
 
-  # =========================
-  # OpenSearch (Single Node)
-  # =========================
-  opensearch:
-    image: opensearchproject/opensearch:latest
-    container_name: opensearch
-    environment:
-      - cluster.name=opensearch-cluster
-      - node.name=opensearch-node1
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - DISABLE_INSTALL_DEMO_CONFIG=true
-      - DISABLE_SECURITY_PLUGIN=true
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - opensearch_data:/usr/share/opensearch/data
-    ports:
-      - "9200:9200"
-    networks:
-      - devopsvaultx_network
-
-  # =========================
-  # OpenSearch Dashboards (GUI)
-  # =========================
-  opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:latest
-    container_name: opensearch-dashboards
-    ports:
-      - "5601:5601"
-    environment:
-      - 'OPENSEARCH_HOSTS=["http://opensearch:9200"]'
-      - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true"
-    networks:
-      - devopsvaultx_network
-    depends_on:
-      - opensearch
-
-  # =========================
-  # Fluent Bit (Log Forwarder)
-  # =========================
-  fluent-bit:
-    image: fluent/fluent-bit:latest
-    container_name: fluent-bit
-    environment:
-      - OPENSEARCH_USER=${OPENSEARCH_USER}
-      - OPENSEARCH_PASS=${OPENSEARCH_PASS}
-    volumes:
-      - ./FluentBit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
-      - ./FluentBit/parsers.conf:/fluent-bit/etc/parsers.conf
-      - app_logs:/mnt/logs/app:ro
-      - ./logs/nginx:/mnt/logs/nginx:ro
-      - db_logs:/mnt/logs/db:ro
-    depends_on:
-      - opensearch
-    networks:
-      - devopsvaultx_network
 
 # =========================
 # Volumes
@@ -136,6 +79,7 @@ volumes:
   opensearch_data:
   app_logs:
   db_logs:
+  nginx_logs:
 
 # =========================
 # Networks
